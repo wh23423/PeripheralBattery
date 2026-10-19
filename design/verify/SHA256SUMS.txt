@@ -1,0 +1,1 @@
+ba7a38253a56fc3fcfd77a9b6820bc1ced9153a2881b03cd9d22fd7f945e00fc *src-tauri/target/release/bundle/nsis/PeripheralBattery_0.1.0_x64-setup.exe
