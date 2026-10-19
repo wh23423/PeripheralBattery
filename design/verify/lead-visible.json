@@ -1,0 +1,163 @@
+{
+  "exe": "src-tauri\\target\\release\\peripheral-battery.exe",
+  "duration_s": 12.0,
+  "show": true,
+  "launch": {
+    "ready": true,
+    "spawn": "sidecar spawn path=D:\\desktop\\电量显示插件\\.venv\\Scripts\\python.exe args=[\"-m\", \"collector\", \"--stdio\", \"--fake\", \"--scenario\", \"static\", \"--speed\", \"1\"] cwd=D:\\desktop\\电量显示插件 kind=env",
+    "hello": "hello protocol=1 session=8ab685fe-522c-46c0-a342-702f5297e472 build=unknown devices=0 capabilities=[approx,left_s,via,transport]",
+    "errors": []
+  },
+  "hidden_window_probe": [],
+  "fps": {
+    "ok": false,
+    "endpoint": "http://127.0.0.1:9222",
+    "ms": 10000,
+    "error": "connectOverCDP failed: browserType.connectOverCDP: connect ECONNREFUSED 127.0.0.1:9222\nCall log:\n\u001b[2m  - <ws preparing> retrieving websocket url from http://127.0.0.1:9222\u001b[22m\n"
+  },
+  "screenshot": "design\\verify\\lead-visible.png",
+  "cpu_single_core_pct": {
+    "app": 0.0,
+    "webview2": 0.0,
+    "collector": 0.0,
+    "other": 0.0
+  },
+  "rss_mb": 423.9,
+  "peak_rss_mb": 423.9,
+  "rss_breakdown": [
+    {
+      "pid": 45336,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 114.6
+    },
+    {
+      "pid": 38664,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 91.9
+    },
+    {
+      "pid": 36276,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 76.0
+    },
+    {
+      "pid": 41604,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 36.5
+    },
+    {
+      "pid": 40120,
+      "name": "peripheral-battery.exe",
+      "kind": "app",
+      "rss_mb": 34.8
+    },
+    {
+      "pid": 30104,
+      "name": "python.exe",
+      "kind": "collector",
+      "rss_mb": 24.1
+    },
+    {
+      "pid": 29856,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 21.0
+    },
+    {
+      "pid": 36900,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 11.0
+    },
+    {
+      "pid": 32172,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 8.5
+    },
+    {
+      "pid": 36540,
+      "name": "python.exe",
+      "kind": "collector",
+      "rss_mb": 5.5
+    }
+  ],
+  "samples": [
+    {
+      "t": 0.27,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 423.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 5.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 423.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 10.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 423.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    }
+  ],
+  "app_exit_code": 0,
+  "leftovers": [
+    {
+      "pid": 27780,
+      "cmd": "C:\\Users\\28482\\.dsh\\profiles\\desktop\\node_modules\\@dsh-ops\\bash-win32-x64\\bin\\..\\usr\\bin\\bash.exe -c cd \"D:/desktop/电量显示插件\" && ./.venv/Scripts/python.exe tools/verify_runtime.py visible --duration 12 "
+    },
+    {
+      "pid": 29456,
+      "cmd": "E:\\deepseek harness offical\\DeepSeek Harness.exe E:\\deepseek harness offical\\resources\\app.asar\\dsh\\node_modules\\@deepseek-ai\\dsh-subprocess-local\\lib\\runner.js -- C:\\Users\\28482\\.dsh\\profiles\\desktop"
+    },
+    {
+      "pid": 29588,
+      "cmd": "C:\\Users\\28482\\.dsh\\profiles\\desktop\\node_modules\\@dsh-ops\\bash-win32-x64\\bin\\bash.exe -c cd \"D:/desktop/电量显示插件\" && ./.venv/Scripts/python.exe tools/verify_runtime.py visible --duration 12 --exe src-t"
+    },
+    {
+      "pid": 42456,
+      "cmd": "C:\\Users\\28482\\AppData\\Local\\Programs\\Python\\Python312\\python.exe tools/verify_runtime.py visible --duration 12 --exe src-tauri/target/release/peripheral-battery.exe --collector-args --stdio --fake --"
+    },
+    {
+      "pid": 42496,
+      "cmd": "D:\\desktop\\电量显示插件\\.venv\\Scripts\\python.exe tools/verify_runtime.py visible --duration 12 --exe src-tauri/target/release/peripheral-battery.exe --collector-args --stdio --fake --scenario static --speed"
+    },
+    {
+      "pid": 43736,
+      "cmd": "C:\\Users\\28482\\.dsh\\profiles\\desktop\\node_modules\\@dsh-ops\\bash-win32-x64\\bin\\..\\usr\\bin\\bash.exe -c cd \"D:/desktop/电量显示插件\" && ./.venv/Scripts/python.exe tools/verify_runtime.py visible --duration 12 "
+    }
+  ]
+}

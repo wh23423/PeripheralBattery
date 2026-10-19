@@ -1,0 +1,204 @@
+{
+  "exe": "src-tauri\\target\\release\\peripheral-battery.exe",
+  "duration_s": 25.1,
+  "show": true,
+  "launch": {
+    "ready": true,
+    "spawn": "sidecar spawn path=D:\\desktop\\电量显示插件\\.venv\\Scripts\\python.exe args=[\"-m\", \"collector\", \"--stdio\", \"--fake\", \"--scenario\", \"static\", \"--speed\", \"1\"] cwd=D:\\desktop\\电量显示插件 kind=env",
+    "hello": "hello protocol=1 session=55d68103-0652-4e92-b79d-4adfd43d58f1 build=unknown devices=0 capabilities=[approx,left_s,via,transport]",
+    "errors": []
+  },
+  "hidden_window_probe": [],
+  "fps": {
+    "duration_ms": 10000,
+    "frames": 2500,
+    "fps": 250,
+    "avg_ms": 4,
+    "p50_ms": 4,
+    "p95_ms": 4.100000000000364,
+    "p99_ms": 4.100000000000364,
+    "max_ms": 4.300000000000068,
+    "rows": 5,
+    "panel_rect": {
+      "x": 30,
+      "y": 30,
+      "w": 720,
+      "h": 380
+    },
+    "dpr": 1.25,
+    "inner": {
+      "w": 780,
+      "h": 440
+    },
+    "backdrop_filter": "none",
+    "hidden": false,
+    "visibility": "visible",
+    "tauri": true,
+    "ts": 1792344053069
+  },
+  "screenshot": "design\\verify\\lead-visible-final.png",
+  "cpu_single_core_pct": {
+    "app": 0.0,
+    "webview2": 0.187,
+    "collector": 0.0,
+    "other": 0.0
+  },
+  "rss_mb": 437.4,
+  "peak_rss_mb": 438.2,
+  "rss_breakdown": [
+    {
+      "pid": 37440,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 114.2
+    },
+    {
+      "pid": 45268,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 93.7
+    },
+    {
+      "pid": 36700,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 79.4
+    },
+    {
+      "pid": 43596,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 36.4
+    },
+    {
+      "pid": 25292,
+      "name": "peripheral-battery.exe",
+      "kind": "app",
+      "rss_mb": 34.5
+    },
+    {
+      "pid": 27872,
+      "name": "python.exe",
+      "kind": "collector",
+      "rss_mb": 24.0
+    },
+    {
+      "pid": 42360,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 21.1
+    },
+    {
+      "pid": 39240,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 20.0
+    },
+    {
+      "pid": 33212,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 8.5
+    },
+    {
+      "pid": 44860,
+      "name": "python.exe",
+      "kind": "collector",
+      "rss_mb": 5.5
+    }
+  ],
+  "samples": [
+    {
+      "t": 0.25,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 426.6,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 5.02,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 426.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 10.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 427.2,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 15.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 427.2,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 20.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.938,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 438.2,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 25.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 437.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    }
+  ],
+  "app_exit_code": 0,
+  "leftovers": []
+}

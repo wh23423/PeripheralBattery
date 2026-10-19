@@ -1,0 +1,460 @@
+🇨🇳 Special pricing for China - 25% off lifetime plans with 
+PDYHUZAV25
+Library
+Resources
+Agents
+Pricing
+Search...
+⌘
+K
+Sign In
+Get Lifetime Access
+Components
+230
+Get Started
+Introduction
+Installation
+MCP Server
+Saved
+Browse
+All Components
+80 New
+Text
+34
+3D Letter Swap
+3D Text Reveal
+ASCII Ripple
+Bending Marquee
+Blur Highlight
+Cipher Reveal
+New
+Domino Lettering
+New
+Elastic Lettering
+New
+Ghost Type
+New
+Glitch Text
+Glyph Lottery
+New
+Gravity Letters
+New
+Label Orbit
+New
+Luminous Type
+New
+Mesh Lettering
+New
+Orbital Type
+New
+Particle Text
+Ribbon Type
+New
+Rising Ink
+New
+Shatter Type
+New
+Signal Type
+New
+Smoke Type
+New
+Speeding Text
+Spring Lettering
+New
+Staggered Text
+Stipple Type
+New
+Tessera Trail
+New
+Text Cube
+Text Morph
+New
+Text Path
+Text Scatter
+Typographic Wall
+New
+Vapor Type
+New
+Wave Lettering
+New
+Backgrounds
+98
+ASCII Tiles
+Ascii Waves
+Astral Shell
+New
+Aura Blob
+Aurora Beam
+Aurora Blur
+Axial Beam
+New
+Binary Orbits
+New
+Black Hole
+Blinking Dots
+Blinking Squares
+Blurred Rays
+Chroma Blinds
+Chroma Current
+New
+Chroma Waves
+Cloud Atlas
+New
+Color Loops
+Concentric Tides
+New
+Contour Tide
+New
+Dappled Light
+New
+Dither Wave
+Dot Shift
+Eclipse
+Fading Stars
+New
+Falling Rays
+Flame Paths
+Fog Sphere
+Glass Flow
+Glass Tiles
+Glimmer Wrap
+New
+Glitter Warp
+Glowing Ridges
+Glowing Wave
+Glue Dots
+Glyph Ember
+New
+Glyph Orb
+New
+Glyph Sonar
+New
+Glyph Tide
+New
+Gradient Bars
+Grain Wave
+Halftone Vortex
+Halftone Wave
+Hexagonal Vault
+New
+Horizon Bloom
+New
+Interference Ribbons
+New
+Landscape
+Light Droplets
+Lightspeed
+Liquid Bars
+Liquid Lines
+Long Exposure
+Luminous Filaments
+New
+Metallic Swirl
+Minimal Ripple
+Mosaic
+Mosaic Waves
+Neon Reveal
+Neural Flash
+Neural Float
+Neural Tunnel
+Nexus Rays
+New
+Perspective Grid
+Photon Knot
+New
+Pixel Rain
+Prismatic Slats
+New
+Radial Liquid
+Ravine
+Retro Lines
+Ring Field
+New
+Rising Lines
+Rising Particles
+Rolling Blinds
+Rotating Stars
+Rubber Fluid
+Satin Ridges
+New
+Shader Waves
+Shadow Bars
+Silk Waves
+Simple Swirl
+Specter Orb
+Spectral Clouds
+Spectral Drape
+New
+Spiral Funnel
+New
+Square Matrix
+Squares Terminal
+Squircle Shift
+Star Swipe
+Swirl Blend
+Synaptic Shift
+Tech Wall
+Terminal Rain
+New
+Thinking Dots
+Twilight Lines
+Vortex
+Voxel Arc
+New
+Warp Twister
+Watercolor
+Wireframe Ball
+3D & Shaders
+49
+Agentic Ball
+AI Blob
+Album Rail
+New
+Bend Gallery
+Chrome Orbit
+New
+Circle Stack
+Concave Carousel
+New
+Constellation Gallery
+New
+Contact Sheet
+New
+Depth Card
+Depth Image
+Depth Ribbon
+New
+Device
+Dolly Gallery
+Elastic Reel
+New
+Elastic Sticker
+New
+Ember Reveal
+New
+Expanding Grid
+New
+Frame Border
+Glass Reveal
+Globe
+Gradient Blob
+Helix Gallery
+New
+Infinite Gallery
+Inverted Dome
+Iris Gallery
+New
+Lenticular Carousel
+Momentum Ring
+New
+Page Flip
+Parallax Carousel
+Particle Image
+Particle Morph
+Passage Gallery
+New
+Pixel Reveal
+Pixel Sculpt
+Pixelate Hover
+Pond Image
+New
+Portal
+Prism Carousel
+New
+Rotating Cards
+Scroll Bend
+New
+Scroll Portal
+Shader Card
+Shader Reveal
+Spin Shutter
+New
+Star Burst
+Tumble Carousel
+Twisting Gallery
+Warped Card
+Cursor Effects
+21
+Arc Cursor
+New
+Ascii Cursor
+Celebration Cursor
+New
+Chroma Halo
+New
+Cursor Wave
+Custom Cursor
+Dither Cursor
+Drafting Cursor
+New
+Glass Cursor
+Glyph Stream
+New
+Grid Rise
+Gyroscope Cursor
+New
+Liquid Ascii
+Parallax Pills
+Pigment Trail
+New
+Pixel Magnet
+Ribbon Trail
+New
+Smooth Cursor
+Snapshot Trail
+New
+Stardust Cursor
+New
+User Cursor
+UI & Cards
+28
+Animated List
+Card Spread
+Center Flow
+Chroma Card
+Circle Gallery
+Circles
+Click Stack
+Comparison Slider
+Credit Card
+Draggable Grid
+Frame Scrub
+Gradient Carousel
+Hover Preview
+Liquid Swap
+Loupe Image
+New
+Magic Transform
+Modal Cards
+Orbit Reel
+New
+Parallax Cards
+Preloader
+Reel Gallery
+Scroll Mask
+Scroll Stack
+Simple Graph
+Skewed Carousel
+Tile Reveal
+Tilted Tiles
+Tumble Wall
+New
+Docs
+Components
+Backgrounds
+Satin Ridges
+Satin Ridges
+
+Flowing satin folds catching soft highlights
+
+Preview
+Code
+satin-ridges-tw
+Copy for AI
+Customize
+Reset
+Preset
+Onyx
+Shadow
+#050505
+Body
+#2A2A30
+Sheen
+#A1A1B5
+Angle
+-20°
+Scale
+1.00
+Depth
+1.00
+Warp
+1.00
+Detail
+1.00
+Gloss
+0.40
+Highlight
+1.00
+Sheen
+0.50
+Light Angle
+10°
+Flow
+1.00
+Speed
+1.00
+Swell
+1.00
+Swell Radius
+0.22
+Seed
+0
+Interactive
+Click Ripples
+Paused
+Props
+23
+NAME	TYPE	DEFAULT	DESCRIPTION
+colors	[string, string]	["#2A2A30", "#A1A1B5"]	Two fabric colours: the body of the satin, then the sheen that tints its lit edges and highlights.
+backgroundColor	string	"#050505"	Colour of the deepest folds, where the fabric falls into shadow.
+angle	number	-20	Direction the folds run, in degrees. 0 gives vertical folds.
+scale	number	1	Number of folds across the frame. Larger values give finer fabric.
+depth	number	1	How deep the folds are. Deeper folds catch more highlights.
+warp	number	1	How much the folds bend and meander.
+detail	number	1	Small ripples layered over the main folds.
+gloss	number	0.4	Sharpness of the highlights, 0 to 1. Higher values give crisper, thinner glints.
+highlight	number	1	Brightness of the highlights.
+sheen	number	0.5	Strength of the tinted sheen along the steep sides of the folds.
+lightAngle	number	10	Direction the light comes from, in degrees. 0 lights the fabric from the top.
+flow	number	1	How fast the folds roll and shift.
+speed	number	1	Overall animation speed. 0 holds the current frame.
+interactive	boolean	true	A soft swell follows the pointer beneath the fabric, and the highlights sweep around it.
+swell	number	1	Height of the swell under the pointer. 0 disables it.
+swellRadius	number	0.22	Width of the swell, relative to the height.
+clickRipples	boolean	true	Each click sends a ripple rolling through the fabric. Rapid clicks stack.
+seed	number	0	Changes the arrangement of the folds.
+paused	boolean	false	Freezes the animation.
+dpr	number	1.5	Upper bound for the device pixel ratio.
+className	string	—	Classes for the root element. Give it a height.
+style	CSSProperties	—	Inline styles for the root element.
+children	ReactNode	—	Content layered above the fabric.
+Previous
+Rubber Fluid
+Backgrounds
+Next
+Shader Waves
+Backgrounds
+
+Animated components, blocks, and templates for React. Pay once, ship stunning pages forever.
+
+pro@reactbits.dev
+Site
+Home
+Builder (Beta)
+Pricing
+Testimonials
+FAQs
+Roadmap
+Changelog
+Free Components
+Docs
+Introduction
+Installation
+MCP Server
+Components
+Blocks
+Templates
+Resources
+About
+Use cases
+Comparisons
+Alternatives
+For AI agents
+Legal & Account
+Login
+Affiliate
+License
+Privacy
+Contact
+
+© 2026 pro.reactbits.dev. All rights reserved.

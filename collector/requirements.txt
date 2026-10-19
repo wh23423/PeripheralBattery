@@ -1,0 +1,2 @@
+# collector（Python）运行时依赖
+hidapi>=0.14

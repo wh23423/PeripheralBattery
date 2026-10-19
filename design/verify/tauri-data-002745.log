@@ -1,0 +1,157 @@
+2026-10-19 00:23:32.153 [INFO] app start version=0.1.0 build=unknown pid=38988 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:23:32.153 [INFO] platform windows_build=0 windows11=false data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:23:32.153 [INFO] config loaded pinned=false
+2026-10-19 00:23:32.407 [INFO] win10 fallback build=0: acrylic disabled, frontend uses opaque background
+2026-10-19 00:23:32.407 [INFO] window created origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:23:32.415 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:23:32.415 [INFO] sidecar start requested
+2026-10-19 00:23:32.424 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:23:32.427 [INFO] sidecar job assigned=true
+2026-10-19 00:23:32.428 [INFO] collector-state state=starting pid=Some(44280) code=None protocol=None session=None message=None
+2026-10-19 00:23:32.428 [INFO] sidecar spawned pid=44280
+2026-10-19 00:23:32.428 [INFO] PB_QUIT_AFTER_MS=60000 armed
+2026-10-19 00:23:32.428 [INFO] setup complete
+2026-10-19 00:23:32.500 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:23:32.502 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:23:32.511 [INFO] command ui_ready
+2026-10-19 00:23:32.511 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":0,"windows11":false},"version":"0.1.0"}
+2026-10-19 00:23:32.511 [INFO] panel position origin=(644,140) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor=(1131,708,0x0)
+2026-10-19 00:23:32.526 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:23:32.528 [INFO] window shown reason=ui-ready
+2026-10-19 00:23:32.528 [INFO] window shown origin=(644,140) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:23:32.565 [INFO] hello protocol=1 session=5de918d8-ae19-4354-8c96-e5a14aa2d281 build=unknown devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 00:23:32.565 [INFO] collector-state state=ready pid=Some(44280) code=None protocol=Some(1) session=Some("5de918d8-ae19-4354-8c96-e5a14aa2d281") message=None
+2026-10-19 00:23:32.566 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:23:32.567 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:23:39.667 [INFO] auto-hide triggered foreground=Some(16582886) ours=Some(16517170)
+2026-10-19 00:23:39.667 [INFO] window hide reason=focus-lost webview IsVisible(false) -> S_OK
+2026-10-19 00:23:39.670 [INFO] window hidden reason=focus-lost
+2026-10-19 00:24:32.429 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:24:32.429 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 00:24:32.429 [INFO] shutdown handshake sent=true pid=44280
+2026-10-19 00:24:32.447 [INFO] collector stdout EOF
+2026-10-19 00:24:32.447 [INFO] collector stderr EOF
+2026-10-19 00:24:32.447 [INFO] job object released active_processes=Some(1)
+2026-10-19 00:24:32.447 [INFO] sidecar exit(code=Some(0)) pid=44280 source=wait
+2026-10-19 00:24:32.449 [INFO] collector-state state=exited pid=Some(44280) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:24:32.449 [INFO] quit collector stopped, exiting
+2026-10-19 00:24:32.449 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:24:32.449 [INFO] run event: Exit
+2026-10-19 00:24:32.449 [INFO] app exit
+2026-10-19 00:24:58.315 [INFO] app start version=0.1.0 build=unknown pid=44328 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:24:58.315 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:24:58.315 [INFO] config loaded pinned=true
+2026-10-19 00:24:58.524 [INFO] DWM round corner build=26300 hwnd=0x1270a14 hresult=0x00000000
+2026-10-19 00:24:58.524 [INFO] window created origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:24:58.531 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:24:58.531 [INFO] sidecar start requested
+2026-10-19 00:24:58.540 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:24:58.543 [INFO] sidecar job assigned=true
+2026-10-19 00:24:58.543 [INFO] collector-state state=starting pid=Some(45684) code=None protocol=None session=None message=None
+2026-10-19 00:24:58.543 [INFO] sidecar spawned pid=45684
+2026-10-19 00:24:58.544 [INFO] PB_QUIT_AFTER_MS=40000 armed
+2026-10-19 00:24:58.544 [INFO] setup complete
+2026-10-19 00:24:58.611 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:24:58.613 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:24:58.617 [INFO] command ui_ready
+2026-10-19 00:24:58.617 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:24:58.619 [INFO] panel position origin=(894,259) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor=(1381,827,0x0)
+2026-10-19 00:24:58.636 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:24:58.639 [INFO] window shown reason=ui-ready
+2026-10-19 00:24:58.639 [INFO] window shown origin=(894,259) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:24:58.665 [INFO] hello protocol=1 session=e16a5ace-2fd6-4a02-b7f3-931fc9ae10d5 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:24:58.666 [INFO] collector-state state=ready pid=Some(45684) code=None protocol=Some(1) session=Some("e16a5ace-2fd6-4a02-b7f3-931fc9ae10d5") message=None
+2026-10-19 00:24:58.666 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:24:58.668 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:25:16.755 [INFO] app start version=0.1.0 build=unknown pid=41064 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:25:16.755 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:25:16.755 [INFO] config loaded pinned=true
+2026-10-19 00:25:16.982 [INFO] DWM round corner build=26300 hwnd=0xd7063e hresult=0x00000000
+2026-10-19 00:25:16.982 [INFO] window created origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:25:16.987 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:25:16.987 [INFO] sidecar start requested
+2026-10-19 00:25:16.998 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:25:17.001 [INFO] sidecar job assigned=true
+2026-10-19 00:25:17.001 [INFO] collector-state state=starting pid=Some(29520) code=None protocol=None session=None message=None
+2026-10-19 00:25:17.001 [INFO] sidecar spawned pid=29520
+2026-10-19 00:25:17.001 [INFO] PB_QUIT_AFTER_MS=30000 armed
+2026-10-19 00:25:17.001 [INFO] setup complete
+2026-10-19 00:25:17.073 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:25:17.075 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:25:17.080 [INFO] command ui_ready
+2026-10-19 00:25:17.080 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:25:17.082 [INFO] panel position origin=(477,292) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor=(964,274,0x0)
+2026-10-19 00:25:17.100 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:25:17.102 [INFO] window shown reason=ui-ready
+2026-10-19 00:25:17.102 [INFO] window shown origin=(477,292) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:25:17.102 [INFO] PB_HIDE_AFTER_MS=3000 armed (one-shot after first show)
+2026-10-19 00:25:17.136 [INFO] hello protocol=1 session=dd9b7d31-c4a7-40a9-bd42-1409db406275 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:25:17.137 [INFO] collector-state state=ready pid=Some(29520) code=None protocol=Some(1) session=Some("dd9b7d31-c4a7-40a9-bd42-1409db406275") message=None
+2026-10-19 00:25:17.138 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:25:17.140 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:25:20.104 [INFO] window hide reason=PB_HIDE_AFTER_MS webview IsVisible(false) -> S_OK
+2026-10-19 00:25:20.107 [INFO] window hidden reason=PB_HIDE_AFTER_MS
+2026-10-19 00:25:40.639 [INFO] app start version=0.1.0 build=unknown pid=39876 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:25:40.639 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:25:40.639 [INFO] config loaded pinned=true
+2026-10-19 00:25:40.862 [INFO] DWM round corner build=26300 hwnd=0xcf05e0 hresult=0x00000000
+2026-10-19 00:25:40.862 [INFO] window created origin=(192,192) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:25:40.867 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:25:40.867 [INFO] sidecar start requested
+2026-10-19 00:25:40.877 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:25:40.881 [INFO] sidecar job assigned=true
+2026-10-19 00:25:40.881 [INFO] collector-state state=starting pid=Some(37320) code=None protocol=None session=None message=None
+2026-10-19 00:25:40.881 [INFO] sidecar spawned pid=37320
+2026-10-19 00:25:40.881 [INFO] PB_QUIT_AFTER_MS=45000 armed
+2026-10-19 00:25:40.881 [INFO] setup complete
+2026-10-19 00:25:40.949 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:25:40.951 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:25:40.956 [INFO] command ui_ready
+2026-10-19 00:25:40.956 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:25:40.957 [INFO] panel position origin=(1386,395) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor=(1873,963,0x0)
+2026-10-19 00:25:40.973 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:25:40.975 [INFO] window shown reason=ui-ready
+2026-10-19 00:25:40.975 [INFO] window shown origin=(1386,395) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:25:40.975 [INFO] PB_HIDE_AFTER_MS=3000 armed (one-shot after first show)
+2026-10-19 00:25:41.017 [INFO] hello protocol=1 session=74877dfa-adf0-4d4e-8051-a226ac0390c4 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:25:41.017 [INFO] collector-state state=ready pid=Some(37320) code=None protocol=Some(1) session=Some("74877dfa-adf0-4d4e-8051-a226ac0390c4") message=None
+2026-10-19 00:25:41.018 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:25:41.020 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:25:43.980 [INFO] window hide reason=PB_HIDE_AFTER_MS webview IsVisible(false) -> S_OK
+2026-10-19 00:25:43.984 [INFO] window hidden reason=PB_HIDE_AFTER_MS
+2026-10-19 00:27:41.346 [INFO] app start version=0.1.0 build=unknown pid=31432 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:27:41.346 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:27:41.346 [INFO] config loaded pinned=true
+2026-10-19 00:27:41.558 [INFO] DWM round corner build=26300 hwnd=0x13f0982 hresult=0x00000000
+2026-10-19 00:27:41.558 [INFO] window created origin=(128,128) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:27:41.565 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:27:41.565 [INFO] sidecar start requested
+2026-10-19 00:27:41.573 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 00:27:41.577 [INFO] sidecar job assigned=true
+2026-10-19 00:27:41.577 [INFO] collector-state state=starting pid=Some(44284) code=None protocol=None session=None message=None
+2026-10-19 00:27:41.577 [INFO] sidecar spawned pid=44284
+2026-10-19 00:27:41.578 [INFO] PB_QUIT_AFTER_MS=35000 armed
+2026-10-19 00:27:41.578 [INFO] setup complete
+2026-10-19 00:27:41.622 [INFO] hello protocol=1 session=602b6ba1-c25e-450c-ae50-6e30473bcc48 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 00:27:41.622 [INFO] collector-state state=ready pid=Some(44284) code=None protocol=Some(1) session=Some("602b6ba1-c25e-450c-ae50-6e30473bcc48") message=None
+2026-10-19 00:27:41.650 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:27:41.651 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:27:41.660 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 00:27:41.661 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 00:27:41.661 [INFO] command ui_ready
+2026-10-19 00:27:41.661 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:27:41.661 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 00:27:41.661 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 00:27:41.679 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:27:41.681 [INFO] window shown reason=ui-ready
+2026-10-19 00:27:41.681 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:27:41.804 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 00:27:41.805 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 00:27:41.806 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 00:27:41.984 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 00:27:41.985 [DEBUG] command set_tray_state level=Some(12) charging=false online=true kind=headset
+2026-10-19 00:27:41.987 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 00:27:42.164 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 00:27:42.345 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 00:27:42.526 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 00:27:42.626 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))

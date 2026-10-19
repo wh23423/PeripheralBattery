@@ -1,0 +1,224 @@
+{
+  "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\debug\\peripheral-battery.exe",
+  "duration_s": 60.1,
+  "show": false,
+  "launch": {
+    "ready": true,
+    "spawn": "sidecar spawn path=\\\\?\\D:\\desktop\\电量显示插件\\src-tauri\\target\\debug\\collector\\collector.exe args=[\"--stdio\"] cwd=\\\\?\\D:\\desktop\\电量显示插件\\src-tauri\\target\\debug\\collector kind=packaged",
+    "hello": "hello protocol=1 session=25a68470-737a-4440-b490-efb38c2c1761 build=unknown devices=0 capabilities=[approx,left_s,via,transport]",
+    "errors": []
+  },
+  "hidden_window_probe": [
+    [],
+    [],
+    []
+  ],
+  "fps": null,
+  "cpu_single_core_pct": {
+    "app": 0.0,
+    "webview2": 0.572,
+    "collector": 0.156,
+    "other": 0.494
+  },
+  "rss_mb": 515.3,
+  "peak_rss_mb": 515.3,
+  "samples": [
+    {
+      "t": 0.25,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 487.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 5.01,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.312
+      },
+      "rss_mb": 487.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 10.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.312
+      },
+      "rss_mb": 487.6,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 15.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.312
+      },
+      "rss_mb": 487.6,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 20.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 1.875,
+        "collector": 0.625,
+        "other": 0.312
+      },
+      "rss_mb": 498.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 25.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.625
+      },
+      "rss_mb": 498.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 30.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 498.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 35.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.312
+      },
+      "rss_mb": 498.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 40.09,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 1.25
+      },
+      "rss_mb": 498.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 45.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 498.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 50.12,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 5.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 512.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 55.12,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 2.5
+      },
+      "rss_mb": 515.2,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    },
+    {
+      "t": 60.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 515.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 1
+      }
+    }
+  ],
+  "app_exit_code": 0,
+  "leftovers": []
+}

@@ -1,0 +1,4 @@
+# 开发 / 构建 / 测试依赖（不含 collector 运行时依赖，见 collector/requirements.txt）
+pytest>=8
+pyinstaller>=6.10
+pillow>=10

@@ -1,0 +1,48 @@
+2026-10-19 01:43:00.471 [INFO] app start version=0.1.0 build=unknown pid=38624 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 01:43:00.471 [INFO] single-instance: mutex acquired name=Global\PBReleaseF4F7 pid=38624
+2026-10-19 01:43:00.471 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:43:00.471 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:43:00.737 [INFO] DWM round corner build=26300 hwnd=0x10a0c1e hresult=0x00000000
+2026-10-19 01:43:00.737 [INFO] window created origin=(224,224) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:43:00.743 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:43:00.743 [INFO] sidecar start requested
+2026-10-19 01:43:00.748 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:43:00.753 [INFO] sidecar job assigned=true
+2026-10-19 01:43:00.753 [INFO] collector-state state=starting pid=Some(41100) code=None protocol=None session=None message=None
+2026-10-19 01:43:00.753 [INFO] sidecar spawned pid=41100
+2026-10-19 01:43:00.753 [INFO] PB_QUIT_AFTER_MS=12000 armed
+2026-10-19 01:43:00.753 [INFO] setup complete
+2026-10-19 01:43:00.815 [INFO] hello protocol=1 session=90f137cb-cbde-4cac-8b15-938d2071f458 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:43:00.815 [INFO] collector-state state=ready pid=Some(41100) code=None protocol=Some(1) session=Some("90f137cb-cbde-4cac-8b15-938d2071f458") message=None
+2026-10-19 01:43:00.830 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:43:00.830 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:43:00.830 [INFO] command ui_ready
+2026-10-19 01:43:00.830 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:43:00.830 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:43:00.830 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:43:00.831 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:43:00.852 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:43:00.852 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:43:00.852 [INFO] window show reason=ui-ready requested collector snapshot=true
+2026-10-19 01:43:00.852 [INFO] window shown reason=ui-ready
+2026-10-19 01:43:00.852 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:43:00.995 [INFO] tray-state source=rust level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:43:00.995 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:43:00.995 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:43:00.997 [DEBUG] tray-state source=frontend unchanged level=Some(68) online=true
+2026-10-19 01:43:01.176 [INFO] tray-state source=rust level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:43:01.176 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:43:01.176 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:43:01.177 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:43:01.356 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:43:01.536 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:43:01.660 [INFO] tray left click rect=(2164,1380 40x60) scale=1.25
+2026-10-19 01:43:01.664 [INFO] window hide reason=tray-click webview IsVisible(false) -> S_OK
+2026-10-19 01:43:01.671 [INFO] window hidden reason=tray-click
+2026-10-19 01:43:01.717 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:43:01.817 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:43:01.817 [INFO] collector stat: timers_per_s=0.99 key_migrations=0 providers=2 slowest=xinput:31.0ms
+2026-10-19 01:43:01.817 [DEBUG] collector stat raw: {"t":"stat","session":"90f137cb-cbde-4cac-8b15-938d2071f458","providers":{"mock":{"polls":1,"avg_ms":12.3,"last_ms":10.0},"xinput":{"polls":2,"avg_ms":31.0,"last_ms":28.0}},"timers_per_s":0.99,"key_migrations":0,"seq":7}
+2026-10-19 01:43:01.971 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:43:01.971 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:43:02.754 [DEBUG] ui_ready received; fallback thread exits (window_visible=false)

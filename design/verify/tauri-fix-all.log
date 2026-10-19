@@ -1,0 +1,1085 @@
+2026-10-19 00:33:59.533 [INFO] app start version=0.1.0 build=unknown pid=40872 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:33:59.534 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:33:59.534 [INFO] config loaded pinned=false
+2026-10-19 00:33:59.747 [INFO] DWM round corner build=26300 hwnd=0x1170a70 hresult=0x00000000
+2026-10-19 00:33:59.747 [INFO] window created origin=(192,192) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:33:59.753 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:33:59.753 [INFO] sidecar start requested
+2026-10-19 00:33:59.762 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:33:59.768 [INFO] sidecar job assigned=true
+2026-10-19 00:33:59.769 [INFO] collector-state state=starting pid=Some(31264) code=None protocol=None session=None message=None
+2026-10-19 00:33:59.769 [INFO] sidecar spawned pid=31264
+2026-10-19 00:33:59.769 [INFO] PB_QUIT_AFTER_MS=3000 armed
+2026-10-19 00:33:59.769 [INFO] setup complete
+2026-10-19 00:33:59.845 [INFO] command ui_ready
+2026-10-19 00:33:59.845 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:33:59.845 [INFO] window startup-hidden origin=(192,192) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:33:59.845 [INFO] window hidden reason=startup-default
+2026-10-19 00:33:59.897 [INFO] hello protocol=1 session=1fdf42c9-4818-4cfc-ab3a-ba49838eeb9f build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:33:59.897 [INFO] collector-state state=ready pid=Some(31264) code=None protocol=Some(1) session=Some("1fdf42c9-4818-4cfc-ab3a-ba49838eeb9f") message=None
+2026-10-19 00:34:02.769 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:34:02.769 [INFO] shutdown handshake sent=true pid=31264
+2026-10-19 00:34:02.782 [INFO] collector stdout EOF
+2026-10-19 00:34:02.782 [INFO] collector stderr EOF
+2026-10-19 00:34:02.782 [INFO] sidecar exit(code=Some(0)) pid=31264 source=wait
+2026-10-19 00:34:02.782 [INFO] collector-state state=exited pid=Some(31264) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:34:02.814 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:34:02.910 [INFO] quit collector stopped, exiting
+2026-10-19 00:34:02.911 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:34:02.911 [INFO] run event: Exit
+2026-10-19 00:34:02.911 [INFO] app exit
+2026-10-19 00:34:43.073 [INFO] app start version=0.1.0 build=unknown pid=6040 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:34:43.073 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:34:43.073 [INFO] config loaded pinned=false
+2026-10-19 00:34:43.285 [INFO] DWM round corner build=26300 hwnd=0x9207ce hresult=0x00000000
+2026-10-19 00:34:43.285 [INFO] window created origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:34:43.292 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:34:43.292 [INFO] sidecar start requested
+2026-10-19 00:34:43.301 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio"] cwd=D:\desktop\电量显示插件 kind=dev
+2026-10-19 00:34:43.305 [INFO] sidecar job assigned=true
+2026-10-19 00:34:43.305 [INFO] collector-state state=starting pid=Some(41952) code=None protocol=None session=None message=None
+2026-10-19 00:34:43.305 [INFO] sidecar spawned pid=41952
+2026-10-19 00:34:43.305 [INFO] PB_QUIT_AFTER_MS=26000 armed
+2026-10-19 00:34:43.305 [INFO] setup complete
+2026-10-19 00:34:43.383 [INFO] command ui_ready
+2026-10-19 00:34:43.384 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:34:43.384 [INFO] window startup-hidden origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:34:43.384 [INFO] window hidden reason=startup-default
+2026-10-19 00:34:43.442 [INFO] hello protocol=1 session=6e626b5f-c528-42d9-a8ce-0b180183d16e build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:34:43.442 [INFO] collector-state state=ready pid=Some(41952) code=None protocol=Some(1) session=Some("6e626b5f-c528-42d9-a8ce-0b180183d16e") message=None
+2026-10-19 00:35:09.306 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:35:09.306 [INFO] shutdown handshake sent=true pid=41952
+2026-10-19 00:35:09.329 [INFO] collector stderr EOF
+2026-10-19 00:35:09.329 [INFO] collector stdout EOF
+2026-10-19 00:35:09.329 [INFO] sidecar exit(code=Some(0)) pid=41952 source=wait
+2026-10-19 00:35:09.329 [INFO] collector-state state=exited pid=Some(41952) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:35:09.360 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:35:09.467 [INFO] quit collector stopped, exiting
+2026-10-19 00:35:09.467 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:35:09.467 [INFO] run event: Exit
+2026-10-19 00:35:09.467 [INFO] app exit
+2026-10-19 00:35:34.526 [INFO] app start version=0.1.0 build=unknown pid=37016 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:35:34.526 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:35:34.526 [INFO] config loaded pinned=false
+2026-10-19 00:35:34.736 [INFO] DWM round corner build=26300 hwnd=0x111085a hresult=0x00000000
+2026-10-19 00:35:34.736 [INFO] window created origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:35:34.742 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:35:34.742 [INFO] sidecar start requested
+2026-10-19 00:35:34.750 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 00:35:34.754 [INFO] sidecar job assigned=true
+2026-10-19 00:35:34.754 [INFO] collector-state state=starting pid=Some(37336) code=None protocol=None session=None message=None
+2026-10-19 00:35:34.754 [INFO] sidecar spawned pid=37336
+2026-10-19 00:35:34.754 [INFO] PB_QUIT_AFTER_MS=25000 armed
+2026-10-19 00:35:34.754 [INFO] setup complete
+2026-10-19 00:35:34.810 [INFO] hello protocol=1 session=5072e395-a2fa-41fc-a3c4-e19b5e2c6d3e build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 00:35:34.810 [INFO] collector-state state=ready pid=Some(37336) code=None protocol=Some(1) session=Some("5072e395-a2fa-41fc-a3c4-e19b5e2c6d3e") message=None
+2026-10-19 00:35:34.826 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:35:34.828 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:35:34.834 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 00:35:34.834 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 00:35:34.834 [INFO] command ui_ready
+2026-10-19 00:35:34.834 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:35:34.835 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:35:34.835 [INFO] window startup-hidden origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:35:34.835 [INFO] window hidden reason=startup-default
+2026-10-19 00:35:34.992 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 00:35:35.172 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 00:35:35.352 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 00:35:35.533 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 00:35:35.713 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 00:35:35.813 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 00:35:40.648 [INFO] tray left click rect=(2058,1107 50x50) scale=1.25
+2026-10-19 00:35:40.648 [INFO] panel position origin=(1567,539) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-event anchor=(2058,1107,50x50)
+2026-10-19 00:35:40.662 [INFO] window show reason=tray-click webview IsVisible(true) -> S_OK
+2026-10-19 00:35:40.665 [INFO] window shown reason=tray-click
+2026-10-19 00:35:40.665 [INFO] window shown origin=(1567,539) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:35:40.670 [DEBUG] command set_tray_state level=Some(12) charging=false online=true kind=headset
+2026-10-19 00:35:40.671 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 00:36:03.733 [INFO] app start version=0.1.0 build=unknown pid=45880 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:36:03.733 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:36:03.733 [INFO] config loaded pinned=false
+2026-10-19 00:36:03.993 [INFO] DWM round corner build=26300 hwnd=0xfd065e hresult=0x00000000
+2026-10-19 00:36:03.993 [INFO] window created origin=(224,224) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:36:04.002 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:36:04.002 [INFO] sidecar start requested
+2026-10-19 00:36:04.013 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 00:36:04.016 [INFO] sidecar job assigned=true
+2026-10-19 00:36:04.017 [INFO] collector-state state=starting pid=Some(44124) code=None protocol=None session=None message=None
+2026-10-19 00:36:04.017 [INFO] sidecar spawned pid=44124
+2026-10-19 00:36:04.017 [INFO] PB_QUIT_AFTER_MS=5000 armed
+2026-10-19 00:36:04.017 [INFO] setup complete
+2026-10-19 00:36:04.090 [INFO] hello protocol=1 session=27f8e750-f020-470e-bcac-bb141d6ee630 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 00:36:04.090 [INFO] collector-state state=ready pid=Some(44124) code=None protocol=Some(1) session=Some("27f8e750-f020-470e-bcac-bb141d6ee630") message=None
+2026-10-19 00:36:04.108 [INFO] command ui_ready
+2026-10-19 00:36:04.108 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:36:04.108 [INFO] window startup-hidden origin=(224,224) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:36:04.108 [INFO] window hidden reason=startup-default
+2026-10-19 00:36:05.092 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 00:36:09.018 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:36:09.018 [INFO] shutdown handshake sent=true pid=44124
+2026-10-19 00:36:09.023 [INFO] collector stdout EOF
+2026-10-19 00:36:09.023 [INFO] collector stderr EOF
+2026-10-19 00:36:09.023 [INFO] sidecar exit(code=Some(0)) pid=44124 source=wait
+2026-10-19 00:36:09.023 [INFO] collector-state state=exited pid=Some(44124) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:36:09.054 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:36:09.159 [INFO] quit collector stopped, exiting
+2026-10-19 00:36:09.159 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:36:09.159 [INFO] run event: Exit
+2026-10-19 00:36:09.159 [INFO] app exit
+2026-10-19 00:38:08.843 [INFO] app start version=0.1.0 build=unknown pid=43648 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:38:08.843 [INFO] single-instance: mutex acquired name=Global\PeripheralBattery.single pid=43648
+2026-10-19 00:38:08.843 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:38:08.843 [INFO] config loaded pinned=false
+2026-10-19 00:38:09.060 [INFO] DWM round corner build=26300 hwnd=0xb00c66 hresult=0x00000000
+2026-10-19 00:38:09.060 [INFO] window created origin=(128,128) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:09.067 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:38:09.067 [INFO] sidecar start requested
+2026-10-19 00:38:09.076 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 00:38:09.083 [INFO] sidecar job assigned=true
+2026-10-19 00:38:09.083 [INFO] collector-state state=starting pid=Some(42444) code=None protocol=None session=None message=None
+2026-10-19 00:38:09.083 [INFO] sidecar spawned pid=42444
+2026-10-19 00:38:09.083 [INFO] PB_QUIT_AFTER_MS=40000 armed
+2026-10-19 00:38:09.083 [INFO] setup complete
+2026-10-19 00:38:09.151 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:38:09.152 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:38:09.157 [INFO] command ui_ready
+2026-10-19 00:38:09.157 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:38:09.157 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:38:09.157 [INFO] window startup-hidden origin=(128,128) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:09.159 [INFO] window hidden reason=startup-default
+2026-10-19 00:38:09.263 [INFO] hello protocol=1 session=5b76758a-f0ce-40b9-989b-c46d1b27d508 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:38:09.263 [INFO] collector-state state=ready pid=Some(42444) code=None protocol=Some(1) session=Some("5b76758a-f0ce-40b9-989b-c46d1b27d508") message=None
+2026-10-19 00:38:12.838 [INFO] app start version=0.1.0 build=unknown pid=40648 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:38:12.838 [INFO] single-instance: existing pid=Some(43648) name=Global\PeripheralBattery.single signaled=true window_activated=false exit
+2026-10-19 00:38:12.839 [INFO] single-instance: activation event received, showing panel
+2026-10-19 00:38:12.839 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 00:38:12.840 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 00:38:12.852 [INFO] window show reason=single-instance webview IsVisible(true) -> S_OK
+2026-10-19 00:38:12.856 [INFO] window shown reason=single-instance
+2026-10-19 00:38:12.856 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:12.861 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:38:12.863 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:38:27.126 [INFO] app start version=0.1.0 build=unknown pid=44644 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:38:27.126 [INFO] single-instance: mutex acquired name=Global\PBTestA pid=44644
+2026-10-19 00:38:27.126 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:38:27.126 [INFO] config loaded pinned=false
+2026-10-19 00:38:27.333 [INFO] DWM round corner build=26300 hwnd=0x11402c0 hresult=0x00000000
+2026-10-19 00:38:27.333 [INFO] window created origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:27.338 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:38:27.338 [INFO] sidecar start requested
+2026-10-19 00:38:27.348 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 00:38:27.352 [INFO] sidecar job assigned=true
+2026-10-19 00:38:27.352 [INFO] collector-state state=starting pid=Some(36344) code=None protocol=None session=None message=None
+2026-10-19 00:38:27.352 [INFO] sidecar spawned pid=36344
+2026-10-19 00:38:27.352 [INFO] PB_QUIT_AFTER_MS=30000 armed
+2026-10-19 00:38:27.352 [INFO] setup complete
+2026-10-19 00:38:27.418 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:38:27.420 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:38:27.423 [INFO] command ui_ready
+2026-10-19 00:38:27.423 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:38:27.423 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:38:27.423 [INFO] window startup-hidden origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:27.423 [INFO] window hidden reason=startup-default
+2026-10-19 00:38:27.467 [INFO] hello protocol=1 session=4084e65e-835e-445e-8ab8-409cbeccbb34 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:38:27.467 [INFO] collector-state state=ready pid=Some(36344) code=None protocol=Some(1) session=Some("4084e65e-835e-445e-8ab8-409cbeccbb34") message=None
+2026-10-19 00:38:28.827 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 00:38:30.142 [INFO] app start version=0.1.0 build=unknown pid=33212 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:38:30.143 [INFO] single-instance: existing pid=Some(44644) name=Global\PBTestA signaled=true window_activated=false exit
+2026-10-19 00:38:30.143 [INFO] single-instance: activation event received, showing panel
+2026-10-19 00:38:30.143 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 00:38:30.143 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 00:38:30.157 [INFO] window show reason=single-instance webview IsVisible(true) -> S_OK
+2026-10-19 00:38:30.161 [INFO] window shown reason=single-instance
+2026-10-19 00:38:30.161 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:30.165 [DEBUG] command set_tray_state level=Some(94) charging=false online=true kind=bluetooth
+2026-10-19 00:38:30.166 [DEBUG] 托盘图标更新 tooltip=外设电量 · 94%
+2026-10-19 00:38:30.172 [INFO] app start version=0.1.0 build=unknown pid=27460 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:38:30.172 [INFO] single-instance: mutex acquired name=Global\PBTestB pid=27460
+2026-10-19 00:38:30.172 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:38:30.172 [INFO] config loaded pinned=false
+2026-10-19 00:38:30.256 [INFO] DWM round corner build=26300 hwnd=0x1250a68 hresult=0x00000000
+2026-10-19 00:38:30.256 [INFO] window created origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:30.260 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:38:30.260 [INFO] sidecar start requested
+2026-10-19 00:38:30.260 [WARN] cleanup residual collector pid=36344 exe=D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe
+2026-10-19 00:38:30.270 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 00:38:30.274 [INFO] sidecar job assigned=true
+2026-10-19 00:38:30.274 [INFO] collector-state state=starting pid=Some(38940) code=None protocol=None session=None message=None
+2026-10-19 00:38:30.274 [INFO] sidecar spawned pid=38940
+2026-10-19 00:38:30.274 [INFO] PB_QUIT_AFTER_MS=30000 armed
+2026-10-19 00:38:30.274 [INFO] setup complete
+2026-10-19 00:38:30.282 [INFO] collector stdout EOF
+2026-10-19 00:38:30.282 [INFO] collector stderr EOF
+2026-10-19 00:38:30.285 [INFO] sidecar exit(code=Some(1)) pid=36344 source=wait
+2026-10-19 00:38:30.285 [INFO] collector-state state=exited pid=Some(36344) code=Some(1) protocol=None session=None message=None
+2026-10-19 00:38:30.343 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:38:30.345 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:38:30.349 [INFO] command ui_ready
+2026-10-19 00:38:30.349 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:38:30.350 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:38:30.350 [INFO] window startup-hidden origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:38:30.350 [INFO] window hidden reason=startup-default
+2026-10-19 00:38:30.400 [INFO] hello protocol=1 session=b4c37019-89ea-4687-9d4e-b68373de2aec build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:38:30.400 [INFO] collector-state state=ready pid=Some(38940) code=None protocol=Some(1) session=Some("b4c37019-89ea-4687-9d4e-b68373de2aec") message=None
+2026-10-19 00:38:30.468 [INFO] job object released active_processes=Some(2)（应为 0）
+2026-10-19 00:38:31.726 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 00:40:32.423 [INFO] app start version=0.1.0 build=unknown pid=43296 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 00:40:32.423 [INFO] single-instance: mutex acquired name=Global\PeripheralBattery.single pid=43296
+2026-10-19 00:40:32.423 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:40:32.423 [INFO] config loaded pinned=false
+2026-10-19 00:40:32.633 [INFO] DWM round corner build=26300 hwnd=0xcc0c36 hresult=0x00000000
+2026-10-19 00:40:32.633 [INFO] window created origin=(64,64) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:40:32.638 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:40:32.638 [INFO] sidecar start requested
+2026-10-19 00:40:32.647 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 00:40:32.651 [INFO] sidecar job assigned=true
+2026-10-19 00:40:32.651 [INFO] collector-state state=starting pid=Some(41372) code=None protocol=None session=None message=None
+2026-10-19 00:40:32.651 [INFO] sidecar spawned pid=41372
+2026-10-19 00:40:32.651 [INFO] PB_QUIT_AFTER_MS=84000 armed
+2026-10-19 00:40:32.652 [INFO] setup complete
+2026-10-19 00:40:32.719 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:40:32.721 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:40:32.726 [INFO] command ui_ready
+2026-10-19 00:40:32.726 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:40:32.726 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:40:32.726 [INFO] window startup-hidden origin=(64,64) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:40:32.726 [INFO] window hidden reason=startup-default
+2026-10-19 00:40:32.771 [INFO] hello protocol=1 session=25a68470-737a-4440-b490-efb38c2c1761 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:40:32.771 [INFO] collector-state state=ready pid=Some(41372) code=None protocol=Some(1) session=Some("25a68470-737a-4440-b490-efb38c2c1761") message=None
+2026-10-19 00:40:34.770 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 00:41:33.212 [DEBUG] collector stat: {"t":"stat","session":"25a68470-737a-4440-b490-efb38c2c1761","providers":{"razer":{"polls":12,"avg_ms":1,"last_ms":1},"audeze":{"polls":4,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":12,"avg_ms":1,"last_ms":1},"mchose":{"polls":12,"avg_ms":4,"last_ms":3},"hyperx_alpha2":{"polls":4,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":4,"avg_ms":1,"last_ms":1},"hyperx":{"polls":4,"avg_ms":1,"last_ms":1},"
+2026-10-19 00:41:56.652 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:41:56.652 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 00:41:56.652 [INFO] shutdown handshake sent=true pid=41372
+2026-10-19 00:41:56.666 [INFO] collector stdout EOF
+2026-10-19 00:41:56.666 [INFO] collector stderr EOF
+2026-10-19 00:41:56.669 [INFO] sidecar exit(code=Some(0)) pid=41372 source=wait
+2026-10-19 00:41:56.669 [INFO] collector-state state=exited pid=Some(41372) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:41:56.669 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:41:56.793 [INFO] quit collector stopped, exiting
+2026-10-19 00:41:56.793 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:41:56.793 [INFO] run event: Exit
+2026-10-19 00:41:56.793 [INFO] app exit
+2026-10-19 00:49:33.191 [INFO] app start version=0.1.0 build=unknown pid=28356 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 00:49:33.191 [INFO] single-instance: mutex acquired name=Global\PeripheralBattery.single pid=28356
+2026-10-19 00:49:33.191 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:49:33.191 [INFO] config loaded pinned=true
+2026-10-19 00:49:33.410 [INFO] DWM round corner build=26300 hwnd=0x120086c hresult=0x00000000
+2026-10-19 00:49:33.410 [INFO] window created origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:49:33.419 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:49:33.419 [INFO] sidecar start requested
+2026-10-19 00:49:33.423 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector kind=packaged
+2026-10-19 00:49:33.428 [INFO] sidecar job assigned=true
+2026-10-19 00:49:33.430 [INFO] collector-state state=starting pid=Some(37532) code=None protocol=None session=None message=None
+2026-10-19 00:49:33.430 [INFO] sidecar spawned pid=37532
+2026-10-19 00:49:33.430 [INFO] PB_QUIT_AFTER_MS=324000 armed
+2026-10-19 00:49:33.430 [INFO] setup complete
+2026-10-19 00:49:33.496 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:49:33.496 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:49:33.501 [INFO] command ui_ready
+2026-10-19 00:49:33.501 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:49:33.504 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 00:49:33.504 [INFO] window startup-hidden origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:49:33.504 [INFO] window hidden reason=startup-default
+2026-10-19 00:49:33.583 [INFO] hello protocol=1 session=1cc8502e-c115-4032-adf9-e07595d4a972 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:49:33.583 [INFO] collector-state state=ready pid=Some(37532) code=None protocol=Some(1) session=Some("1cc8502e-c115-4032-adf9-e07595d4a972") message=None
+2026-10-19 00:49:35.065 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 00:50:34.020 [DEBUG] collector stat: {"t":"stat","session":"1cc8502e-c115-4032-adf9-e07595d4a972","providers":{"razer":{"polls":12,"avg_ms":1,"last_ms":1},"audeze":{"polls":4,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":12,"avg_ms":1,"last_ms":1},"mchose":{"polls":12,"avg_ms":3,"last_ms":4},"hyperx_alpha2":{"polls":4,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":4,"avg_ms":1,"last_ms":1},"hyperx":{"polls":4,"avg_ms":1,"last_ms":1},"
+2026-10-19 00:51:34.420 [DEBUG] collector stat: {"t":"stat","session":"1cc8502e-c115-4032-adf9-e07595d4a972","providers":{"razer":{"polls":24,"avg_ms":1,"last_ms":1},"audeze":{"polls":8,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":24,"avg_ms":1,"last_ms":1},"mchose":{"polls":24,"avg_ms":3,"last_ms":3},"hyperx_alpha2":{"polls":8,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":8,"avg_ms":1,"last_ms":1},"hyperx":{"polls":8,"avg_ms":1,"last_ms":1},"
+2026-10-19 00:52:34.843 [DEBUG] collector stat: {"t":"stat","session":"1cc8502e-c115-4032-adf9-e07595d4a972","providers":{"razer":{"polls":36,"avg_ms":1,"last_ms":1},"audeze":{"polls":12,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":36,"avg_ms":1,"last_ms":1},"mchose":{"polls":36,"avg_ms":3,"last_ms":4},"hyperx_alpha2":{"polls":12,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":12,"avg_ms":1,"last_ms":1},"hyperx":{"polls":12,"avg_ms":1,"last_ms":
+2026-10-19 00:53:35.256 [DEBUG] collector stat: {"t":"stat","session":"1cc8502e-c115-4032-adf9-e07595d4a972","providers":{"razer":{"polls":48,"avg_ms":1,"last_ms":1},"audeze":{"polls":16,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":48,"avg_ms":1,"last_ms":1},"mchose":{"polls":48,"avg_ms":3,"last_ms":4},"hyperx_alpha2":{"polls":16,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":16,"avg_ms":1,"last_ms":1},"hyperx":{"polls":16,"avg_ms":1,"last_ms":
+2026-10-19 00:54:35.695 [DEBUG] collector stat: {"t":"stat","session":"1cc8502e-c115-4032-adf9-e07595d4a972","providers":{"razer":{"polls":60,"avg_ms":1,"last_ms":1},"audeze":{"polls":20,"avg_ms":1,"last_ms":1},"wlmouse":{"polls":60,"avg_ms":1,"last_ms":1},"mchose":{"polls":60,"avg_ms":3,"last_ms":3},"hyperx_alpha2":{"polls":20,"avg_ms":1,"last_ms":1},"hyperx_cloud3":{"polls":20,"avg_ms":1,"last_ms":1},"hyperx":{"polls":20,"avg_ms":1,"last_ms":
+2026-10-19 00:54:57.430 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:54:57.430 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 00:54:57.430 [INFO] shutdown handshake sent=true pid=37532
+2026-10-19 00:54:57.445 [INFO] collector stdout EOF
+2026-10-19 00:54:57.445 [INFO] collector stderr EOF
+2026-10-19 00:54:57.447 [INFO] sidecar exit(code=Some(0)) pid=37532 source=wait
+2026-10-19 00:54:57.447 [INFO] collector-state state=exited pid=Some(37532) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:54:57.478 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:54:57.571 [INFO] quit collector stopped, exiting
+2026-10-19 00:54:57.571 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:54:57.571 [INFO] run event: Exit
+2026-10-19 00:54:57.571 [INFO] app exit
+2026-10-19 00:55:06.996 [INFO] app start version=0.1.0 build=unknown pid=40120 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 00:55:06.996 [INFO] single-instance: mutex acquired name=Global\PeripheralBattery.single pid=40120
+2026-10-19 00:55:06.996 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:55:06.996 [INFO] config loaded pinned=true
+2026-10-19 00:55:07.200 [INFO] DWM round corner build=26300 hwnd=0x9d07ce hresult=0x00000000
+2026-10-19 00:55:07.200 [INFO] window created origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:55:07.205 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:55:07.205 [INFO] sidecar start requested
+2026-10-19 00:55:07.210 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["-m", "collector", "--stdio", "--fake", "--scenario", "static", "--speed", "1"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 00:55:07.213 [INFO] sidecar job assigned=true
+2026-10-19 00:55:07.213 [INFO] collector-state state=starting pid=Some(36540) code=None protocol=None session=None message=None
+2026-10-19 00:55:07.213 [INFO] sidecar spawned pid=36540
+2026-10-19 00:55:07.213 [INFO] PB_QUIT_AFTER_MS=36000 armed
+2026-10-19 00:55:07.213 [INFO] setup complete
+2026-10-19 00:55:07.278 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:55:07.279 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:55:07.282 [INFO] command ui_ready
+2026-10-19 00:55:07.282 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 00:55:07.282 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 00:55:07.283 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 00:55:07.297 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:55:07.299 [INFO] window shown reason=ui-ready
+2026-10-19 00:55:07.299 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:55:07.326 [INFO] hello protocol=1 session=8ab685fe-522c-46c0-a342-702f5297e472 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:55:07.326 [INFO] collector-state state=ready pid=Some(36540) code=None protocol=Some(1) session=Some("8ab685fe-522c-46c0-a342-702f5297e472") message=None
+2026-10-19 00:55:07.326 [DEBUG] command set_tray_state level=None charging=false online=false kind=
+2026-10-19 00:55:07.328 [DEBUG] collector device key=Some("logitech:046d:c547:u1")
+2026-10-19 00:55:07.328 [DEBUG] collector device key=Some("razer:1532:0554:1a2b3c4d")
+2026-10-19 00:55:07.328 [DEBUG] collector device key=Some("keychron:3434:0121:u1")
+2026-10-19 00:55:07.328 [DEBUG] collector device key=Some("xinput:045e:0b13:u1")
+2026-10-19 00:55:07.328 [DEBUG] 托盘图标更新 tooltip=外设电量 · 离线
+2026-10-19 00:55:07.328 [DEBUG] collector device key=Some("bluetooth:0000:0000:001122334455")
+2026-10-19 00:55:07.330 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 00:55:07.330 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 00:55:07.331 [DEBUG] command set_tray_state level=Some(55) charging=true online=true kind=headset
+2026-10-19 00:55:07.332 [DEBUG] 托盘图标更新 tooltip=外设电量 · 55% 充电中
+2026-10-19 00:55:07.332 [DEBUG] command set_tray_state level=Some(52) charging=false online=true kind=keyboard
+2026-10-19 00:55:07.333 [DEBUG] 托盘图标更新 tooltip=外设电量 · 52%
+2026-10-19 00:55:07.333 [DEBUG] command set_tray_state level=Some(41) charging=false online=true kind=bluetooth
+2026-10-19 00:55:07.333 [DEBUG] 托盘图标更新 tooltip=外设电量 · 41%
+2026-10-19 00:55:43.214 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:55:43.214 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 00:55:43.214 [INFO] shutdown handshake sent=true pid=36540
+2026-10-19 00:55:43.227 [INFO] collector stdout EOF
+2026-10-19 00:55:43.227 [INFO] collector stderr EOF
+2026-10-19 00:55:43.227 [INFO] sidecar exit(code=Some(0)) pid=36540 source=wait
+2026-10-19 00:55:43.227 [INFO] collector-state state=exited pid=Some(36540) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:55:43.258 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:55:43.354 [INFO] quit collector stopped, exiting
+2026-10-19 00:55:43.354 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:55:43.354 [INFO] run event: Exit
+2026-10-19 00:55:43.354 [INFO] app exit
+2026-10-19 00:55:52.872 [INFO] app start version=0.1.0 build=unknown pid=33480 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 00:55:52.872 [INFO] single-instance: mutex acquired name=Global\PeripheralBattery.single pid=33480
+2026-10-19 00:55:52.872 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 00:55:52.872 [INFO] config loaded pinned=true
+2026-10-19 00:55:53.079 [INFO] DWM round corner build=26300 hwnd=0x42084e hresult=0x00000000
+2026-10-19 00:55:53.079 [INFO] window created origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:55:53.083 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 00:55:53.083 [INFO] sidecar start requested
+2026-10-19 00:55:53.089 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector kind=packaged
+2026-10-19 00:55:53.092 [INFO] sidecar job assigned=true
+2026-10-19 00:55:53.092 [INFO] collector-state state=starting pid=Some(37552) code=None protocol=None session=None message=None
+2026-10-19 00:55:53.092 [INFO] sidecar spawned pid=37552
+2026-10-19 00:55:53.092 [INFO] PB_QUIT_AFTER_MS=25000 armed
+2026-10-19 00:55:53.092 [INFO] setup complete
+2026-10-19 00:55:53.159 [INFO] command ui_ready
+2026-10-19 00:55:53.160 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 00:55:53.171 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 00:55:53.173 [INFO] window shown reason=ui-ready
+2026-10-19 00:55:53.173 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 00:55:53.205 [INFO] hello protocol=1 session=8584f7a5-9702-41fb-bd11-6db457f3101d build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 00:55:53.205 [INFO] collector-state state=ready pid=Some(37552) code=None protocol=Some(1) session=Some("8584f7a5-9702-41fb-bd11-6db457f3101d") message=None
+2026-10-19 00:56:18.093 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 00:56:18.093 [INFO] shutdown handshake sent=true pid=37552
+2026-10-19 00:56:18.111 [INFO] collector stdout EOF
+2026-10-19 00:56:18.111 [INFO] collector stderr EOF
+2026-10-19 00:56:18.113 [INFO] sidecar exit(code=Some(0)) pid=37552 source=wait
+2026-10-19 00:56:18.113 [INFO] collector-state state=exited pid=Some(37552) code=Some(0) protocol=None session=None message=None
+2026-10-19 00:56:18.113 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 00:56:18.234 [INFO] quit collector stopped, exiting
+2026-10-19 00:56:18.234 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 00:56:18.234 [INFO] run event: Exit
+2026-10-19 00:56:18.234 [INFO] app exit
+2026-10-19 01:00:41.161 [INFO] app start version=0.1.0 build=unknown pid=42808 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:00:41.161 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=42808
+2026-10-19 01:00:41.161 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:00:41.162 [INFO] app config: migrated pinned=true from config.json; created C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:00:41.162 [INFO] app.json loaded pinned=true path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:00:41.391 [INFO] DWM round corner build=26300 hwnd=0x1250920 hresult=0x00000000
+2026-10-19 01:00:41.391 [INFO] window created origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:00:41.397 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:00:41.397 [INFO] sidecar start requested
+2026-10-19 01:00:41.407 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:00:41.411 [INFO] sidecar job assigned=true
+2026-10-19 01:00:41.411 [INFO] collector-state state=starting pid=Some(31276) code=None protocol=None session=None message=None
+2026-10-19 01:00:41.411 [INFO] sidecar spawned pid=31276
+2026-10-19 01:00:41.411 [INFO] PB_QUIT_AFTER_MS=30000 armed
+2026-10-19 01:00:41.411 [INFO] setup complete
+2026-10-19 01:00:41.467 [INFO] hello protocol=1 session=22961d09-059e-470d-aa34-00ad3792415d build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:00:41.467 [INFO] collector-state state=ready pid=Some(31276) code=None protocol=Some(1) session=Some("22961d09-059e-470d-aa34-00ad3792415d") message=None
+2026-10-19 01:00:41.490 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:00:41.490 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:00:41.490 [INFO] command ui_ready
+2026-10-19 01:00:41.490 [DEBUG] app-state emitted {"build":"unknown","pinned":true,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:00:41.490 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:00:41.491 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:00:41.492 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:00:41.511 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:00:41.515 [INFO] window shown reason=ui-ready
+2026-10-19 01:00:41.515 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:00:41.515 [INFO] PB_FPS_PROBE=2500ms armed (inject 500ms after first show)
+2026-10-19 01:00:41.648 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:00:41.650 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:00:41.651 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:00:41.828 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:00:41.829 [DEBUG] command set_tray_state level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:00:41.830 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:00:42.008 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:00:42.016 [INFO] FPS_PROBE injected duration=2500ms (结果将以 FPS_PROBE {json} 写入本日志)
+2026-10-19 01:00:42.188 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:00:42.368 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:00:42.470 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:00:44.518 [INFO] FPS_PROBE {"duration_ms":2500,"frames":625,"fps":249.99,"avg_ms":4,"p50_ms":4,"p95_ms":4.100000000000023,"p99_ms":4.100000000000136,"max_ms":4.2000000000000455,"rows":5,"panel_rect":{"x":30,"y":30,"w":720,"h":380},"dpr":1.25,"inner":{"w":780,"h":440},"backdrop_filter":"none","hidden":false,"visibility":"visible","tauri":true,"ts":1792342844517}
+2026-10-19 01:01:11.412 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:01:11.412 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 01:01:11.412 [INFO] shutdown handshake sent=true pid=31276
+2026-10-19 01:01:11.417 [INFO] collector stdout EOF
+2026-10-19 01:01:11.417 [INFO] collector stderr EOF
+2026-10-19 01:01:11.418 [INFO] sidecar exit(code=Some(0)) pid=31276 source=wait
+2026-10-19 01:01:11.418 [INFO] collector-state state=exited pid=Some(31276) code=Some(0) protocol=None session=None message=None
+2026-10-19 01:01:11.449 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 01:01:11.553 [INFO] quit collector stopped, exiting
+2026-10-19 01:01:11.553 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:01:11.553 [INFO] run event: Exit
+2026-10-19 01:01:11.553 [INFO] app exit
+2026-10-19 01:01:33.609 [INFO] app start version=0.1.0 build=unknown pid=41724 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:01:33.609 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=41724
+2026-10-19 01:01:33.609 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:01:33.609 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:01:33.812 [INFO] DWM round corner build=26300 hwnd=0x11d02c0 hresult=0x00000000
+2026-10-19 01:01:33.812 [INFO] window created origin=(128,128) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:01:33.818 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:01:33.818 [INFO] sidecar start requested
+2026-10-19 01:01:33.826 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:01:33.830 [INFO] sidecar job assigned=true
+2026-10-19 01:01:33.830 [INFO] collector-state state=starting pid=Some(42664) code=None protocol=None session=None message=None
+2026-10-19 01:01:33.830 [INFO] sidecar spawned pid=42664
+2026-10-19 01:01:33.831 [INFO] PB_QUIT_AFTER_MS=20000 armed
+2026-10-19 01:01:33.831 [INFO] setup complete
+2026-10-19 01:01:33.872 [INFO] hello protocol=1 session=fff7392b-05f9-473b-8e10-dcd27478ef92 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:01:33.872 [INFO] collector-state state=ready pid=Some(42664) code=None protocol=Some(1) session=Some("fff7392b-05f9-473b-8e10-dcd27478ef92") message=None
+2026-10-19 01:01:33.898 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:01:33.898 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:01:33.898 [INFO] command ui_ready
+2026-10-19 01:01:33.898 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:01:33.899 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:01:33.899 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:01:33.899 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:01:33.920 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:01:33.922 [INFO] window shown reason=ui-ready
+2026-10-19 01:01:33.922 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:01:34.053 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:01:34.055 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:01:34.057 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:01:34.234 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:01:34.235 [DEBUG] command set_tray_state level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:01:34.236 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:01:34.414 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:01:34.594 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:01:34.775 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:01:34.875 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:01:36.797 [INFO] command window_action action=minimize
+2026-10-19 01:01:36.797 [INFO] window_action minimize -> 走隐藏四步（等价 hide）
+2026-10-19 01:01:36.801 [INFO] window hide reason=minimize webview IsVisible(false) -> S_OK
+2026-10-19 01:01:36.806 [INFO] window hidden reason=minimize
+2026-10-19 01:01:37.107 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:01:37.107 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:01:37.741 [INFO] app start version=0.1.0 build=unknown pid=38432 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:01:37.742 [INFO] single-instance: existing pid=Some(41724) name=Global\PBAuditFix signaled=true window_activated=false exit
+2026-10-19 01:01:37.742 [INFO] single-instance: activation event received, showing panel
+2026-10-19 01:01:37.742 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:01:37.742 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:01:37.742 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:01:37.751 [INFO] window show reason=single-instance webview IsVisible(true) -> S_OK
+2026-10-19 01:01:37.751 [INFO] window shown reason=single-instance
+2026-10-19 01:01:37.751 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:01:46.546 [INFO] app start version=0.1.0 build=unknown pid=38564 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:01:46.546 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=38564
+2026-10-19 01:01:46.546 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:01:46.546 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:01:46.749 [INFO] DWM round corner build=26300 hwnd=0xc70622 hresult=0x00000000
+2026-10-19 01:01:46.749 [INFO] window created origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:01:46.754 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:01:46.754 [INFO] sidecar start requested
+2026-10-19 01:01:46.763 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:01:46.766 [INFO] sidecar job assigned=true
+2026-10-19 01:01:46.766 [INFO] collector-state state=starting pid=Some(30212) code=None protocol=None session=None message=None
+2026-10-19 01:01:46.766 [INFO] sidecar spawned pid=30212
+2026-10-19 01:01:46.766 [INFO] PB_QUIT_AFTER_MS=45000 armed
+2026-10-19 01:01:46.766 [INFO] setup complete
+2026-10-19 01:01:46.811 [INFO] hello protocol=1 session=9fc554c6-15a9-4716-a110-37734c172ef7 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:01:46.811 [INFO] collector-state state=ready pid=Some(30212) code=None protocol=Some(1) session=Some("9fc554c6-15a9-4716-a110-37734c172ef7") message=None
+2026-10-19 01:01:46.833 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:01:46.835 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:01:46.835 [INFO] command ui_ready
+2026-10-19 01:01:46.835 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:01:46.835 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:01:46.835 [INFO] window startup-hidden origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:01:46.835 [INFO] window hidden reason=startup-default
+2026-10-19 01:01:46.991 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:01:46.992 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:01:46.994 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:01:47.136 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:01:47.136 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:01:47.171 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:01:47.351 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:01:47.531 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:01:47.712 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:01:47.812 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:02:16.519 [INFO] app start version=0.1.0 build=unknown pid=45316 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:02:16.519 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=45316
+2026-10-19 01:02:16.519 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:02:16.519 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:02:16.733 [INFO] DWM round corner build=26300 hwnd=0xaf0626 hresult=0x00000000
+2026-10-19 01:02:16.733 [INFO] window created origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:02:16.740 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:02:16.740 [INFO] sidecar start requested
+2026-10-19 01:02:16.749 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:02:16.752 [INFO] sidecar job assigned=true
+2026-10-19 01:02:16.752 [INFO] collector-state state=starting pid=Some(44976) code=None protocol=None session=None message=None
+2026-10-19 01:02:16.752 [INFO] sidecar spawned pid=44976
+2026-10-19 01:02:16.752 [INFO] PB_QUIT_AFTER_MS=40000 armed
+2026-10-19 01:02:16.752 [INFO] setup complete
+2026-10-19 01:02:16.800 [INFO] hello protocol=1 session=3a6af7c7-74f3-4aad-b64d-0a52d54bd620 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:02:16.800 [INFO] collector-state state=ready pid=Some(44976) code=None protocol=Some(1) session=Some("3a6af7c7-74f3-4aad-b64d-0a52d54bd620") message=None
+2026-10-19 01:02:16.825 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:02:16.825 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:02:16.825 [INFO] command ui_ready
+2026-10-19 01:02:16.825 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:02:16.826 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:02:16.826 [INFO] window startup-hidden origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:02:16.826 [INFO] window hidden reason=startup-default
+2026-10-19 01:02:16.980 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:02:16.982 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:02:16.983 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:02:17.127 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:02:17.127 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:02:17.160 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:02:17.341 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:02:17.521 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:02:17.701 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:02:17.801 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:02:45.026 [INFO] app start version=0.1.0 build=unknown pid=44124 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:02:45.026 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=44124
+2026-10-19 01:02:45.026 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:02:45.026 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:02:45.238 [INFO] DWM round corner build=26300 hwnd=0x8007d6 hresult=0x00000000
+2026-10-19 01:02:45.238 [INFO] window created origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:02:45.243 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:02:45.243 [INFO] sidecar start requested
+2026-10-19 01:02:45.252 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:02:45.256 [INFO] sidecar job assigned=true
+2026-10-19 01:02:45.256 [INFO] collector-state state=starting pid=Some(38672) code=None protocol=None session=None message=None
+2026-10-19 01:02:45.256 [INFO] sidecar spawned pid=38672
+2026-10-19 01:02:45.256 [INFO] PB_QUIT_AFTER_MS=120000 armed
+2026-10-19 01:02:45.256 [INFO] setup complete
+2026-10-19 01:02:45.300 [INFO] hello protocol=1 session=fb86cd83-5021-4157-96ca-b7e7e86a2440 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:02:45.300 [INFO] collector-state state=ready pid=Some(38672) code=None protocol=Some(1) session=Some("fb86cd83-5021-4157-96ca-b7e7e86a2440") message=None
+2026-10-19 01:02:45.323 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:02:45.323 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:02:45.324 [INFO] command ui_ready
+2026-10-19 01:02:45.324 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:02:45.324 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:02:45.324 [INFO] window startup-hidden origin=(32,32) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:02:45.324 [INFO] window hidden reason=startup-default
+2026-10-19 01:02:45.480 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:02:45.481 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:02:45.483 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:02:45.625 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:02:45.625 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:02:45.661 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:02:45.841 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:02:46.022 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:02:46.202 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:02:46.302 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:03:10.975 [INFO] app start version=0.1.0 build=unknown pid=43484 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:03:10.975 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=43484
+2026-10-19 01:03:10.975 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:03:10.975 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:03:11.201 [INFO] DWM round corner build=26300 hwnd=0xb10626 hresult=0x00000000
+2026-10-19 01:03:11.201 [INFO] window created origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:03:11.207 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:03:11.207 [INFO] sidecar start requested
+2026-10-19 01:03:11.216 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:03:11.220 [INFO] sidecar job assigned=true
+2026-10-19 01:03:11.220 [INFO] collector-state state=starting pid=Some(42448) code=None protocol=None session=None message=None
+2026-10-19 01:03:11.220 [INFO] sidecar spawned pid=42448
+2026-10-19 01:03:11.220 [INFO] PB_QUIT_AFTER_MS=90000 armed
+2026-10-19 01:03:11.220 [INFO] setup complete
+2026-10-19 01:03:11.280 [INFO] hello protocol=1 session=6cb4db6e-398d-4b90-a463-4b3d871dae14 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:03:11.280 [INFO] collector-state state=ready pid=Some(42448) code=None protocol=Some(1) session=Some("6cb4db6e-398d-4b90-a463-4b3d871dae14") message=None
+2026-10-19 01:03:11.293 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:03:11.293 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:03:11.293 [INFO] command ui_ready
+2026-10-19 01:03:11.293 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:03:11.293 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:03:11.294 [INFO] window startup-hidden origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:03:11.294 [INFO] window hidden reason=startup-default
+2026-10-19 01:03:11.460 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:03:11.462 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:03:11.463 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:03:11.595 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:03:11.595 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:03:11.640 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:03:11.821 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:03:12.001 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:03:12.181 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:03:12.281 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:03:38.392 [INFO] app start version=0.1.0 build=unknown pid=35428 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:03:38.392 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=35428
+2026-10-19 01:03:38.392 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:03:38.392 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:03:38.618 [INFO] DWM round corner build=26300 hwnd=0x49084e hresult=0x00000000
+2026-10-19 01:03:38.618 [INFO] window created origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:03:38.625 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:03:38.625 [INFO] sidecar start requested
+2026-10-19 01:03:38.635 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:03:38.637 [INFO] sidecar job assigned=true
+2026-10-19 01:03:38.639 [INFO] collector-state state=starting pid=Some(37384) code=None protocol=None session=None message=None
+2026-10-19 01:03:38.639 [INFO] sidecar spawned pid=37384
+2026-10-19 01:03:38.639 [INFO] PB_QUIT_AFTER_MS=90000 armed
+2026-10-19 01:03:38.639 [INFO] setup complete
+2026-10-19 01:03:38.700 [INFO] hello protocol=1 session=e5a0f75f-5f0b-4cc4-83fd-a245014cb810 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:03:38.700 [INFO] collector-state state=ready pid=Some(37384) code=None protocol=Some(1) session=Some("e5a0f75f-5f0b-4cc4-83fd-a245014cb810") message=None
+2026-10-19 01:03:38.715 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:03:38.715 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:03:38.715 [INFO] command ui_ready
+2026-10-19 01:03:38.715 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:03:38.715 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:03:38.715 [INFO] window startup-hidden origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:03:38.715 [INFO] window hidden reason=startup-default
+2026-10-19 01:03:38.880 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:03:38.882 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:03:38.883 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:03:39.017 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:03:39.017 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:03:39.061 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:03:39.241 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:03:39.421 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:03:39.601 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:03:39.702 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:04:17.868 [INFO] app start version=0.1.0 build=unknown pid=35948 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:04:17.870 [INFO] single-instance: mutex acquired name=Global\PBAuditFix pid=35948
+2026-10-19 01:04:17.870 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:04:17.870 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:04:18.092 [INFO] DWM round corner build=26300 hwnd=0x12c0920 hresult=0x00000000
+2026-10-19 01:04:18.092 [INFO] window created origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:04:18.098 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:04:18.098 [INFO] sidecar start requested
+2026-10-19 01:04:18.107 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:04:18.111 [INFO] sidecar job assigned=true
+2026-10-19 01:04:18.112 [INFO] collector-state state=starting pid=Some(38968) code=None protocol=None session=None message=None
+2026-10-19 01:04:18.112 [INFO] sidecar spawned pid=38968
+2026-10-19 01:04:18.112 [INFO] PB_QUIT_AFTER_MS=15000 armed
+2026-10-19 01:04:18.112 [INFO] setup complete
+2026-10-19 01:04:18.171 [INFO] hello protocol=1 session=9f004d4e-6590-492f-ad6a-544359dd674c build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:04:18.171 [INFO] collector-state state=ready pid=Some(38968) code=None protocol=Some(1) session=Some("9f004d4e-6590-492f-ad6a-544359dd674c") message=None
+2026-10-19 01:04:18.191 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:04:18.191 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:04:18.191 [INFO] command ui_ready
+2026-10-19 01:04:18.191 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:04:18.191 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:04:18.191 [INFO] window startup-hidden origin=(256,256) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:04:18.191 [INFO] window hidden reason=startup-default
+2026-10-19 01:04:18.351 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:04:18.354 [DEBUG] command set_tray_state level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:04:18.355 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:04:18.493 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:04:18.493 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:04:18.531 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:04:18.712 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:04:18.892 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:04:19.073 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:04:19.173 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:04:20.613 [INFO] [debug-only] PB_TEST_TRAY_ACTION=settings
+2026-10-19 01:04:20.613 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:04:20.613 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:04:20.613 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:04:20.627 [INFO] window show reason=tray-settings webview IsVisible(true) -> S_OK
+2026-10-19 01:04:20.631 [INFO] window shown reason=tray-settings
+2026-10-19 01:04:20.631 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:04:20.631 [INFO] tray action=settings (panel shown before emit)
+2026-10-19 01:04:20.631 [DEBUG] command set_tray_state level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:04:20.633 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:04:33.113 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:04:33.113 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 01:04:33.113 [INFO] shutdown handshake sent=true pid=38968
+2026-10-19 01:04:33.117 [INFO] collector stdout EOF
+2026-10-19 01:04:33.117 [INFO] collector stderr EOF
+2026-10-19 01:04:33.118 [INFO] sidecar exit(code=Some(0)) pid=38968 source=wait
+2026-10-19 01:04:33.118 [INFO] collector-state state=exited pid=Some(38968) code=Some(0) protocol=None session=None message=None
+2026-10-19 01:04:33.149 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 01:04:33.254 [INFO] quit collector stopped, exiting
+2026-10-19 01:04:33.254 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:04:33.254 [INFO] run event: Exit
+2026-10-19 01:04:33.254 [INFO] app exit
+2026-10-19 01:04:43.421 [INFO] app start version=0.1.0 build=unknown pid=28572 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:04:43.421 [INFO] single-instance: mutex acquired name=Global\PBTimeoutKillTest pid=28572
+2026-10-19 01:04:43.421 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:04:43.421 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:04:43.640 [INFO] DWM round corner build=26300 hwnd=0xfc0c0c hresult=0x00000000
+2026-10-19 01:04:43.640 [INFO] window created origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:04:43.646 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:04:43.646 [INFO] sidecar start requested
+2026-10-19 01:04:43.655 [INFO] sidecar spawn path=C:\Windows\System32\cmd.exe args=["/c", "ping", "-n", "60", "127.0.0.1"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:04:43.699 [INFO] sidecar job assigned=true
+2026-10-19 01:04:44.149 [INFO] collector-state state=starting pid=Some(41316) code=None protocol=None session=None message=None
+2026-10-19 01:04:44.149 [INFO] sidecar spawned pid=41316
+2026-10-19 01:04:44.149 [INFO] PB_QUIT_AFTER_MS=7000 armed
+2026-10-19 01:04:44.149 [INFO] setup complete
+2026-10-19 01:04:44.149 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� Ping 127.0.0.1 ���� 32 �ֽڵ�����:
+2026-10-19 01:04:44.149 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:44.243 [INFO] command ui_ready
+2026-10-19 01:04:44.243 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:04:44.243 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:04:44.244 [INFO] window startup-hidden origin=(288,288) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:04:44.244 [INFO] window hidden reason=startup-default
+2026-10-19 01:04:44.546 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:04:44.546 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:04:44.910 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:45.918 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:46.926 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:47.934 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:48.941 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:49.149 [WARN] hello timeout 5s pid=41316
+2026-10-19 01:04:49.149 [INFO] collector-state state=error pid=Some(41316) code=None protocol=None session=None message=Some("采集器 5 秒内未完成握手")
+2026-10-19 01:04:49.949 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:50.955 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:51.150 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:04:51.150 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 01:04:51.150 [INFO] shutdown handshake sent=true pid=41316
+2026-10-19 01:04:51.962 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:52.965 [WARN] collector 输出非 JSON: expected value at line 1 column 1: ���� 127.0.0.1 �Ļظ�: �ֽ�=32 ʱ��<1ms TTL=128
+2026-10-19 01:04:53.164 [WARN] shutdown handshake timeout pid=41316 (2s), terminate
+2026-10-19 01:04:53.164 [WARN] shutdown timeout: TerminateJobObject 终止 3 个进程（before=Some(3) remaining=Some(0)）
+2026-10-19 01:04:53.164 [WARN] shutdown timeout: TerminateProcess pid=41316 ok=false
+2026-10-19 01:04:53.172 [INFO] collector stdout EOF
+2026-10-19 01:04:53.172 [INFO] collector stderr EOF
+2026-10-19 01:04:53.173 [INFO] terminate pid=41316 exited=true
+2026-10-19 01:04:53.173 [INFO] sidecar exit(code=Some(1)) pid=41316 source=wait
+2026-10-19 01:04:53.173 [INFO] collector-state state=exited pid=Some(41316) code=Some(1) protocol=None session=None message=None
+2026-10-19 01:04:53.293 [INFO] quit collector stopped, exiting
+2026-10-19 01:04:53.293 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:04:53.293 [INFO] run event: Exit
+2026-10-19 01:04:53.293 [INFO] app exit
+2026-10-19 01:05:05.827 [INFO] app start version=0.1.0 build=unknown pid=44852 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:05:05.827 [INFO] single-instance: mutex acquired name=Global\PBResidualTest pid=44852
+2026-10-19 01:05:05.827 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:05:05.827 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:05:06.064 [INFO] DWM round corner build=26300 hwnd=0xb50626 hresult=0x00000000
+2026-10-19 01:05:06.064 [INFO] window created origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:05:06.071 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:05:06.071 [INFO] sidecar start requested
+2026-10-19 01:05:06.080 [WARN] cleanup residual packaged collector pid=39984
+2026-10-19 01:05:06.080 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 01:05:06.084 [INFO] sidecar job assigned=true
+2026-10-19 01:05:06.085 [INFO] collector-state state=starting pid=Some(43492) code=None protocol=None session=None message=None
+2026-10-19 01:05:06.085 [INFO] sidecar spawned pid=43492
+2026-10-19 01:05:06.085 [INFO] PB_QUIT_AFTER_MS=6000 armed
+2026-10-19 01:05:06.085 [INFO] setup complete
+2026-10-19 01:05:06.107 [INFO] collector stderr EOF
+2026-10-19 01:05:06.107 [INFO] collector stdout EOF
+2026-10-19 01:05:06.107 [INFO] sidecar exit(code=Some(1)) pid=43492 source=wait
+2026-10-19 01:05:06.107 [INFO] collector-state state=exited pid=Some(43492) code=Some(1) protocol=None session=None message=None
+2026-10-19 01:05:06.138 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 01:05:06.160 [INFO] command ui_ready
+2026-10-19 01:05:06.160 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:05:06.160 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:05:06.160 [INFO] window startup-hidden origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:05:06.160 [INFO] window hidden reason=startup-default
+2026-10-19 01:05:06.461 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:05:06.461 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:05:12.087 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:05:12.207 [INFO] quit collector stopped, exiting
+2026-10-19 01:05:12.207 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:05:12.207 [INFO] run event: Exit
+2026-10-19 01:05:12.207 [INFO] app exit
+2026-10-19 01:05:21.906 [INFO] app start version=0.1.0 build=unknown pid=29876 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:05:21.906 [INFO] single-instance: mutex acquired name=Global\PBMemTest pid=29876
+2026-10-19 01:05:21.906 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:05:21.906 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:05:22.131 [INFO] DWM round corner build=26300 hwnd=0xcf0622 hresult=0x00000000
+2026-10-19 01:05:22.131 [INFO] window created origin=(96,96) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:05:22.137 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:05:22.137 [INFO] sidecar start requested
+2026-10-19 01:05:22.146 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\debug\collector kind=packaged
+2026-10-19 01:05:22.151 [INFO] sidecar job assigned=true
+2026-10-19 01:05:22.151 [INFO] collector-state state=starting pid=Some(39816) code=None protocol=None session=None message=None
+2026-10-19 01:05:22.151 [INFO] sidecar spawned pid=39816
+2026-10-19 01:05:22.151 [INFO] PB_QUIT_AFTER_MS=90000 armed
+2026-10-19 01:05:22.151 [INFO] setup complete
+2026-10-19 01:05:22.231 [INFO] command ui_ready
+2026-10-19 01:05:22.232 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:05:22.232 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:05:22.255 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:05:22.260 [INFO] window shown reason=ui-ready
+2026-10-19 01:05:22.260 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:05:22.260 [INFO] PB_HIDE_AFTER_MS=4000 armed (one-shot after first show)
+2026-10-19 01:05:22.311 [INFO] hello protocol=1 session=d08b3b68-4703-4834-b1f5-bd861b4339f9 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 01:05:22.311 [INFO] collector-state state=ready pid=Some(39816) code=None protocol=Some(1) session=Some("d08b3b68-4703-4834-b1f5-bd861b4339f9") message=None
+2026-10-19 01:05:26.265 [INFO] window hide reason=PB_HIDE_AFTER_MS webview IsVisible(false) -> S_OK
+2026-10-19 01:05:26.271 [INFO] window hidden reason=PB_HIDE_AFTER_MS
+2026-10-19 01:05:26.572 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:05:26.572 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:07:01.013 [INFO] app start version=0.1.0 build=unknown pid=38644 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 01:07:01.013 [INFO] single-instance: mutex acquired name=Global\PBReleaseTest pid=38644
+2026-10-19 01:07:01.013 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:07:01.013 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:07:01.232 [INFO] DWM round corner build=26300 hwnd=0x8607d6 hresult=0x00000000
+2026-10-19 01:07:01.232 [INFO] window created origin=(320,320) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:07:01.237 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:07:01.237 [INFO] sidecar start requested
+2026-10-19 01:07:01.243 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector kind=packaged
+2026-10-19 01:07:01.247 [INFO] sidecar job assigned=true
+2026-10-19 01:07:01.247 [INFO] collector-state state=starting pid=Some(43460) code=None protocol=None session=None message=None
+2026-10-19 01:07:01.247 [INFO] sidecar spawned pid=43460
+2026-10-19 01:07:01.247 [INFO] PB_QUIT_AFTER_MS=16000 armed
+2026-10-19 01:07:01.247 [INFO] setup complete
+2026-10-19 01:07:01.315 [INFO] command ui_ready
+2026-10-19 01:07:01.315 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:07:01.315 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:07:01.315 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:07:01.315 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:07:01.333 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:07:01.337 [INFO] window shown reason=ui-ready
+2026-10-19 01:07:01.337 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:07:01.337 [INFO] PB_FPS_PROBE=2000ms armed (inject 500ms after first show)
+2026-10-19 01:07:01.381 [INFO] hello protocol=1 session=e135e3da-c1cd-4c0e-8673-609e5d70ae47 build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 01:07:01.381 [INFO] collector-state state=ready pid=Some(43460) code=None protocol=Some(1) session=Some("e135e3da-c1cd-4c0e-8673-609e5d70ae47") message=None
+2026-10-19 01:07:01.838 [INFO] FPS_PROBE injected duration=2000ms (结果将以 FPS_PROBE {json} 写入本日志)
+2026-10-19 01:07:03.388 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 01:07:03.391 [DEBUG] command set_tray_state level=Some(94) charging=false online=true kind=bluetooth
+2026-10-19 01:07:03.392 [DEBUG] 托盘图标更新 tooltip=外设电量 · 94%
+2026-10-19 01:07:03.836 [INFO] FPS_PROBE {"duration_ms":2000,"frames":498,"fps":248.99,"avg_ms":4.02,"p50_ms":4,"p95_ms":4.100000000000136,"p99_ms":4.100000000000364,"max_ms":9.599999999999909,"rows":1,"panel_rect":{"x":30,"y":30,"w":720,"h":380},"dpr":1.25,"inner":{"w":780,"h":440},"backdrop_filter":"none","hidden":false,"visibility":"visible","tauri":true,"ts":1792343223835}
+2026-10-19 01:07:05.879 [INFO] auto-hide triggered foreground=Some(16582886) ours=Some(8783830)
+2026-10-19 01:07:05.879 [INFO] window hide reason=focus-lost webview IsVisible(false) -> S_OK
+2026-10-19 01:07:05.881 [INFO] window hidden reason=focus-lost
+2026-10-19 01:07:06.182 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:07:06.182 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:07:17.248 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:07:17.248 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 01:07:17.248 [INFO] shutdown handshake sent=true pid=43460
+2026-10-19 01:07:17.263 [INFO] collector stderr EOF
+2026-10-19 01:07:17.263 [INFO] collector stdout EOF
+2026-10-19 01:07:17.265 [INFO] sidecar exit(code=Some(0)) pid=43460 source=wait
+2026-10-19 01:07:17.265 [INFO] collector-state state=exited pid=Some(43460) code=Some(0) protocol=None session=None message=None
+2026-10-19 01:07:17.265 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 01:07:17.389 [INFO] quit collector stopped, exiting
+2026-10-19 01:07:17.389 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:07:17.389 [INFO] run event: Exit
+2026-10-19 01:07:17.389 [INFO] app exit
+2026-10-19 01:08:51.688 [INFO] app start version=0.1.0 build=unknown pid=43468 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:08:51.688 [INFO] single-instance: mutex acquired name=Global\PBHiddenTrayTest pid=43468
+2026-10-19 01:08:51.688 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:08:51.688 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:08:51.905 [INFO] DWM round corner build=26300 hwnd=0x15a09c4 hresult=0x00000000
+2026-10-19 01:08:51.905 [INFO] window created origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:08:51.912 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:08:51.912 [INFO] sidecar start requested
+2026-10-19 01:08:51.921 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:08:51.924 [INFO] sidecar job assigned=true
+2026-10-19 01:08:51.924 [INFO] collector-state state=starting pid=Some(40728) code=None protocol=None session=None message=None
+2026-10-19 01:08:51.924 [INFO] sidecar spawned pid=40728
+2026-10-19 01:08:51.924 [INFO] PB_QUIT_AFTER_MS=26000 armed
+2026-10-19 01:08:51.924 [INFO] setup complete
+2026-10-19 01:08:51.974 [INFO] hello protocol=1 session=73bf8944-9939-4cad-a93f-48b0cf754a5e build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:08:51.974 [INFO] collector-state state=ready pid=Some(40728) code=None protocol=Some(1) session=Some("73bf8944-9939-4cad-a93f-48b0cf754a5e") message=None
+2026-10-19 01:08:51.994 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:08:51.994 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:08:51.995 [INFO] command ui_ready
+2026-10-19 01:08:51.995 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:08:51.995 [INFO] window startup hidden webview IsVisible(false) -> S_OK
+2026-10-19 01:08:51.995 [INFO] window startup-hidden origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:08:51.995 [INFO] window hidden reason=startup-default
+2026-10-19 01:08:52.155 [INFO] tray-state source=rust level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:08:52.156 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:08:52.156 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:08:52.156 [DEBUG] tray-state source=frontend unchanged level=Some(68) online=true
+2026-10-19 01:08:52.296 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:08:52.296 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:08:52.335 [INFO] tray-state source=rust level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:08:52.337 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:08:52.337 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:08:52.515 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:08:52.695 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:08:52.876 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:08:52.976 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:08:54.477 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:08:54.478 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:08:54.478 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:08:54.478 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:08:55.977 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:08:55.979 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:08:55.979 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:08:55.979 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:08:57.477 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:08:57.478 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:08:57.479 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:08:57.479 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:08:58.978 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:08:58.979 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:08:58.979 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:08:58.979 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:00.478 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:00.480 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:00.480 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:00.480 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:01.721 [INFO] app start version=0.1.0 build=unknown pid=27780 exe=D:\desktop\电量显示插件\src-tauri\target\debug\peripheral-battery.exe
+2026-10-19 01:09:01.722 [INFO] single-instance: existing pid=Some(43468) name=Global\PBHiddenTrayTest signaled=true window_activated=false exit
+2026-10-19 01:09:01.722 [INFO] single-instance: activation event received, showing panel
+2026-10-19 01:09:01.722 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:09:01.722 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:09:01.723 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:09:01.736 [INFO] window show reason=single-instance webview IsVisible(true) -> S_OK
+2026-10-19 01:09:01.736 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:09:01.736 [INFO] window show reason=single-instance requested collector snapshot=true
+2026-10-19 01:09:01.740 [INFO] window shown reason=single-instance
+2026-10-19 01:09:01.740 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:09:01.746 [INFO] tray-state source=frontend level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:09:01.747 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:09:01.747 [INFO] tray-state source=frontend level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:01.749 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:01.750 [INFO] tray-state source=frontend level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:01.751 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:01.751 [INFO] tray-state source=frontend level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:01.752 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:01.752 [INFO] tray-state source=frontend level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:01.753 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:01.753 [INFO] tray-state source=frontend level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:01.755 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:01.978 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:01.978 [DEBUG] tray-state source=frontend unchanged level=Some(43) online=true
+2026-10-19 01:09:01.979 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:01.979 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:01.979 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:03.478 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:03.479 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:03.480 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:03.480 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:03.480 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:52.926 [INFO] app start version=0.1.0 build=unknown pid=45460 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 01:09:52.926 [INFO] single-instance: mutex acquired name=Global\PBReleaseSmoke pid=45460
+2026-10-19 01:09:52.926 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:09:52.927 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:09:53.140 [INFO] DWM round corner build=26300 hwnd=0x8807d6 hresult=0x00000000
+2026-10-19 01:09:53.140 [INFO] window created origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:09:53.147 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:09:53.147 [INFO] sidecar start requested
+2026-10-19 01:09:53.153 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:09:53.158 [INFO] sidecar job assigned=true
+2026-10-19 01:09:53.158 [INFO] collector-state state=starting pid=Some(40164) code=None protocol=None session=None message=None
+2026-10-19 01:09:53.158 [INFO] sidecar spawned pid=40164
+2026-10-19 01:09:53.158 [INFO] PB_QUIT_AFTER_MS=22000 armed
+2026-10-19 01:09:53.158 [INFO] setup complete
+2026-10-19 01:09:53.206 [INFO] hello protocol=1 session=2df07c11-0484-4e25-9c20-a49c4acd2127 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:09:53.206 [INFO] collector-state state=ready pid=Some(40164) code=None protocol=Some(1) session=Some("2df07c11-0484-4e25-9c20-a49c4acd2127") message=None
+2026-10-19 01:09:53.226 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:09:53.226 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:09:53.227 [INFO] command ui_ready
+2026-10-19 01:09:53.227 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:09:53.227 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:09:53.227 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:09:53.227 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:09:53.244 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:09:53.244 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:09:53.244 [INFO] window show reason=ui-ready requested collector snapshot=true
+2026-10-19 01:09:53.247 [INFO] window shown reason=ui-ready
+2026-10-19 01:09:53.247 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:09:53.247 [INFO] PB_FPS_PROBE=1500ms armed (inject 500ms after first show)
+2026-10-19 01:09:53.247 [INFO] PB_HIDE_AFTER_MS=5000 armed (one-shot after first show)
+2026-10-19 01:09:53.387 [INFO] tray-state source=rust level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:09:53.388 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:09:53.388 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:09:53.389 [DEBUG] tray-state source=frontend unchanged level=Some(68) online=true
+2026-10-19 01:09:53.568 [INFO] tray-state source=rust level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:09:53.568 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:09:53.568 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:53.569 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:53.748 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:09:53.748 [INFO] FPS_PROBE injected duration=1500ms (结果将以 FPS_PROBE {json} 写入本日志)
+2026-10-19 01:09:53.928 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:54.108 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:09:54.208 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:09:55.254 [INFO] FPS_PROBE {"duration_ms":1500,"frames":376,"fps":249.98,"avg_ms":4,"p50_ms":4,"p95_ms":4.099999999999909,"p99_ms":4.100000000000136,"max_ms":4.100000000000364,"rows":5,"panel_rect":{"x":30,"y":30,"w":720,"h":380},"dpr":1.25,"inner":{"w":780,"h":440},"backdrop_filter":"none","hidden":false,"visibility":"visible","tauri":true,"ts":1792343395254}
+2026-10-19 01:09:55.409 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:55.411 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:55.411 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:55.411 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:55.411 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:56.610 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:56.611 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:56.611 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:56.611 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:56.611 [DEBUG] tray-state source=frontend unchanged level=Some(43) online=true
+2026-10-19 01:09:57.810 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:57.811 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:57.811 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:57.811 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:57.811 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:58.252 [INFO] window hide reason=PB_HIDE_AFTER_MS webview IsVisible(false) -> S_OK
+2026-10-19 01:09:58.256 [INFO] window hidden reason=PB_HIDE_AFTER_MS
+2026-10-19 01:09:58.557 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:09:58.557 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:09:59.011 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:59.011 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:59.011 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:59.011 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:00.211 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:00.211 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:00.211 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:00.211 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:01.412 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:01.412 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:01.412 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:01.412 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:02.612 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:02.612 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:02.612 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:02.612 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:03.812 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:03.813 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:03.813 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:03.813 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:05.012 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:05.014 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:05.014 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:05.014 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:06.213 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:06.213 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:06.213 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:06.213 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:07.413 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:07.414 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:07.414 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:07.414 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:08.613 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:08.614 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:08.614 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:08.614 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:09.814 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:09.814 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:09.814 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:09.814 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:11.014 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:11.014 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:11.014 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:11.014 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:12.215 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:12.216 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:12.216 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:12.216 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:13.415 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:13.416 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:13.416 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:13.416 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:14.616 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:14.616 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:14.616 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:14.616 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:15.159 [INFO] quit requested reason=PB_QUIT_AFTER_MS
+2026-10-19 01:10:15.159 [DEBUG] collector << {"t":"shutdown"}
+2026-10-19 01:10:15.159 [INFO] shutdown handshake sent=true pid=40164
+2026-10-19 01:10:15.163 [INFO] collector stdout EOF
+2026-10-19 01:10:15.163 [INFO] collector stderr EOF
+2026-10-19 01:10:15.163 [INFO] sidecar exit(code=Some(0)) pid=40164 source=wait
+2026-10-19 01:10:15.163 [INFO] collector-state state=exited pid=Some(40164) code=Some(0) protocol=None session=None message=None
+2026-10-19 01:10:15.195 [INFO] job object released active_processes=Some(0)（应为 0）
+2026-10-19 01:10:15.300 [INFO] quit collector stopped, exiting
+2026-10-19 01:10:15.300 [INFO] run event: ExitRequested -> shutdown handshake
+2026-10-19 01:10:15.300 [INFO] run event: Exit
+2026-10-19 01:10:15.300 [INFO] app exit

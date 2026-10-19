@@ -1,0 +1,160 @@
+started pid=25184 show=False duration=300.0s
+  t=   0.3s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=449.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=   5.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 1.25, 'other': 0.0} rss=449.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  10.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=449.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  15.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=426.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  20.1s cpu={'app': 0.0, 'webview2': 0.625, 'collector': 2.188, 'other': 0.0} rss=226.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  25.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=226.5MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  30.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=226.5MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  35.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=226.6MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  40.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=226.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  45.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=226.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  50.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=234.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  55.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 2.188, 'other': 0.0} rss=236.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  60.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=236.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  65.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=236.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  70.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=236.5MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  75.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=236.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  80.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=237.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  85.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.938, 'other': 0.0} rss=237.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  90.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t=  95.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 100.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 105.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=238.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 110.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=239.6MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 115.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=239.8MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 120.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=239.8MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 125.0s cpu={'app': 0.0, 'webview2': 0.625, 'collector': 0.312, 'other': 0.0} rss=243.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 130.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=243.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 135.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=243.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 140.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=243.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 145.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=244.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 150.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.625, 'other': 0.0} rss=245.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 155.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 160.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 165.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=244.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 170.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=244.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 175.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=245.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 180.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 185.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 190.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.2MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 195.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 200.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.1MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 205.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=245.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 210.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 1.562, 'other': 0.0} rss=242.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 215.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=242.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 220.3s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=242.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 225.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=242.3MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 230.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=241.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 235.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=241.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 240.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.938, 'other': 0.0} rss=241.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 245.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=241.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 250.0s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=241.9MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 255.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=242.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 260.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=242.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 265.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=242.0MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 270.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 1.875, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 275.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 280.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 285.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=238.4MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 290.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.0, 'other': 0.0} rss=247.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 295.1s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=247.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+  t= 300.2s cpu={'app': 0.0, 'webview2': 0.0, 'collector': 0.312, 'other': 0.0} rss=247.7MB procs={'app': 1, 'webview2': 6, 'collector': 2}
+waiting for app self-quit ...
+
+=== RESULT ===
+{
+  "exe": "src-tauri\\target\\release\\peripheral-battery.exe",
+  "show": false,
+  "launch": {
+    "ready": true,
+    "spawn": "sidecar spawn path=\\\\?\\D:\\desktop\\������ʾ���\\src-tauri\\target\\release\\collector\\collector.exe args=[\"--stdio\"] cwd=\\\\?\\D:\\desktop\\������ʾ���\\src-tauri\\target\\release\\collector kind=packaged",
+    "hello": "hello protocol=1 session=f1843a65-ce7b-477b-97a4-584c72e785e3 build=unknown devices=0 capabilities=[approx,left_s,via,transport]",
+    "errors": []
+  },
+  "hidden_window_probe": [
+    [],
+    [],
+    []
+  ],
+  "fps": null,
+  "cpu_single_core_pct": {
+    "app": 0.0,
+    "webview2": 0.021,
+    "collector": 0.297,
+    "other": 0.0
+  },
+  "rss_mb": 247.7,
+  "peak_rss_mb": 449.3,
+  "rss_breakdown": [
+    {
+      "pid": 21388,
+      "name": "powershell.exe",
+      "kind": "collector",
+      "rss_mb": 125.5
+    },
+    {
+      "pid": 25184,
+      "name": "peripheral-battery.exe",
+      "kind": "app",
+      "rss_mb": 30.4
+    },
+    {
+      "pid": 21480,
+      "name": "collector.exe",
+      "kind": "collector",
+      "rss_mb": 28.7
+    },
+    {
+      "pid": 11848,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 13.6
+    },
+    {
+      "pid": 22292,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 13.0
+    },
+    {
+      "pid": 7936,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 8.5
+    },
+    {
+      "pid": 22588,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 7.5
+    },
+    {
+      "pid": 25440,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 7.5
+    },
+    {
+      "pid": 17856,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 5.9
+    },
+    {
+      "pid": 26456,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 4.4
+    },
+    {
+      "pid": 5636,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 2.6
+    }
+  ],
+  "app_exit_code": 0,
+  "leftovers": []
+}
+saved: design\verify\lead-hidden-final5.json

@@ -1,0 +1,19 @@
+{
+  "name": "peripheral-battery",
+  "version": "0.1.0",
+  "private": true,
+  "description": "外设电量显示器 — Tauri 2 外壳 + Python 采集器",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "test:ui": "node tools/ui_smoke.js",
+    "test:collector": ".venv\\Scripts\\python.exe -m pytest tests/collector -q",
+    "collector:demo": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/collector_demo.ps1",
+    "collector:probe": ".venv\\Scripts\\python.exe -m collector --probe --fake --scenario demo"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.3",
+    "playwright": "^1.64.1"
+  }
+}

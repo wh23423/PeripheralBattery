@@ -1,0 +1,448 @@
+🇨🇳 Special pricing for China - 25% off lifetime plans with 
+PDYHUZAV25
+Library
+Resources
+Agents
+Pricing
+Search...
+⌘
+K
+Sign In
+Get Lifetime Access
+Components
+230
+Get Started
+Introduction
+Installation
+MCP Server
+Saved
+Browse
+All Components
+80 New
+Text
+34
+3D Letter Swap
+3D Text Reveal
+ASCII Ripple
+Bending Marquee
+Blur Highlight
+Cipher Reveal
+New
+Domino Lettering
+New
+Elastic Lettering
+New
+Ghost Type
+New
+Glitch Text
+Glyph Lottery
+New
+Gravity Letters
+New
+Label Orbit
+New
+Luminous Type
+New
+Mesh Lettering
+New
+Orbital Type
+New
+Particle Text
+Ribbon Type
+New
+Rising Ink
+New
+Shatter Type
+New
+Signal Type
+New
+Smoke Type
+New
+Speeding Text
+Spring Lettering
+New
+Staggered Text
+Stipple Type
+New
+Tessera Trail
+New
+Text Cube
+Text Morph
+New
+Text Path
+Text Scatter
+Typographic Wall
+New
+Vapor Type
+New
+Wave Lettering
+New
+Backgrounds
+98
+ASCII Tiles
+Ascii Waves
+Astral Shell
+New
+Aura Blob
+Aurora Beam
+Aurora Blur
+Axial Beam
+New
+Binary Orbits
+New
+Black Hole
+Blinking Dots
+Blinking Squares
+Blurred Rays
+Chroma Blinds
+Chroma Current
+New
+Chroma Waves
+Cloud Atlas
+New
+Color Loops
+Concentric Tides
+New
+Contour Tide
+New
+Dappled Light
+New
+Dither Wave
+Dot Shift
+Eclipse
+Fading Stars
+New
+Falling Rays
+Flame Paths
+Fog Sphere
+Glass Flow
+Glass Tiles
+Glimmer Wrap
+New
+Glitter Warp
+Glowing Ridges
+Glowing Wave
+Glue Dots
+Glyph Ember
+New
+Glyph Orb
+New
+Glyph Sonar
+New
+Glyph Tide
+New
+Gradient Bars
+Grain Wave
+Halftone Vortex
+Halftone Wave
+Hexagonal Vault
+New
+Horizon Bloom
+New
+Interference Ribbons
+New
+Landscape
+Light Droplets
+Lightspeed
+Liquid Bars
+Liquid Lines
+Long Exposure
+Luminous Filaments
+New
+Metallic Swirl
+Minimal Ripple
+Mosaic
+Mosaic Waves
+Neon Reveal
+Neural Flash
+Neural Float
+Neural Tunnel
+Nexus Rays
+New
+Perspective Grid
+Photon Knot
+New
+Pixel Rain
+Prismatic Slats
+New
+Radial Liquid
+Ravine
+Retro Lines
+Ring Field
+New
+Rising Lines
+Rising Particles
+Rolling Blinds
+Rotating Stars
+Rubber Fluid
+Satin Ridges
+New
+Shader Waves
+Shadow Bars
+Silk Waves
+Simple Swirl
+Specter Orb
+Spectral Clouds
+Spectral Drape
+New
+Spiral Funnel
+New
+Square Matrix
+Squares Terminal
+Squircle Shift
+Star Swipe
+Swirl Blend
+Synaptic Shift
+Tech Wall
+Terminal Rain
+New
+Thinking Dots
+Twilight Lines
+Vortex
+Voxel Arc
+New
+Warp Twister
+Watercolor
+Wireframe Ball
+3D & Shaders
+49
+Agentic Ball
+AI Blob
+Album Rail
+New
+Bend Gallery
+Chrome Orbit
+New
+Circle Stack
+Concave Carousel
+New
+Constellation Gallery
+New
+Contact Sheet
+New
+Depth Card
+Depth Image
+Depth Ribbon
+New
+Device
+Dolly Gallery
+Elastic Reel
+New
+Elastic Sticker
+New
+Ember Reveal
+New
+Expanding Grid
+New
+Frame Border
+Glass Reveal
+Globe
+Gradient Blob
+Helix Gallery
+New
+Infinite Gallery
+Inverted Dome
+Iris Gallery
+New
+Lenticular Carousel
+Momentum Ring
+New
+Page Flip
+Parallax Carousel
+Particle Image
+Particle Morph
+Passage Gallery
+New
+Pixel Reveal
+Pixel Sculpt
+Pixelate Hover
+Pond Image
+New
+Portal
+Prism Carousel
+New
+Rotating Cards
+Scroll Bend
+New
+Scroll Portal
+Shader Card
+Shader Reveal
+Spin Shutter
+New
+Star Burst
+Tumble Carousel
+Twisting Gallery
+Warped Card
+Cursor Effects
+21
+Arc Cursor
+New
+Ascii Cursor
+Celebration Cursor
+New
+Chroma Halo
+New
+Cursor Wave
+Custom Cursor
+Dither Cursor
+Drafting Cursor
+New
+Glass Cursor
+Glyph Stream
+New
+Grid Rise
+Gyroscope Cursor
+New
+Liquid Ascii
+Parallax Pills
+Pigment Trail
+New
+Pixel Magnet
+Ribbon Trail
+New
+Smooth Cursor
+Snapshot Trail
+New
+Stardust Cursor
+New
+User Cursor
+UI & Cards
+28
+Animated List
+Card Spread
+Center Flow
+Chroma Card
+Circle Gallery
+Circles
+Click Stack
+Comparison Slider
+Credit Card
+Draggable Grid
+Frame Scrub
+Gradient Carousel
+Hover Preview
+Liquid Swap
+Loupe Image
+New
+Magic Transform
+Modal Cards
+Orbit Reel
+New
+Parallax Cards
+Preloader
+Reel Gallery
+Scroll Mask
+Scroll Stack
+Simple Graph
+Skewed Carousel
+Tile Reveal
+Tilted Tiles
+Tumble Wall
+New
+Docs
+Components
+Backgrounds
+Satin Ridges
+Satin Ridges
+
+Flowing satin folds catching soft highlights
+
+Preview
+Code
+satin-ridges-tw
+Unlock Satin Ridges
+
+Choose a plan to get the source for Satin Ridges and use it in your projects.
+
+Lifetime
+Annual
+Starter
+
+Every animated component,
+ready for production.
+
+$129
+$97
+one-time payment
+230 animated components
+Tailwind and vanilla CSS variants
+Production-ready TypeScript
+One-command install for Claude Code and Cursor
+Every future component, free
+Commercial license, unlimited projects
+Get Starter
+Pro
+
+Components, blocks, app UI
+and the Agent Kit.
+
+$249
+$187
+one-time payment
+Everything in Starter
+300 page blocks across 22 categories
+300 app UI blocks across 38 categories
+Live app UI theming: accent, base, font, radius
+20-item Agent Kit: skills, prompts, recipes
+Landing Builder (Beta): compose and export pages
+Every future block, free
+Get Pro
+Ultimate
+Most popular
+
+The complete library,
+including every template.
+
+$349
+$262
+one-time payment
+Everything in Pro
+15 complete landing-page templates
+New templates the day they ship
+Priority email support
+One license, the whole product
+Get Everything
+
+Lock in today’s price, preview before buying, secure checkout by Polar. Taxes are calculated at checkout.
+
+🇨🇳 25% Discount Applied
+Previous
+Rubber Fluid
+Backgrounds
+Next
+Shader Waves
+Backgrounds
+
+Animated components, blocks, and templates for React. Pay once, ship stunning pages forever.
+
+pro@reactbits.dev
+Site
+Home
+Builder (Beta)
+Pricing
+Testimonials
+FAQs
+Roadmap
+Changelog
+Free Components
+Docs
+Introduction
+Installation
+MCP Server
+Components
+Blocks
+Templates
+Resources
+About
+Use cases
+Comparisons
+Alternatives
+For AI agents
+Legal & Account
+Login
+Affiliate
+License
+Privacy
+Contact
+
+© 2026 pro.reactbits.dev. All rights reserved.

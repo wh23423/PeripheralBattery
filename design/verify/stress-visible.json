@@ -1,0 +1,168 @@
+{
+  "mode": "visible",
+  "runs": 20,
+  "hangs": 0,
+  "no_exit_log": 0,
+  "results": [
+    {
+      "run": 1,
+      "hang": false,
+      "elapsed_s": 4.91,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 2,
+      "hang": false,
+      "elapsed_s": 4.89,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 3,
+      "hang": false,
+      "elapsed_s": 4.89,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 4,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 5,
+      "hang": false,
+      "elapsed_s": 4.91,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 6,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 7,
+      "hang": false,
+      "elapsed_s": 4.89,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 8,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 9,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 10,
+      "hang": false,
+      "elapsed_s": 4.89,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 11,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 12,
+      "hang": false,
+      "elapsed_s": 4.89,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 13,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 14,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 15,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 16,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 17,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 18,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 19,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    },
+    {
+      "run": 20,
+      "hang": false,
+      "elapsed_s": 4.88,
+      "exit_code": 0,
+      "app_exit_logged": true,
+      "log_lines": 43
+    }
+  ]
+}

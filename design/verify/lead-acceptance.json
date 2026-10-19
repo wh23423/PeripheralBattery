@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-19T13:22+08:00",
+  "host": "Windows 11 build 26300 / 2560x1440 / 125% / 250Hz",
+  "build": "release 0.1.0; NSIS PeripheralBattery_0.1.0_x64-setup.exe 8.92 MiB (13:12 rebuilt); collector 19.4MB (13:12)",
+  "tests": {
+    "pytest": "94 passed",
+    "ui_smoke": "15 passed",
+    "cargo_test": "10 passed"
+  },
+  "P1": {
+    "fps": 250,
+    "p99_ms": 4.2,
+    "max_ms": 5.8,
+    "rows": 5,
+    "panel_rect": {
+      "x": 30,
+      "y": 30,
+      "w": 720,
+      "h": 380
+    },
+    "dpr": 1.25,
+    "backdrop_filter": "none",
+    "tauri": true,
+    "note": "design/verify/lead-hero-fps.png + FPS_PROBE in app.log"
+  },
+  "P2": {
+    "hidden_tree_cpu_pct": 0.318,
+    "breakdown": {
+      "app": 0.0,
+      "webview2": 0.021,
+      "collector": 0.297,
+      "other": 0.0
+    },
+    "note": "bt watcher interval 30000ms; PS 0.078-0.130% in dedicated 60s samples"
+  },
+  "P3": {
+    "collector_plus_powershell_pct": 0.297
+  },
+  "P4": {
+    "hidden_steady_rss_mb": 247.7,
+    "startup_peak_rss_mb": 449.3,
+    "breakdown": [
+      [
+        "powershell.exe",
+        125.5
+      ],
+      [
+        "peripheral-battery.exe",
+        30.4
+      ],
+      [
+        "collector.exe",
+        28.7
+      ],
+      [
+        "msedgewebview2.exe",
+        13.6
+      ],
+      [
+        "msedgewebview2.exe",
+        13.0
+      ]
+    ]
+  },
+  "P5_ms": 200,
+  "P6_ms_proxy": 17,
+  "P8_timers_per_s": 0.99,
+  "P10": {
+    "app_exit_code": 0,
+    "leftovers": []
+  },
+  "P0_deadlock_fix": {
+    "tauri_dev_stress_visible": "40/40",
+    "tauri_dev_stress_hidden": "10/10",
+    "lead_stress_visible": "20/20",
+    "hang": 0,
+    "tray_update_begin_end": "1320/1320"
+  },
+  "F1_hero": "PASS: Arctis 12% hero over G502 68 / Keychron 55 / Xbox 84 / XM5 43",
+  "F3_cold_start_s": {
+    "lead_5": [
+      1.71,
+      1.58,
+      1.65,
+      1.57,
+      1.53
+    ],
+    "collector_dev_10": "1.33-1.45s 10/10"
+  },
+  "F4": "PASS: no false ui_ready WARN / fallback after focus-lost hide",
+  "F7": "PASS: app.log collector stat timers_per_s=0.99 key_migrations=0 providers=30",
+  "packaging": "PASS: install -> packaged collector -> hello -> exit job=0 -> uninstall clean (PB-install-test3)",
+  "remaining_risks": [
+    "P7 24h memory growth not run (+21MB/5min hidden)",
+    "P4 startup peak 449.3MB before suspend",
+    "P9 24h key stability not run; real HID devices not tested",
+    "P6 first-paint not measured exactly",
+    "Win10/multi-monitor/DPI matrix not tested",
+    "CfgMgr32/WGI helper not implemented; 30s BT connect detection tradeoff",
+    "native tray right-click menu not physically clicked in this round",
+    "updater not wired; build string unknown"
+  ],
+  "evidence": [
+    "design/verify/lead-hidden-final5.json",
+    "design/verify/lead-hero-fps.png",
+    "design/verify/stress-visible.json",
+    "design/verify/tray-stress-result.json",
+    "design/verify/lead-acceptance.json",
+    "README.md",
+    "design/audit/final-runtime-audit.md",
+    "design/audit/shell-audit.md",
+    "design/audit/collector-audit-independent.md",
+    "design/audit/runtime-audit.md"
+  ]
+}

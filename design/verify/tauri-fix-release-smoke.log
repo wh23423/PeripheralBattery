@@ -1,0 +1,87 @@
+2026-10-19 01:09:52.926 [INFO] app start version=0.1.0 build=unknown pid=45460 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 01:09:52.926 [INFO] single-instance: mutex acquired name=Global\PBReleaseSmoke pid=45460
+2026-10-19 01:09:52.926 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\PeripheralBattery
+2026-10-19 01:09:52.927 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\PeripheralBattery\app.json
+2026-10-19 01:09:53.140 [INFO] DWM round corner build=26300 hwnd=0x8807d6 hresult=0x00000000
+2026-10-19 01:09:53.140 [INFO] window created origin=(160,160) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:09:53.147 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8
+2026-10-19 01:09:53.147 [INFO] sidecar start requested
+2026-10-19 01:09:53.153 [INFO] sidecar spawn path=D:\desktop\电量显示插件\.venv\Scripts\python.exe args=["D:\\desktop\\电量显示插件\\scripts\\mock-collector.py"] cwd=D:\desktop\电量显示插件 kind=env
+2026-10-19 01:09:53.158 [INFO] sidecar job assigned=true
+2026-10-19 01:09:53.158 [INFO] collector-state state=starting pid=Some(40164) code=None protocol=None session=None message=None
+2026-10-19 01:09:53.158 [INFO] sidecar spawned pid=40164
+2026-10-19 01:09:53.158 [INFO] PB_QUIT_AFTER_MS=22000 armed
+2026-10-19 01:09:53.158 [INFO] setup complete
+2026-10-19 01:09:53.206 [INFO] hello protocol=1 session=2df07c11-0484-4e25-9c20-a49c4acd2127 build=mock-shell-fixture devices=0 capabilities=[approx,left_s,via,transport,replaces]
+2026-10-19 01:09:53.206 [INFO] collector-state state=ready pid=Some(40164) code=None protocol=Some(1) session=Some("2df07c11-0484-4e25-9c20-a49c4acd2127") message=None
+2026-10-19 01:09:53.226 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:09:53.226 [DEBUG] command collector_send ok=true line_len=29
+2026-10-19 01:09:53.227 [INFO] command ui_ready
+2026-10-19 01:09:53.227 [DEBUG] app-state emitted {"build":"unknown","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.0"}
+2026-10-19 01:09:53.227 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 01:09:53.227 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 01:09:53.227 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 01:09:53.244 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 01:09:53.244 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 01:09:53.244 [INFO] window show reason=ui-ready requested collector snapshot=true
+2026-10-19 01:09:53.247 [INFO] window shown reason=ui-ready
+2026-10-19 01:09:53.247 [INFO] window shown origin=(1567,812) size=975x550 scale=1.250 dip=(780.0x440.0)
+2026-10-19 01:09:53.247 [INFO] PB_FPS_PROBE=1500ms armed (inject 500ms after first show)
+2026-10-19 01:09:53.247 [INFO] PB_HIDE_AFTER_MS=5000 armed (one-shot after first show)
+2026-10-19 01:09:53.387 [INFO] tray-state source=rust level=Some(68) charging=false online=true kind=mouse
+2026-10-19 01:09:53.388 [DEBUG] 托盘图标更新 tooltip=外设电量 · 68%
+2026-10-19 01:09:53.388 [DEBUG] collector device key=Some("logi:046d:c547:unit-12")
+2026-10-19 01:09:53.389 [DEBUG] tray-state source=frontend unchanged level=Some(68) online=true
+2026-10-19 01:09:53.568 [INFO] tray-state source=rust level=Some(12) charging=false online=true kind=headset
+2026-10-19 01:09:53.568 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12%
+2026-10-19 01:09:53.568 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:53.569 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:53.748 [DEBUG] collector device key=Some("keychron:3434:0200:serial-k2")
+2026-10-19 01:09:53.748 [INFO] FPS_PROBE injected duration=1500ms (结果将以 FPS_PROBE {json} 写入本日志)
+2026-10-19 01:09:53.928 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:54.108 [DEBUG] collector device key=Some("bt:0000:0000:aabbccddeeff")
+2026-10-19 01:09:54.208 [INFO] collector alert kind=Some(String("low")) key=Some(String("ss:1038:2202:serial-abc")) level=Some(Number(12))
+2026-10-19 01:09:55.254 [INFO] FPS_PROBE {"duration_ms":1500,"frames":376,"fps":249.98,"avg_ms":4,"p50_ms":4,"p95_ms":4.099999999999909,"p99_ms":4.100000000000136,"max_ms":4.100000000000364,"rows":5,"panel_rect":{"x":30,"y":30,"w":720,"h":380},"dpr":1.25,"inner":{"w":780,"h":440},"backdrop_filter":"none","hidden":false,"visibility":"visible","tauri":true,"ts":1792343395254}
+2026-10-19 01:09:55.409 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:55.411 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:55.411 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:55.411 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:55.411 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:56.610 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:56.611 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:56.611 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:56.611 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:56.611 [DEBUG] tray-state source=frontend unchanged level=Some(43) online=true
+2026-10-19 01:09:57.810 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:09:57.811 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:09:57.811 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:57.811 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:09:57.811 [DEBUG] tray-state source=frontend unchanged level=Some(12) online=true
+2026-10-19 01:09:58.252 [INFO] window hide reason=PB_HIDE_AFTER_MS webview IsVisible(false) -> S_OK
+2026-10-19 01:09:58.256 [INFO] window hidden reason=PB_HIDE_AFTER_MS
+2026-10-19 01:09:58.557 [INFO] webview memory mode low (hidden): MemoryUsageTargetLevel=LOW; TrySuspend dispatched
+2026-10-19 01:09:58.557 [INFO] webview TrySuspend completed suspended=true
+2026-10-19 01:09:59.011 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:09:59.011 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:09:59.011 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:09:59.011 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:00.211 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:00.211 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:00.211 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:00.211 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:01.412 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:01.412 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:01.412 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:01.412 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:02.612 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:02.612 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:02.612 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:02.612 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:03.812 [INFO] tray-state source=rust level=Some(43) charging=false online=true kind=bluetooth
+2026-10-19 01:10:03.813 [DEBUG] 托盘图标更新 tooltip=外设电量 · 43%
+2026-10-19 01:10:03.813 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:03.813 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")
+2026-10-19 01:10:05.012 [INFO] tray-state source=rust level=Some(12) charging=true online=true kind=headset
+2026-10-19 01:10:05.014 [DEBUG] 托盘图标更新 tooltip=外设电量 · 12% 充电中
+2026-10-19 01:10:05.014 [DEBUG] collector device key=Some("ss:1038:2202:serial-abc")
+2026-10-19 01:10:05.014 [DEBUG] collector device key=Some("xinput:045e:0b13:u3")

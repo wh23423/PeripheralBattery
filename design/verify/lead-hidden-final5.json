@@ -1,0 +1,1013 @@
+{
+  "exe": "src-tauri\\target\\release\\peripheral-battery.exe",
+  "duration_s": 300.2,
+  "show": false,
+  "launch": {
+    "ready": true,
+    "spawn": "sidecar spawn path=\\\\?\\D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\collector\\collector.exe args=[\"--stdio\"] cwd=\\\\?\\D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\collector kind=packaged",
+    "hello": "hello protocol=1 session=f1843a65-ce7b-477b-97a4-584c72e785e3 build=unknown devices=0 capabilities=[approx,left_s,via,transport]",
+    "errors": []
+  },
+  "hidden_window_probe": [
+    [],
+    [],
+    []
+  ],
+  "fps": null,
+  "screenshot": null,
+  "cpu_single_core_pct": {
+    "app": 0.0,
+    "webview2": 0.021,
+    "collector": 0.297,
+    "other": 0.0
+  },
+  "rss_mb": 247.7,
+  "peak_rss_mb": 449.3,
+  "rss_breakdown": [
+    {
+      "pid": 21388,
+      "name": "powershell.exe",
+      "kind": "collector",
+      "rss_mb": 125.5
+    },
+    {
+      "pid": 25184,
+      "name": "peripheral-battery.exe",
+      "kind": "app",
+      "rss_mb": 30.4
+    },
+    {
+      "pid": 21480,
+      "name": "collector.exe",
+      "kind": "collector",
+      "rss_mb": 28.7
+    },
+    {
+      "pid": 11848,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 13.6
+    },
+    {
+      "pid": 22292,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 13.0
+    },
+    {
+      "pid": 7936,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 8.5
+    },
+    {
+      "pid": 22588,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 7.5
+    },
+    {
+      "pid": 25440,
+      "name": "conhost.exe",
+      "kind": "other:conhost.exe",
+      "rss_mb": 7.5
+    },
+    {
+      "pid": 17856,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 5.9
+    },
+    {
+      "pid": 26456,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 4.4
+    },
+    {
+      "pid": 5636,
+      "name": "msedgewebview2.exe",
+      "kind": "webview2",
+      "rss_mb": 2.6
+    }
+  ],
+  "samples": [
+    {
+      "t": 0.27,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 449.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 5.02,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 1.25,
+        "other": 0.0
+      },
+      "rss_mb": 449.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 10.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 449.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 15.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 426.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 20.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.625,
+        "collector": 2.188,
+        "other": 0.0
+      },
+      "rss_mb": 226.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 25.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 226.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 30.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 226.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 35.09,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 226.6,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 40.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 226.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 45.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 226.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 50.13,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 234.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 55.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 2.188,
+        "other": 0.0
+      },
+      "rss_mb": 236.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 60.16,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 236.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 65.16,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 236.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 70.17,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 236.5,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 75.19,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 236.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 80.19,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 237.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 85.2,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.938,
+        "other": 0.0
+      },
+      "rss_mb": 237.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 90.22,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 95.22,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 100.23,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 105.0,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 238.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 110.0,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 239.6,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 115.02,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 239.8,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 120.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 239.8,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 125.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.625,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 243.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 130.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 243.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 135.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 243.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 140.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 243.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 145.09,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 244.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 150.09,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.625,
+        "other": 0.0
+      },
+      "rss_mb": 245.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 155.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 160.13,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 165.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 244.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 170.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 244.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 175.16,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 245.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 180.17,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 185.17,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 190.19,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.2,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 195.19,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 200.2,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.1,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 205.22,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 245.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 210.22,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 1.562,
+        "other": 0.0
+      },
+      "rss_mb": 242.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 215.23,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 242.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 220.25,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 242.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 225.0,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 242.3,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 230.02,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 241.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 235.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 241.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 240.03,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.938,
+        "other": 0.0
+      },
+      "rss_mb": 241.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 245.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 241.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 250.05,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 241.9,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 255.06,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 242.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 260.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 242.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 265.08,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 242.0,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 270.09,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 1.875,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 275.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 280.11,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 285.13,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 238.4,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 290.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.0,
+        "other": 0.0
+      },
+      "rss_mb": 247.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 295.14,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 247.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    },
+    {
+      "t": 300.16,
+      "cpu": {
+        "app": 0.0,
+        "webview2": 0.0,
+        "collector": 0.312,
+        "other": 0.0
+      },
+      "rss_mb": 247.7,
+      "procs": {
+        "app": 1,
+        "webview2": 6,
+        "collector": 2
+      }
+    }
+  ],
+  "app_exit_code": 0,
+  "leftovers": []
+}

@@ -1,0 +1,1279 @@
+/* ============================================================
+   tools/ui_smoke.js — 前端 Playwright 冒烟测试（一键运行）
+   用法：node tools/ui_smoke.js
+   失败退出码非 0；截图输出 design/verify/ui-*.png。
+
+   为了真实覆盖 Tauri 的 CSP（style-src 'self'），测试用本地 HTTP
+   服务器给 ui/ 加上与 BUILD_PLAN §5.3 相同的 CSP 头再加载页面。
+   ============================================================ */
+'use strict';
+
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { chromium } = require('playwright');
+
+const ROOT = path.resolve(__dirname, '..');
+const UI_DIR = path.join(ROOT, 'ui');
+const SHOT_DIR = path.join(ROOT, 'design', 'verify');
+
+const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost";
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.json': 'application/json'
+};
+
+const W = 780;
+const H = 440;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------------------------------------------------------- 断言工具 */
+
+const failures = [];
+let passed = 0;
+
+function ok(cond, msg) {
+  if (!cond) throw new Error(msg || '断言失败');
+}
+
+function eq(actual, expected, msg) {
+  if (actual !== expected) {
+    throw new Error((msg || '值不相等') + '：期望 ' + JSON.stringify(expected) + '，实际 ' + JSON.stringify(actual));
+  }
+}
+
+function includes(haystack, needle, msg) {
+  if (String(haystack).indexOf(needle) < 0) {
+    throw new Error((msg || '缺少文本') + '：' + JSON.stringify(String(haystack).slice(0, 220)) + ' 中找不到 ' + JSON.stringify(needle));
+  }
+}
+
+async function test(name, fn) {
+  try {
+    await fn();
+    passed++;
+    console.log('  \u2713 ' + name);
+  } catch (err) {
+    failures.push({ name: name, message: err && err.message || String(err) });
+    console.log('  \u2717 ' + name);
+    console.log('      ' + (err && err.message || err));
+  }
+}
+
+/* ---------------------------------------------------------- 静态文件服务器（带 CSP） */
+
+function startServer() {
+  return new Promise(resolve => {
+    const server = http.createServer((req, res) => {
+      const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+      const rel = urlPath === '/' ? '/index.html' : urlPath;
+      if (rel === '/favicon.ico') { res.writeHead(204); res.end(); return; }
+      const file = path.normalize(path.join(UI_DIR, rel));
+      if (!file.startsWith(UI_DIR)) { res.writeHead(403); res.end('forbidden'); return; }
+      fs.readFile(file, (err, buf) => {
+        if (err) { res.writeHead(404); res.end('not found'); return; }
+        res.writeHead(200, {
+          'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
+          'Content-Security-Policy': CSP,
+          'Cache-Control': 'no-store'
+        });
+        res.end(buf);
+      });
+    });
+    server.listen(0, '127.0.0.1', () => {
+      resolve({ server: server, base: 'http://127.0.0.1:' + server.address().port + '/index.html' });
+    });
+  });
+}
+
+/* ---------------------------------------------------------- 页面工具 */
+
+let browser = null;
+let baseUrl = '';
+const pageErrors = [];
+
+async function openPage(query) {
+  const page = await browser.newPage({
+    viewport: { width: W, height: H },
+    deviceScaleFactor: 2
+  });
+  const pageName = query;
+  page.on('pageerror', err => pageErrors.push({ page: pageName, kind: 'pageerror', text: String(err && err.message || err) }));
+  page.on('console', msg => {
+    if (msg.type() === 'error') pageErrors.push({ page: pageName, kind: 'console', text: msg.text() });
+  });
+  await page.goto(baseUrl + query, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+  return page;
+}
+
+async function waitRenders(page, n) {
+  const target = n == null ? (await page.evaluate(() => window.__pbDebug.renders)) + 1 : n;
+  await page.waitForFunction(count => window.__pbDebug.renders >= count, target, { timeout: 5000 });
+}
+
+async function waitIntroDone(page) {
+  await page.waitForFunction(() => !document.body.classList.contains('intro'), null, { timeout: 5000 });
+}
+
+async function screenshot(page, name) {
+  fs.mkdirSync(SHOT_DIR, { recursive: true });
+  const file = path.join(SHOT_DIR, name);
+  await page.screenshot({ path: file, omitBackground: true });
+  const size = fs.statSync(file).size;
+  ok(size > 20000, '截图疑似为空：' + name + ' (' + size + 'B)');
+  console.log('      screenshot: design/verify/' + name + ' (' + size + 'B)');
+  return file;
+}
+
+function rect(page, selector) {
+  return page.evaluate(sel => {
+    const node = document.querySelector(sel);
+    if (!node) return null;
+    const r = node.getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height, right: r.right, bottom: r.bottom };
+  }, selector);
+}
+
+/* ---------------------------------------------------------- 测试主体 */
+
+(async () => {
+  const srv = await startServer();
+  baseUrl = srv.base;
+  browser = await chromium.launch();
+  console.log('ui smoke · ' + baseUrl + ' · CSP 已启用');
+
+  /* ============ 1. ?demo&effects=css：渲染 / 布局 / 截图 ============ */
+  await test('G1 ?demo&effects=css 截图非空、4+ 行、主卡与列表无溢出', async () => {
+    const page = await openPage('?demo&effects=css');
+    try {
+      await page.mouse.move(W * 0.62, H * 0.34);
+      await sleep(900);
+      await screenshot(page, 'ui-dev-demo.png');
+
+      const rows = await page.$$eval('.row:not([hidden])', nodes => nodes.length);
+      ok(rows >= 4, '列表行数不足 4，实际 ' + rows);
+
+      const layout = await page.evaluate(() => {
+        const panel = document.getElementById('panel').getBoundingClientRect();
+        const list = document.getElementById('list');
+        const hero = document.getElementById('hero').getBoundingClientRect();
+        const side = document.querySelector('.side').getBoundingClientRect();
+        return {
+          vw: window.innerWidth,
+          vh: window.innerHeight,
+          panel: { x: panel.x, y: panel.y, w: panel.width, h: panel.height, right: panel.right, bottom: panel.bottom },
+          listScroll: list.scrollHeight,
+          listClient: list.clientHeight,
+          hero: { x: hero.x, y: hero.y, right: hero.right, bottom: hero.bottom },
+          side: { x: side.x, y: side.y, right: side.right, bottom: side.bottom },
+          docOverflowX: document.documentElement.scrollWidth > window.innerWidth,
+          docOverflowY: document.documentElement.scrollHeight > window.innerHeight
+        };
+      });
+      /* BUILD_PLAN §5.1：780×440 窗口里 720×380 面板，四周正好 30px 安全边 */
+      ok(Math.abs(layout.panel.x - 30) <= 1, '面板左安全边不是 30px：' + layout.panel.x);
+      ok(Math.abs(layout.panel.y - 30) <= 1, '面板上安全边不是 30px：' + layout.panel.y);
+      eq(Math.round(layout.panel.w), 720, '面板宽度');
+      eq(Math.round(layout.panel.h), 380, '面板高度');
+      ok(layout.panel.right <= W - 29 && layout.panel.bottom <= H - 29, '面板撑出窗口安全边');
+      ok(!layout.docOverflowX && !layout.docOverflowY, '文档出现滚动溢出');
+      ok(layout.listScroll <= layout.listClient + 1, 'demo 列表出现纵向溢出：' + layout.listScroll + ' > ' + layout.listClient);
+      ok(layout.hero.right <= layout.panel.right && layout.hero.bottom <= layout.panel.bottom, '主卡溢出面板');
+      ok(layout.side.right <= layout.panel.right && layout.side.bottom <= layout.panel.bottom, '列表区溢出面板');
+
+      /* ?effects=css 必须真的保留 CSS 毛玻璃 */
+      const filters = await page.evaluate(() => ({
+        panel: getComputedStyle(document.getElementById('panel')).backdropFilter,
+        controls: getComputedStyle(document.getElementById('controls')).backdropFilter,
+        hero: getComputedStyle(document.querySelector('.hero-card')).backdropFilter,
+        row: getComputedStyle(document.querySelector('.row')).backdropFilter
+      }));
+      ok(filters.panel !== 'none', 'effects=css 时面板应有 backdrop-filter');
+      ok(filters.controls !== 'none', 'effects=css 时控件簇应有 backdrop-filter');
+      ok(filters.hero !== 'none', 'effects=css 时主卡应有 backdrop-filter');
+      ok(filters.row !== 'none', 'effects=css 时列表行应有 backdrop-filter');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 2. ?mock：null / approx / charging / low / alert ============ */
+  await test('G2 ?mock 的 null/approx/charging/low 文案与 alert toast', async () => {
+    const page = await openPage('?mock&freeze');
+    try {
+      const rows = await page.$$eval('.row:not([hidden])', n => n.length);
+      eq(rows, 4, 'mock 列表行数（5 台设备，主卡 1 台）');
+
+      /* level=null：必须显示未知，不能显示 0% */
+      const nullRow = await page.$('[data-key="logi:046d:c092:unit-77"]');
+      ok(!!nullRow, '找不到 null 电量设备行');
+      const nullInfo = await nullRow.evaluate(node => ({
+        text: node.textContent,
+        level: node.querySelector('.row-level').textContent,
+        levelClass: node.querySelector('.row-level').className
+      }));
+      eq(nullInfo.level, '未知', 'null 电量行右侧文案');
+      includes(nullInfo.text, '未知', 'null 电量行文案');
+      ok(nullInfo.text.indexOf('0%') < 0, 'null 电量被渲染成了 0%');
+      includes(nullInfo.levelClass, 'is-unknown', 'null 电量标记 class');
+
+      /* approx：档位设备展示 approx 文案（协议 §1） */
+      const approxRow = await page.$('[data-key="steelseries:1038:1720:unit-5"]');
+      ok(!!approxRow, '找不到 approx 设备行');
+      const approxInfo = await approxRow.evaluate(node => ({
+        text: node.textContent,
+        right: node.querySelector('.row-level').textContent,
+        ring: node.querySelector('.ring').className
+      }));
+      includes(approxInfo.text, '约 55%（中）', 'approx 文案');
+      eq(approxInfo.right, '55%', 'approx 设备右侧电量');
+      ok(approxInfo.ring.indexOf('state-low') < 0, '55% 不应被判低电');
+
+      /* charging：圆环状态 class + 文案 */
+      const chargeInfo = await page.$eval('[data-key="xinput:045e:0b00:unit-1"]', node => ({
+        ring: node.querySelector('.ring').className,
+        text: node.textContent
+      }));
+      includes(chargeInfo.ring, 'state-charging', '充电设备圆环 class');
+      includes(chargeInfo.text, '充电中', '充电中文案');
+
+      /* low：主卡（最低电量 12%）红色 + 建议充电 */
+      const heroInfo = await page.evaluate(() => ({
+        ringClass: document.getElementById('hero-ring').className,
+        alertHidden: document.getElementById('hero-alert').hidden,
+        alertText: document.getElementById('hero-alert').textContent,
+        panelLow: document.getElementById('panel').classList.contains('is-low')
+      }));
+      includes(heroInfo.ringClass, 'state-low', '主卡低电 class');
+      ok(!heroInfo.alertHidden, '低电主卡应显示告警标签');
+      includes(heroInfo.alertText, '建议充电', '告警标签文案');
+      ok(heroInfo.panelLow, '低电时面板应加 is-low');
+
+      /* collector alert → toast */
+      await page.evaluate(() => {
+        window.__pbMock.alert('low', 'logi:046d:c547:unit-12', 12, 'Arctis Nova 7 电量低，建议充电');
+      });
+      await page.waitForSelector('.toast', { state: 'visible', timeout: 3000 });
+      const toastText = await page.$eval('.toast', node => node.textContent);
+      includes(toastText, '电量低', '告警 toast 文案');
+
+      /* 副标题：设备数 + HH:MM 更新时间 */
+      const subtitle = await page.$eval('#subtitle', node => node.textContent);
+      ok(/5 台设备 · \d{2}:\d{2} 更新/.test(subtitle), '副标题设备数/更新时间格式错误：' + subtitle);
+
+      /* transport 枚举 → 展示文案；left_s → 人类可读 */
+      const viperText = await page.$eval('[data-key="razer:1532:0099:unit-3"]', node => node.textContent);
+      includes(viperText, '2.4 GHz', '2.4g transport 映射');
+      includes(viperText, '约 18 小时', 'left_s 人类可读');
+      const unknownText = await page.$eval('[data-key="logi:046d:c092:unit-77"]', node => node.textContent);
+      includes(unknownText, '未知连接', 'unknown transport 映射');
+      const chargeText = await page.$eval('[data-key="xinput:045e:0b00:unit-1"]', node => node.textContent);
+      includes(chargeText, '蓝牙', 'bluetooth transport 映射');
+      eq(await page.$eval('#hero-caption', node => node.textContent), '约 1 小时 48 分', 'left_s 人类可读（主卡）');
+
+      await screenshot(page, 'ui-prod-mock.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 3. keyed diff：节点复用 / 悬停 / 焦点 ============ */
+  await test('G3 20 次数据更新后行节点复用、悬停与焦点保持', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await page.waitForFunction(() => window.__pbDebug.rowCount === 4, null, { timeout: 3000 });
+      const second = page.locator('.row:not([hidden])').nth(1);
+      const box = await second.boundingBox();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await sleep(120);
+
+      await page.evaluate(() => {
+        window.__rowsBefore = Array.from(document.querySelectorAll('.row:not([hidden])'));
+        window.__hoverRow = window.__rowsBefore[1];
+        window.__focusRow = window.__rowsBefore[0];
+        window.__createsBefore = window.__pbDebug.rowCreates;
+        window.__removesBefore = window.__pbDebug.rowRemoves;
+        window.__levelBefore = window.__hoverRow.querySelector('.row-level').textContent;
+        window.__focusRow.focus();
+      });
+
+      const hoverBefore = await page.evaluate(() => window.__hoverRow.matches(':hover'));
+      ok(hoverBefore, '数据更新前悬停状态未生效');
+
+      await page.evaluate(() => {
+        const key = window.__hoverRow.dataset.key;
+        window.__pbMock.stressUpdates(key, 20);
+      });
+      await sleep(160);
+
+      const after = await page.evaluate(() => {
+        const rowsNow = Array.from(document.querySelectorAll('.row:not([hidden])'));
+        return {
+          sameCount: rowsNow.length,
+          sameNodes: window.__rowsBefore.every((node, i) => node === rowsNow[i]),
+          nodeCount: window.__rowsBefore.length,
+          creates: window.__pbDebug.rowCreates,
+          createsBefore: window.__createsBefore,
+          removes: window.__pbDebug.rowRemoves,
+          removesBefore: window.__removesBefore,
+          hoverKept: window.__hoverRow.matches(':hover'),
+          focusKept: document.activeElement === window.__focusRow,
+          hoverConnected: window.__hoverRow.isConnected,
+          levelChanged: window.__hoverRow.querySelector('.row-level').textContent !== window.__levelBefore,
+          renders: window.__pbDebug.renders
+        };
+      });
+      eq(after.sameCount, 4, '更新后行数变化');
+      ok(after.sameNodes, '数据更新后行 DOM 节点被替换（发生了整列表重建）');
+      eq(after.creates, after.createsBefore, '数据更新不应创建新行节点');
+      eq(after.removes, after.removesBefore, '数据更新不应删除行节点');
+      ok(after.hoverConnected, '悬停行被移除');
+      ok(after.hoverKept, '数据更新后悬停状态丢失');
+      ok(after.focusKept, '数据更新后键盘焦点丢失');
+      ok(after.levelChanged, '数据更新没有生效（电量文案未变化）');
+      await screenshot(page, 'ui-dev-hover.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 4. session 重置 / replaces morph / seq 乱序 ============ */
+  await test('G4 session 重置不重播 intro、replaces 原地 morph、seq 乱序丢弃', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      const introPlays1 = await page.evaluate(() => window.__pbDebug.introPlays);
+      eq(introPlays1, 1, '入场动画应只播 1 次');
+
+      /* session 变化：全量重置但不重播 intro */
+      const rowsBefore = await page.$$eval('.row:not([hidden])', n => n.length);
+      await page.evaluate(() => { window.__pbMock.sessionReset('smoke-session-2'); });
+      await sleep(120);
+      const sessionInfo = await page.evaluate(() => ({
+        sessions: window.__pbDebug.sessions,
+        intro: document.body.classList.contains('intro'),
+        introPlays: window.__pbDebug.introPlays,
+        rows: document.querySelectorAll('.row:not([hidden])').length,
+        session: window.__pbDebug.session
+      }));
+      eq(sessionInfo.sessions, 2, 'session 变化应触发一次全量重置');
+      ok(!sessionInfo.intro, 'session 变化后 body.intro 被重新加上（会重播入场动画）');
+      eq(sessionInfo.introPlays, 1, 'intro 播放次数被增加');
+      eq(sessionInfo.rows, rowsBefore, 'session 重置后行数异常');
+      eq(sessionInfo.session, 'smoke-session-2', 'session id 未更新');
+
+      /* replaces：key 迁移 → 同一 DOM 节点 morph，不 delete+insert */
+      const morphInfo = await page.evaluate(() => {
+        const oldKey = window.__pbDebug.rowKeys[0];
+        const node = document.querySelector('[data-key="' + oldKey + '"]');
+        window.__morphOldKey = oldKey;
+        window.__morphNode = node;
+        window.__createsBefore = window.__pbDebug.rowCreates;
+        window.__removesBefore = window.__pbDebug.rowRemoves;
+        window.__pbMock.device({
+          key: 'morph:new:key:1',
+          name: 'Renamed Device',
+          level: 40,
+          approx: '',
+          left_s: 3600,
+          charging: false,
+          online: true,
+          kind: 'mouse',
+          transport: '2.4g'
+        }, oldKey);
+        return { oldKey: oldKey, creates: window.__pbDebug.rowCreates, removes: window.__pbDebug.rowRemoves };
+      });
+      await sleep(120);
+      const morphAfter = await page.evaluate(() => {
+        const newNode = document.querySelector('[data-key="morph:new:key:1"]');
+        return {
+          sameNode: newNode === window.__morphNode,
+          connected: !!newNode && newNode.isConnected,
+          oldGone: document.querySelector('[data-key="' + window.__morphOldKey + '"]') === null,
+          name: newNode ? newNode.querySelector('.row-name').textContent : '',
+          creates: window.__pbDebug.rowCreates,
+          removes: window.__pbDebug.rowRemoves,
+          opacity: newNode ? getComputedStyle(newNode).opacity : '0',
+          rows: document.querySelectorAll('.row:not([hidden])').length
+        };
+      });
+      ok(morphAfter.sameNode && morphAfter.connected, 'replaces 后行 DOM 节点被替换（不是 morph）');
+      ok(morphAfter.oldGone, 'replaces 后旧 key 行仍然存在');
+      eq(morphAfter.name, 'Renamed Device', 'replaces 后行文案未更新');
+      eq(morphAfter.creates, morphInfo.creates, 'replaces 不应创建新节点');
+      eq(morphAfter.removes, morphInfo.removes, 'replaces 不应删除节点');
+      eq(morphAfter.opacity, '1', 'replaces 后行透明度异常（疑似闪烁）');
+      eq(morphAfter.rows, rowsBefore, 'replaces 后行数变化');
+
+      /* seq 乱序：比当前 seq 旧的事件必须丢弃 */
+      const dropped = await page.evaluate(() => {
+        const seq = window.__pbDebug.seq;
+        const key = window.__pbDebug.rowKeys[0];
+        const row = document.querySelector('[data-key="' + key + '"]');
+        const before = row.querySelector('.row-level').textContent;
+        const beforeDropped = window.__pbDebug.dropped;
+        window.__pbMock.emit({
+          t: 'device',
+          session: 'smoke-session-2',
+          seq: Math.max(0, seq - 3),
+          device: {
+            key: key, name: 'Stale Name', level: 3, approx: '', left_s: null,
+            charging: false, online: true, kind: 'mouse', transport: '2.4g'
+          }
+        });
+        return {
+          levelBefore: before,
+          levelAfter: row.querySelector('.row-level').textContent,
+          nameAfter: row.querySelector('.row-name').textContent,
+          droppedBefore: beforeDropped,
+          droppedAfter: window.__pbDebug.dropped
+        };
+      });
+      eq(dropped.droppedAfter, dropped.droppedBefore + 1, '乱序 seq 未被丢弃');
+      eq(dropped.levelAfter, dropped.levelBefore, '乱序事件改写了电量');
+      ok(dropped.nameAfter !== 'Stale Name', '乱序事件改写了设备名');
+      await screenshot(page, 'ui-dev-session.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 5. 生产模式零 backdrop-filter / 柔光结构 ============ */
+  await test('G5 生产模式 computedStyle 无 backdrop-filter，?effects=css 有', async () => {
+    const prod = await openPage('?demo');
+    try {
+      await waitIntroDone(prod);
+      const prodInfo = await prod.evaluate(() => {
+        const all = Array.from(document.querySelectorAll('*'));
+        const withFilter = all.filter(node => {
+          const cs = getComputedStyle(node);
+          return (cs.backdropFilter && cs.backdropFilter !== 'none') ||
+            (cs.webkitBackdropFilter && cs.webkitBackdropFilter !== 'none');
+        }).map(node => node.id || node.className || node.tagName);
+        const sel = s => {
+          const node = document.querySelector(s);
+          return node ? getComputedStyle(node).backdropFilter : 'missing';
+        };
+        const specular = document.getElementById('specular');
+        const ring = document.getElementById('hero-ring');
+        return {
+          filterCount: withFilter.length,
+          filters: withFilter.slice(0, 8),
+          panel: sel('#panel'),
+          controls: sel('#controls'),
+          hero: sel('.hero-card'),
+          row: sel('.row'),
+          effects: document.documentElement.dataset.effects || '',
+          specularInsidePanel: !!(specular && specular.closest('#panel')),
+          specularBlend: specular ? getComputedStyle(specular).mixBlendMode : 'missing',
+          specularWillChange: specular ? getComputedStyle(specular).willChange : 'missing',
+          specularParent: specular && specular.parentElement ? specular.parentElement.id : '',
+          panelWillChange: getComputedStyle(document.getElementById('panel')).willChange,
+          heroRing: ring ? ring.className : ''
+        };
+      });
+      eq(prodInfo.filterCount, 0, '生产模式仍有元素带 backdrop-filter：' + JSON.stringify(prodInfo.filters));
+      eq(prodInfo.panel, 'none', '生产模式面板 backdrop-filter');
+      eq(prodInfo.controls, 'none', '生产模式控件簇 backdrop-filter');
+      eq(prodInfo.hero, 'none', '生产模式主卡 backdrop-filter');
+      eq(prodInfo.row, 'none', '生产模式列表行 backdrop-filter');
+      eq(prodInfo.effects, '', '生产模式不应设置 data-effects');
+      ok(prodInfo.specularParent === 'glow-layer', '指针柔光不在独立的 glow-layer 层');
+      ok(!prodInfo.specularInsidePanel, '指针柔光仍在 .panel（backdrop-filter 祖先）内');
+      eq(prodInfo.specularBlend, 'normal', '指针柔光不应有 mix-blend-mode');
+      includes(prodInfo.specularWillChange, 'auto', '柔光 will-change 不应常驻');
+      eq(prodInfo.panelWillChange, 'auto', '入场结束后面板 will-change 应被移除');
+      await screenshot(prod, 'ui-prod-demo.png');
+    } finally {
+      await prod.close();
+    }
+
+    const dev = await openPage('?demo&effects=css');
+    try {
+      const devFilters = await dev.evaluate(() => {
+        const sel = s => getComputedStyle(document.querySelector(s)).backdropFilter;
+        return {
+          effects: document.documentElement.dataset.effects || '',
+          panel: sel('#panel'),
+          controls: sel('#controls'),
+          hero: sel('.hero-card'),
+          row: sel('.row')
+        };
+      });
+      eq(devFilters.effects, 'css', 'data-effects 未按 ?effects=css 设置');
+      ok(devFilters.panel !== 'none', 'effects=css 面板无 backdrop-filter');
+      ok(devFilters.controls !== 'none', 'effects=css 控件簇无 backdrop-filter');
+      ok(devFilters.hero !== 'none', 'effects=css 主卡无 backdrop-filter');
+      ok(devFilters.row !== 'none', 'effects=css 列表行无 backdrop-filter');
+    } finally {
+      await dev.close();
+    }
+  });
+
+  /* ============ 6. 隐藏四步前端部分 ============ */
+  await test('G6 隐藏后动画全 paused、rAF 停、DOM 不更新，恢复后渲染最新快照', async () => {
+    const page = await openPage('?mock&freeze&effects=css&hide');
+    try {
+      await page.waitForFunction(() => window.__pbDebug.hidden === true, null, { timeout: 5000 });
+      await sleep(180);
+
+      const hiddenInfo = await page.evaluate(() => {
+        const anims = document.getAnimations();
+        return {
+          bodyHidden: document.body.classList.contains('is-hidden'),
+          animationCount: anims.length,
+          running: anims.filter(a => a.playState === 'running').length,
+          paused: anims.filter(a => a.playState === 'paused').length,
+          rafActive: window.__pbDebug.rafActive,
+          rafTicks: window.__pbDebug.rafTicks,
+          timers: window.__pbDebug.timersActive,
+          renders: window.__pbDebug.renders,
+          skips: window.__pbDebug.renderSkipsHidden,
+          domWrites: window.__pbDebug.domWritesWhileHidden
+        };
+      });
+      ok(hiddenInfo.bodyHidden, '隐藏后 body.is-hidden 未设置');
+      ok(hiddenInfo.animationCount > 0, '隐藏时没有可暂停的动画，用例不可信');
+      eq(hiddenInfo.running, 0, '隐藏后仍有动画在运行（WAAPI 未暂停）');
+      ok(hiddenInfo.paused > 0, '隐藏后没有 paused 动画');
+      eq(hiddenInfo.rafActive, false, '隐藏后 rAF 仍在运行');
+      eq(hiddenInfo.timers, 0, '隐藏后 UI 定时器未清理');
+
+      /* 隐藏期间推 30 次数据：DOM 必须保持不动 */
+      const target = await page.evaluate(() => {
+        const key = window.__pbDebug.rowKeys[1];
+        const row = document.querySelector('[data-key="' + key + '"]');
+        window.__hiddenRow = row;
+        window.__hiddenKey = key;
+        window.__hiddenText = row.querySelector('.row-level').textContent;
+        window.__hiddenRenders = window.__pbDebug.renders;
+        window.__hiddenRaf = window.__pbDebug.rafTicks;
+        for (let i = 0; i < 30; i++) {
+          window.__pbMock.setLevel(key, 30 + i);
+        }
+        return { key: key, text: window.__hiddenText, renders: window.__hiddenRenders };
+      });
+      await sleep(260);
+
+      const duringHidden = await page.evaluate(() => ({
+        text: window.__hiddenRow.querySelector('.row-level').textContent,
+        textBefore: window.__hiddenText,
+        renders: window.__pbDebug.renders,
+        rendersBefore: window.__hiddenRenders,
+        skips: window.__pbDebug.renderSkipsHidden,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        rafTicks: window.__pbDebug.rafTicks,
+        rafBefore: window.__hiddenRaf,
+        connected: window.__hiddenRow.isConnected
+      }));
+      eq(duringHidden.text, duringHidden.textBefore, '隐藏期间 DOM 被写入（行文案已变化）');
+      eq(duringHidden.renders, duringHidden.rendersBefore, '隐藏期间仍执行了渲染');
+      ok(duringHidden.skips >= 30, '隐藏期间未记录到跳过的渲染次数：' + duringHidden.skips);
+      eq(duringHidden.domWrites, 0, '隐藏期间发生 DOM 写入：' + duringHidden.domWrites);
+      eq(duringHidden.rafTicks, duringHidden.rafBefore, '隐藏期间 rAF 仍在跑');
+      ok(duringHidden.connected, '隐藏期间行节点被移除');
+      await screenshot(page, 'ui-dev-hidden.png');
+
+      /* 恢复：先用最后快照渲染一帧，再恢复动画 */
+      await page.evaluate(() => { window.__pbMock.visibility(false); });
+      await page.waitForFunction(() => window.__pbDebug.hidden === false, null, { timeout: 3000 });
+      await sleep(160);
+      const resumed = await page.evaluate(() => {
+        const anims = document.getAnimations();
+        return {
+          text: window.__hiddenRow.querySelector('.row-level').textContent,
+          renders: window.__pbDebug.renders,
+          rendersHidden: window.__hiddenRenders,
+          bodyHidden: document.body.classList.contains('is-hidden'),
+          running: anims.filter(a => a.playState === 'running').length,
+          sameNode: document.querySelector('[data-key="' + window.__hiddenKey + '"]') === window.__hiddenRow
+        };
+      });
+      ok(!resumed.bodyHidden, '恢复后 body.is-hidden 未移除');
+      ok(resumed.renders > resumed.rendersHidden, '恢复后没有渲染最新快照');
+      eq(resumed.text, '59%', '恢复后未渲染最后一份快照：' + resumed.text);
+      ok(resumed.sameNode, '恢复后行节点被替换');
+      ok(resumed.running > 0, '恢复后动画没有继续播放');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 7. 控制台 / CSP / 内联样式 ============ */
+  await test('G7 无控制台错误、无 CSP 违规、无内联 style/script', async () => {
+    /* 静态源码检查 */
+    const html = fs.readFileSync(path.join(UI_DIR, 'index.html'), 'utf8');
+    ok(!/\sstyle\s*=/i.test(html), 'index.html 存在内联 style 属性');
+    ok(!/<style[\s>]/i.test(html), 'index.html 存在内联 <style>');
+    ok(!/\son[a-z]+\s*=/i.test(html), 'index.html 存在内联事件属性');
+    ok(!/javascript:/i.test(html), 'index.html 存在 javascript: URL');
+    ok(!/<script(?![^>]*\bsrc=)/i.test(html), 'index.html 存在内联 <script>');
+
+    const scriptSrcs = Array.from(html.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)).map(m => m[1]);
+    eq(scriptSrcs.join(','), 'bridge.js,app.js', 'script 引用顺序错误');
+
+    const appJs = fs.readFileSync(path.join(UI_DIR, 'app.js'), 'utf8');
+    const bridgeJs = fs.readFileSync(path.join(UI_DIR, 'bridge.js'), 'utf8');
+    ok(!/\.cssText\s*=/.test(appJs) && !/\.cssText\s*=/.test(bridgeJs), 'JS 中使用 cssText 写内联样式');
+    ok(!/setAttribute\(\s*['"]style['"]/.test(appJs) && !/setAttribute\(\s*['"]style['"]/.test(bridgeJs), 'JS 用 setAttribute 写 style 属性');
+    ok(!/innerHTML\s*=\s*[`'"][^`'"]*style\s*=/.test(appJs) && !/innerHTML\s*=\s*[`'"][^`'"]*style\s*=/.test(bridgeJs), 'innerHTML 字符串里带 style=');
+
+    /* CSS：backdrop-filter 只允许出现在 data-effects / reduced-transparency 作用域 */
+    const css = fs.readFileSync(path.join(UI_DIR, 'styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const lines = css.split(/\r?\n/);
+    let selector = '';
+    const badFilters = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      if (trimmed.indexOf('backdrop-filter') >= 0 && trimmed.indexOf('{') < 0) {
+        const scope = selector + ' ' + trimmed;
+        if (!/data-effects|prefers-reduced-transparency/.test(scope)) badFilters.push(trimmed);
+        continue;
+      }
+      if (trimmed.indexOf('{') >= 0) {
+        const head = trimmed.slice(0, trimmed.indexOf('{'));
+        if (head) selector = head;
+      }
+    }
+    eq(badFilters.length, 0, '生产作用域出现 backdrop-filter：' + JSON.stringify(badFilters));
+
+    /* 没有页面级错误 / CSP 违规（所有已打开页面） */
+    const cspIssues = pageErrors.filter(e => /content security policy|refused to|violates the following/i.test(e.text));
+    const otherErrors = pageErrors.filter(e => !/content security policy|refused to|violates the following/i.test(e.text));
+    eq(cspIssues.length, 0, 'CSP 违规：' + JSON.stringify(cspIssues.slice(0, 4)));
+    eq(otherErrors.length, 0, '控制台错误：' + JSON.stringify(otherErrors.slice(0, 4)));
+  });
+
+  /* ============ 附加 A. 托盘状态同步 ============ */
+  await test('A1 set_tray_state：最低电量设备 / 全离线 online:false / level=null', async () => {
+    const page = await openPage('?mock&freeze');
+    try {
+      const tray1 = await page.evaluate(() => window.__pbDebug.lastTray);
+      ok(tray1 && tray1.online === true, '托盘状态未同步 online');
+      eq(tray1.level, 12, '托盘应取最低电量设备（12%）');
+      eq(tray1.kind, 'headset', '托盘 kind');
+      const calls = await page.evaluate(() => window.__pbDebug.trayCalls.length);
+      ok(calls >= 1, '没有调用 set_tray_state');
+
+      await page.evaluate(() => { window.__pbMock.allOffline(); });
+      await sleep(120);
+      const offline = await page.evaluate(() => ({
+        offlineRows: document.querySelectorAll('.row.is-offline:not([hidden])').length,
+        rowsText: Array.from(document.querySelectorAll('.row:not([hidden])')).map(n => n.textContent).join('|'),
+        liveText: document.getElementById('live-text').textContent,
+        subtitle: document.getElementById('subtitle').textContent,
+        heroCaption: document.getElementById('hero-caption').textContent
+      }));
+      ok(offline.offlineRows > 0, '离线设备行未加 is-offline');
+      includes(offline.rowsText, '离线', '离线设备行文案');
+      eq(offline.liveText, '离线', '全部离线时在线徽标文案');
+      includes(offline.subtitle, '0 台设备', '全部离线时副标题设备数');
+      eq(offline.heroCaption, '设备离线', '离线主卡文案');
+      const tray2 = await page.evaluate(() => window.__pbDebug.lastTray);
+      eq(tray2.online, false, '全离线时托盘 online 应为 false');
+      eq(tray2.level, null, '全离线时托盘 level 应为 null');
+
+      /* level=null 的在线设备：允许 level:null 直接透传 */
+      const trayNull = await page.evaluate(() => {
+        window.__pbMock.tick([{
+          key: 'only:unknown:1', name: 'Unknown Device', level: null, approx: '',
+          left_s: null, charging: false, online: true, kind: 'mouse', transport: 'unknown'
+        }]);
+        return window.__pbDebug.lastTray;
+      });
+      eq(trayNull.level, null, '在线但电量未知的设备应传 level=null');
+      eq(trayNull.online, true, '在线设备托盘 online 应为 true');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 附加 B. 设置抽屉 / 键盘 / 持久化 ============ */
+  await test('A2 设置抽屉：键盘可操作、阈值生效、localStorage 持久化', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await page.evaluate(() => localStorage.removeItem('pb.settings.v1'));
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+      await waitIntroDone(page);
+
+      /* 键盘焦点到设置按钮 → Enter 打开 */
+      await page.focus('#btn-settings');
+      await page.keyboard.press('Enter');
+      await page.waitForSelector('#drawer.is-open', { timeout: 2000 });
+      const opened = await page.evaluate(() => ({
+        expanded: document.getElementById('btn-settings').getAttribute('aria-expanded'),
+        ariaHidden: document.getElementById('drawer').getAttribute('aria-hidden'),
+        inert: document.getElementById('drawer').hasAttribute('inert'),
+        focus: document.activeElement && document.activeElement.id
+      }));
+      eq(opened.expanded, 'true', '按钮 aria-expanded 未更新');
+      eq(opened.ariaHidden, 'false', '抽屉 aria-hidden 未更新');
+      ok(!opened.inert, '打开后抽屉仍有 inert');
+      eq(opened.focus, 'set-threshold', '打开抽屉后焦点未进入第一个设置项');
+
+      /* 抽屉是覆盖层，不能改变 720×380 面板外框 */
+      const panelWhileOpen = await page.evaluate(() => {
+        const r = document.getElementById('panel').getBoundingClientRect();
+        return { x: r.x, y: r.y, w: r.width, h: r.height };
+      });
+      eq(Math.round(panelWhileOpen.w), 720, '打开设置后面板宽度被改变');
+      eq(Math.round(panelWhileOpen.h), 380, '打开设置后面板高度被改变');
+      eq(Math.round(panelWhileOpen.x), 30, '打开设置后安全边改变');
+      eq(Math.round(panelWhileOpen.y), 30, '打开设置后安全边改变');
+
+      /* 调整低电阈值：32 → 55% 的 Arctis 7P 不应再被判低电之外，检查阈值写入生效 */
+      await page.evaluate(() => {
+        const input = document.getElementById('set-threshold');
+        input.value = '32';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      const thresholdInfo = await page.evaluate(() => ({
+        debug: window.__pbDebug.settings.lowThreshold,
+        out: document.getElementById('set-threshold-out').textContent,
+        stored: JSON.parse(localStorage.getItem('pb.settings.v1') || '{}').lowThreshold
+      }));
+      eq(thresholdInfo.debug, 32, '低电阈值未生效（debug）');
+      eq(thresholdInfo.out, '32%', '低电阈值输出未更新');
+      eq(thresholdInfo.stored, 32, '低电阈值未写入 localStorage');
+
+      /* 降低动效勾选 */
+      await page.evaluate(() => {
+        const box = document.getElementById('set-reduced');
+        box.checked = true;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      const reduced = await page.evaluate(() => ({
+        dataset: document.documentElement.dataset.reducedMotion,
+        stored: JSON.parse(localStorage.getItem('pb.settings.v1') || '{}').reducedMotion
+      }));
+      eq(reduced.dataset, 'true', '降低动效未写到 html[data-reduced-motion]');
+      eq(reduced.stored, true, '降低动效未持久化');
+
+      await screenshot(page, 'ui-dev-settings.png');
+
+      /* Escape 关闭，焦点回到设置按钮 */
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.getElementById('drawer').classList.contains('is-open'), null, { timeout: 2000 });
+      const closed = await page.evaluate(() => ({
+        expanded: document.getElementById('btn-settings').getAttribute('aria-expanded'),
+        focus: document.activeElement && document.activeElement.id
+      }));
+      eq(closed.expanded, 'false', '关闭后 aria-expanded 未复位');
+      eq(closed.focus, 'btn-settings', '关闭后焦点未回到设置按钮');
+
+      /* 刷新后设置仍在 */
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+      const persisted = await page.evaluate(() => ({
+        threshold: document.getElementById('set-threshold').value,
+        reduced: document.getElementById('set-reduced').checked,
+        debug: window.__pbDebug.settings.lowThreshold
+      }));
+      eq(persisted.threshold, '32', '刷新后阈值未恢复');
+      eq(persisted.debug, 32, '刷新后 debug 阈值未恢复');
+      eq(persisted.reduced, true, '刷新后降低动效未恢复');
+      await page.evaluate(() => localStorage.removeItem('pb.settings.v1'));
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 附加 C. 柔光 / 涟漪 / rAF 按需 / Win10 回退 ============ */
+  await test('A3 指针柔光与涟漪（PNG+transform）在 CSP 下工作，rAF 按需启动', async () => {
+    const page = await openPage('?demo&effects=css');
+    try {
+      const initial = await page.evaluate(() => ({
+        transform: document.getElementById('specular').style.transform,
+        rafTicks: window.__pbDebug.rafTicks
+      }));
+
+      await page.mouse.move(W * 0.7, H * 0.4);
+      await sleep(160);
+      const moved = await page.evaluate(() => ({
+        transform: document.getElementById('specular').style.transform,
+        opacity: getComputedStyle(document.getElementById('specular')).opacity,
+        tracking: document.getElementById('glow-layer').classList.contains('is-tracking'),
+        willChange: getComputedStyle(document.getElementById('specular')).willChange,
+        rafTicks: window.__pbDebug.rafTicks,
+        blend: getComputedStyle(document.getElementById('specular')).mixBlendMode
+      }));
+      eq(moved.opacity, '1', '柔光层不透明度异常（应只动 transform）');
+      ok(moved.tracking, '指针进入后未进入 tracking（will-change 生命周期）');
+      ok(moved.transform !== initial.transform, '柔光 transform 未随指针更新');
+      ok(moved.rafTicks > initial.rafTicks, 'pointermove 没有走 rAF 合并');
+      includes(moved.willChange, 'transform', '指针进入期间柔光未加 will-change');
+      eq(moved.blend, 'normal', '柔光不应有 mix-blend-mode');
+
+      await sleep(220);
+      const idle = await page.evaluate(() => ({
+        active: window.__pbDebug.rafActive,
+        ticks: window.__pbDebug.rafTicks
+      }));
+      eq(idle.active, false, '指针停下后 rAF 仍在空转');
+
+      /* 点击空白玻璃：预渲染 PNG 涟漪 + transform */
+      const before = await page.$$eval('.ripple', n => n.length);
+      await page.mouse.click(120, 190);
+      await sleep(120);
+      const rippleInfo = await page.evaluate(beforeCount => {
+        const nodes = document.querySelectorAll('.ripple');
+        const r = nodes[nodes.length - 1];
+        return {
+          count: nodes.length,
+          before: beforeCount,
+          exists: !!r,
+          bg: r ? getComputedStyle(r).backgroundImage : '',
+          blend: r ? getComputedStyle(r).mixBlendMode : '',
+          animation: r ? getComputedStyle(r).animationName : ''
+        };
+      }, before);
+      ok(rippleInfo.count > rippleInfo.before, '点击后没有生成涟漪');
+      includes(rippleInfo.bg, 'data:image/png', '涟漪不是预渲染 PNG data URI');
+      eq(rippleInfo.blend, 'normal', '涟漪仍使用 mix-blend-mode');
+      eq(rippleInfo.animation, 'ripple-out', '涟漪动画名异常');
+
+      /* Win10 回退：html[data-windows11="false"] 面板给不透明底 */
+      await page.evaluate(() => {
+        window.__pbMock.appState({
+          pinned: false,
+          platform: { windows11: false, build: 19045 },
+          build: 'dev',
+          version: '0.1.0'
+        });
+      });
+      await sleep(80);
+      const win10 = await page.evaluate(() => ({
+        dataset: document.documentElement.dataset.windows11,
+        bg: getComputedStyle(document.getElementById('panel')).backgroundColor
+      }));
+      eq(win10.dataset, 'false', 'app-state.windows11=false 未落到 html[data-windows11]');
+      ok(win10.bg !== 'rgba(0, 0, 0, 0)' && win10.bg !== 'transparent', 'Win10 回退面板不是不透明底：' + win10.bg);
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ F1. 隐藏态托盘同步（P1-2） ============ */
+  await test('F1 隐藏态 set_tray_state 仍随数据/充电变化同步；首次数据前不发 offline', async () => {
+    /* 1) 启动无数据：不应下发 online:false（保持 Rust 的「未知」图标） */
+    const emptyPage = await openPage('?mock&freeze&empty');
+    try {
+      await sleep(150);
+      const empty = await emptyPage.evaluate(() => ({
+        calls: window.__pbDebug.trayCalls.length,
+        devices: window.__pbDebug.devices,
+        lastTray: window.__pbDebug.lastTray,
+        rows: document.querySelectorAll('.row').length
+      }));
+      eq(empty.devices, 0, '?mock&empty 应无设备');
+      eq(empty.calls, 0, '首次数据到达前不应下发 set_tray_state（避免启动即「离线」图标）');
+      eq(empty.lastTray, null, '首次数据到达前不应有托盘 payload');
+
+      /* 首台设备到达 → 立即同步 */
+      await emptyPage.evaluate(() => {
+        window.__pbMock.device({
+          key: 'first:dev:1', name: 'First Device', level: 77, approx: '', left_s: null,
+          charging: false, online: true, kind: 'mouse', transport: '2.4g'
+        });
+      });
+      await sleep(120);
+      const first = await emptyPage.evaluate(() => ({
+        calls: window.__pbDebug.trayCalls.length,
+        last: window.__pbDebug.lastTray
+      }));
+      ok(first.calls >= 1, '首台设备到达后未立即同步托盘');
+      eq(first.last.level, 77, '首台设备托盘电量');
+      eq(first.last.online, true, '首台设备托盘 online');
+      eq(first.last.kind, 'mouse', '首台设备托盘 kind');
+    } finally {
+      await emptyPage.close();
+    }
+
+    /* 2) 隐藏态：level / charging 变化都同步托盘，且不写 DOM / 不动 rAF/timer */
+    const page = await openPage('?mock&freeze&hide');
+    try {
+      await page.waitForFunction(() => window.__pbDebug.hidden === true, null, { timeout: 5000 });
+      await sleep(100);
+      const before = await page.evaluate(() => ({
+        calls: window.__pbDebug.trayCalls.length,
+        last: window.__pbDebug.lastTray,
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        rafTicks: window.__pbDebug.rafTicks,
+        timers: window.__pbDebug.timersActive
+      }));
+      ok(!!before.last, '隐藏前应有已同步的托盘状态');
+      eq(before.last.level, 12, '隐藏前托盘应为最低电量 12%');
+
+      /* 最低电量设备 level 变化（隐藏态） */
+      await page.evaluate(() => { window.__pbMock.setLevel('logi:046d:c547:unit-12', 8); });
+      await sleep(160);
+      const afterLevel = await page.evaluate(() => ({
+        calls: window.__pbDebug.trayCalls.length,
+        last: window.__pbDebug.lastTray
+      }));
+      ok(afterLevel.calls > before.calls, '隐藏态 level 变化未同步托盘');
+      eq(afterLevel.last.level, 8, '隐藏态托盘电量未更新');
+
+      /* charging 变化（隐藏态） */
+      await page.evaluate(() => {
+        window.__pbMock.device({
+          key: 'logi:046d:c547:unit-12', name: 'Arctis Nova 7', level: 8, approx: '',
+          left_s: 6480, charging: true, online: true, kind: 'headset', transport: '2.4g'
+        });
+      });
+      await sleep(160);
+      const afterCharge = await page.evaluate(() => ({
+        calls: window.__pbDebug.trayCalls.length,
+        last: window.__pbDebug.lastTray
+      }));
+      eq(afterCharge.last.charging, true, '隐藏态 charging 变化未同步托盘');
+      ok(afterCharge.calls > afterLevel.calls, '隐藏态 charging 变化未触发 set_tray_state');
+
+      const after = await page.evaluate(() => ({
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        rafTicks: window.__pbDebug.rafTicks,
+        timers: window.__pbDebug.timersActive,
+        hidden: window.__pbDebug.hidden
+      }));
+      eq(after.renders, before.renders, '隐藏态托盘同步不应触发 DOM 渲染');
+      eq(after.domWrites, 0, '隐藏态托盘同步写入了 DOM');
+      eq(after.rafTicks, before.rafTicks, '隐藏态托盘同步动了 rAF');
+      eq(after.timers, 0, '隐藏态托盘同步创建了 timer');
+      ok(after.hidden, '测试应仍在隐藏态');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ F2. 托盘「设置」/用户动作的 hidden 守卫（P2-1 / P2-3） ============ */
+  await test('F2 托盘 settings：可见态直接开抽屉；隐藏态只记状态、显示后打开且不写 DOM', async () => {
+    /* 可见态：tray-action settings → 抽屉立即打开 */
+    const vis = await openPage('?mock&freeze&effects=css');
+    try {
+      await vis.evaluate(() => window.__pbMock.trayAction('settings'));
+      await vis.waitForFunction(() => document.getElementById('drawer').classList.contains('is-open'), null, { timeout: 2500 });
+      const opened = await vis.evaluate(() => ({
+        open: document.getElementById('drawer').classList.contains('is-open'),
+        expanded: document.getElementById('btn-settings').getAttribute('aria-expanded'),
+        focus: document.activeElement && document.activeElement.id
+      }));
+      ok(opened.open, '可见态托盘 settings 未打开抽屉');
+      eq(opened.expanded, 'true', 'aria-expanded 未同步');
+      eq(opened.focus, 'set-threshold', '打开抽屉后焦点未进入设置项');
+      await screenshot(vis, 'ui-dev-tray-settings.png');
+    } finally {
+      await vis.close();
+    }
+
+    /* 隐藏态：settings/refresh/toggle-pin 只记状态，不写 DOM / 不建 WAAPI / 不建 timer */
+    const page = await openPage('?mock&freeze&effects=css&hide');
+    try {
+      await page.waitForFunction(() => window.__pbDebug.hidden === true, null, { timeout: 5000 });
+      await sleep(100);
+      const before = await page.evaluate(() => ({
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        animations: document.getAnimations().length,
+        timers: window.__pbDebug.timersActive,
+        rafTicks: window.__pbDebug.rafTicks,
+        drawerOpen: document.getElementById('drawer').classList.contains('is-open'),
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on')
+      }));
+
+      await page.evaluate(() => {
+        window.__pbMock.trayAction('settings');
+        window.__pbMock.trayAction('refresh');
+        window.__pbMock.trayAction('toggle-pin');
+      });
+      await sleep(220);
+
+      const during = await page.evaluate(() => ({
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        animations: document.getAnimations().length,
+        timers: window.__pbDebug.timersActive,
+        rafTicks: window.__pbDebug.rafTicks,
+        drawerOpen: document.getElementById('drawer').classList.contains('is-open'),
+        pendingSettings: window.__pbDebug.pendingSettings,
+        pendingSpin: window.__pbDebug.pendingSpin,
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        bridgePinned: window.__pbBridge.pinned,
+        blocked: window.__pbDebug.hiddenActionsBlocked
+      }));
+      eq(during.renders, before.renders, '隐藏态托盘动作触发了 DOM 渲染');
+      eq(during.domWrites, 0, '隐藏态托盘动作写入了 DOM（domWritesWhileHidden）');
+      eq(during.animations, before.animations, '隐藏态托盘动作创建了 WAAPI（refresh 旋转）');
+      eq(during.timers, 0, '隐藏态托盘动作创建了 timer');
+      eq(during.rafTicks, before.rafTicks, '隐藏态托盘动作动了 rAF');
+      eq(during.drawerOpen, before.drawerOpen, '隐藏态托盘 settings 不应直接改抽屉 DOM');
+      ok(!during.drawerOpen, '隐藏态抽屉不应打开');
+      eq(during.pendingSettings, true, '隐藏态 settings 意图未记录');
+      eq(during.pendingSpin, true, '隐藏态 refresh 意图未记录');
+      eq(during.pinOn, before.pinOn, '隐藏态托盘 toggle-pin 不应改按钮 DOM');
+      eq(during.bridgePinned, true, '隐藏态 toggle-pin 应通过 set_pinned 更新状态');
+      ok(during.blocked >= 3, '隐藏态托盘动作未被 hidden 守卫拦截：' + during.blocked);
+
+      /* 恢复显示：先渲染快照，再补做设置抽屉与刷新动画，pin 回写 */
+      await page.evaluate(() => window.__pbMock.visibility(false));
+      await page.waitForFunction(() => window.__pbDebug.hidden === false, null, { timeout: 3000 });
+      await page.waitForFunction(() => document.getElementById('drawer').classList.contains('is-open'), null, { timeout: 3000 });
+      const resumed = await page.evaluate(() => ({
+        drawerOpen: document.getElementById('drawer').classList.contains('is-open'),
+        pendingSettings: window.__pbDebug.pendingSettings,
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        renders: window.__pbDebug.renders
+      }));
+      ok(resumed.drawerOpen, '恢复显示后抽屉未打开（tray settings 丢失）');
+      eq(resumed.pendingSettings, false, '恢复后 pendingSettings 未清除');
+      ok(resumed.pinOn, '恢复显示后 pin 按钮未回写');
+      ok(resumed.renders > before.renders, '恢复显示后未渲染快照');
+      await screenshot(page, 'ui-dev-tray-resume.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ F3. 主卡切换不重建行节点（P3-15） ============ */
+  await test('F3 hero 换人不重建行节点、其它行 hover 保持、主卡行用 hidden 切换', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await page.waitForFunction(() => window.__pbDebug.rowCount === 4, null, { timeout: 3000 });
+      /* 悬停第 3 行（不会被点成主卡），记录全部行节点与主卡行 */
+      const third = page.locator('.row:not([hidden])').nth(2);
+      const box = await third.boundingBox();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await sleep(100);
+
+      await page.evaluate(() => {
+        window.__f3Nodes = {};
+        document.querySelectorAll('.row').forEach(function (node) { window.__f3Nodes[node.dataset.key] = node; });
+        window.__f3Keys = Object.keys(window.__f3Nodes);
+        window.__f3HeroRow = document.querySelector('.row.is-hero');
+        const hoveredNode = document.querySelector('.row:hover');
+        window.__f3HoverKey = (hoveredNode || document.querySelector('.row:not([hidden])')).dataset.key;
+        window.__f3Creates = window.__pbDebug.rowCreates;
+        window.__f3Removes = window.__pbDebug.rowRemoves;
+        /* 用键盘把第 2 行设为主卡（不改变鼠标位置） */
+        const target = document.querySelectorAll('.row:not([hidden])')[1];
+        window.__f3TargetKey = target.dataset.key;
+        target.focus();
+      });
+      await page.keyboard.press('Enter');
+      await sleep(160);
+
+      const after = await page.evaluate(() => {
+        const nodes = {};
+        document.querySelectorAll('.row').forEach(function (node) { nodes[node.dataset.key] = node; });
+        const sameNode = window.__f3Keys.every(function (key) { return nodes[key] && nodes[key] === window.__f3Nodes[key]; });
+        const hovered = document.querySelector('.row[data-key="' + window.__f3HoverKey + '"]');
+        const targetRow = document.querySelector('.row[data-key="' + window.__f3TargetKey + '"]');
+        return {
+          keys: Object.keys(nodes).sort(),
+          sameKeys: Object.keys(nodes).length === window.__f3Keys.length,
+          sameNode: sameNode,
+          targetKey: window.__f3TargetKey,
+          creates: window.__pbDebug.rowCreates,
+          removes: window.__pbDebug.rowRemoves,
+          createsBefore: window.__f3Creates,
+          removesBefore: window.__f3Removes,
+          heroKey: window.__pbDebug.heroKey,
+          targetHidden: targetRow ? targetRow.hidden : null,
+          heroRowVisible: window.__f3HeroRow ? !window.__f3HeroRow.hidden : null,
+          hoverKept: hovered ? hovered.matches(':hover') : false,
+          hoverSameNode: hovered === window.__f3Nodes[window.__f3HoverKey],
+          visibleRows: document.querySelectorAll('.row:not([hidden])').length,
+          activeTag: document.activeElement ? document.activeElement.id : ''
+        };
+      });
+      ok(after.sameKeys, 'hero 换人后行节点集合变化');
+      ok(after.sameNode, 'hero 换人重建了行 DOM 节点');
+      eq(after.creates, after.createsBefore, 'hero 换人创建了新行节点');
+      eq(after.removes, after.removesBefore, 'hero 换人删除了行节点');
+      eq(after.heroKey, after.targetKey, '主卡未切换到目标设备');
+      eq(after.targetHidden, true, '新主卡行未用 hidden 隐藏');
+      eq(after.heroRowVisible, true, '旧主卡行未重新显示');
+      ok(after.hoverSameNode, '未点中的行节点被替换');
+      ok(after.hoverKept, 'hero 换人后其他行 hover 丢失');
+      eq(after.visibleRows, 4, 'hero 换人后可见行数异常');
+      eq(after.activeTag, 'hero', '键盘设为主卡后焦点未迁移到主卡区域');
+      await screenshot(page, 'ui-dev-hero-switch.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ F4. 逐条 device 到达：自动主卡=最低电量（runtime-audit F1） ============ */
+  await test('F4 逐条 device 到达自动取最低电量；点击固定；固定设备 offline/gone 回落', async () => {
+    const page = await openPage('?mock&freeze&empty');
+    try {
+      const g502 = {
+        key: 'logi:046d:c547:g502', name: 'G502 X PLUS', level: 68, approx: '',
+        left_s: null, charging: false, online: true, kind: 'mouse', transport: '2.4g'
+      };
+      const arctis = {
+        key: 'ss:1038:2202:arctis', name: 'Arctis Nova 7', level: 12, approx: '',
+        left_s: 6480, charging: false, online: true, kind: 'headset', transport: '2.4g'
+      };
+
+      /* 1) 先到 G502 68%：只有一台，主卡就是它 */
+      await page.evaluate(dev => window.__pbMock.device(dev), g502);
+      await sleep(120);
+      let s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        heroName: document.getElementById('hero-name').textContent,
+        pinned: window.__pbDebug.heroPinnedByUser
+      }));
+      eq(s.heroKey, 'logi:046d:c547:g502', '首台设备应成为主卡');
+      eq(s.heroName, 'G502 X PLUS', '首台设备主卡名称');
+      eq(s.pinned, false, '自动模式不应标记为用户固定');
+
+      /* 2) 后到 Arctis 12%：自动模式必须切到最低电量 */
+      await page.evaluate(dev => window.__pbMock.device(dev), arctis);
+      await sleep(180);
+      s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        heroName: document.getElementById('hero-name').textContent,
+        heroNum: document.getElementById('hero-num').textContent,
+        pinned: window.__pbDebug.heroPinnedByUser,
+        rows: Array.from(document.querySelectorAll('.row:not([hidden])')).map(n => n.dataset.key)
+      }));
+      eq(s.heroKey, 'ss:1038:2202:arctis', '后到的更低电量设备未自动成为主卡');
+      eq(s.heroName, 'Arctis Nova 7', '自动主卡名称应为 Arctis');
+      await page.waitForFunction(() => document.getElementById('hero-num').textContent === '12', null, { timeout: 2000 });
+      s = await page.evaluate(() => ({
+        pinned: window.__pbDebug.heroPinnedByUser,
+        rows: Array.from(document.querySelectorAll('.row:not([hidden])')).map(n => n.dataset.key),
+        heroNum: document.getElementById('hero-num').textContent
+      }));
+      eq(s.heroNum, '12', '自动主卡电量应为 12');
+      eq(s.pinned, false, '自动切换不应变成用户固定');
+      ok(s.rows.indexOf('logi:046d:c547:g502') >= 0, '旧主卡 G502 未回到列表');
+      await screenshot(page, 'ui-dev-hero-auto.png');
+
+      /* 3) 点击 G502 行：用户固定主卡，即使电量更高也不再自动切走 */
+      await page.locator('.row:not([hidden])[data-key="logi:046d:c547:g502"]').click();
+      await sleep(140);
+      await page.waitForFunction(() => document.getElementById('hero-num').textContent === '68', null, { timeout: 2000 });
+      s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        pinned: window.__pbDebug.heroPinnedByUser,
+        pinnedKey: window.__pbDebug.pinnedHeroKey
+      }));
+      eq(s.heroKey, 'logi:046d:c547:g502', '点击行后未固定为主卡');
+      eq(s.pinned, true, '点击行后未标记用户固定');
+      eq(s.pinnedKey, 'logi:046d:c547:g502', 'pinnedHeroKey 未记录');
+
+      await page.evaluate(() => window.__pbMock.setLevel('ss:1038:2202:arctis', 10));
+      await sleep(160);
+      s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        heroNum: document.getElementById('hero-num').textContent
+      }));
+      eq(s.heroKey, 'logi:046d:c547:g502', '用户固定的主卡被自动切换走了');
+      eq(s.heroNum, '68', '固定主卡电量显示异常');
+
+      /* 4) 固定设备 offline → 回落到自动（最低电量 Arctis 10%） */
+      await page.evaluate(dev => window.__pbMock.device(Object.assign({}, dev, { online: false })), g502);
+      await sleep(160);
+      await page.waitForFunction(() => document.getElementById('hero-num').textContent === '10', null, { timeout: 2000 });
+      s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        pinned: window.__pbDebug.heroPinnedByUser,
+        heroNum: document.getElementById('hero-num').textContent
+      }));
+      eq(s.heroKey, 'ss:1038:2202:arctis', '固定设备 offline 后未回落到最低电量');
+      eq(s.pinned, false, '固定设备 offline 后未解除固定');
+      eq(s.heroNum, '10', '回落后的主卡电量应为 10');
+
+      /* 5) 重新固定 G502 后 gone → 回落自动 */
+      await page.evaluate(dev => window.__pbMock.device(Object.assign({}, dev, { online: true })), g502);
+      await sleep(120);
+      await page.locator('.row:not([hidden])[data-key="logi:046d:c547:g502"]').click();
+      await sleep(120);
+      s = await page.evaluate(() => ({ heroKey: window.__pbDebug.heroKey, pinned: window.__pbDebug.heroPinnedByUser }));
+      eq(s.heroKey, 'logi:046d:c547:g502', '重新固定 G502 失败');
+      eq(s.pinned, true, '重新固定后 pinned 标记异常');
+
+      await page.evaluate(() => window.__pbMock.gone('logi:046d:c547:g502'));
+      await sleep(160);
+      await page.waitForFunction(() => document.getElementById('hero-num').textContent === '10', null, { timeout: 2000 });
+      s = await page.evaluate(() => ({
+        heroKey: window.__pbDebug.heroKey,
+        pinned: window.__pbDebug.heroPinnedByUser,
+        heroNum: document.getElementById('hero-num').textContent
+      }));
+      eq(s.heroKey, 'ss:1038:2202:arctis', '固定设备 gone 后未回落到最低电量');
+      eq(s.pinned, false, '固定设备 gone 后 pinned 标记未清除');
+      eq(s.heroNum, '10', 'gone 回落后的主卡电量应为 10');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ F5. 低电 toast 不遮挡列表数值（runtime-audit F5） ============ */
+  await test('F5 低电 toast 不遮挡列表行右侧电量，面板外框保持 720×380', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await page.evaluate(() => {
+        window.__pbMock.alert('low', 'logi:046d:c547:unit-12', 12, 'Arctis Nova 7 电量低，建议充电');
+      });
+      await page.waitForSelector('.toast', { state: 'visible', timeout: 3000 });
+      await sleep(120);
+
+      const info = await page.evaluate(() => {
+        const toast = document.querySelector('.toast');
+        const tr = toast.getBoundingClientRect();
+        const levels = Array.from(document.querySelectorAll('.row:not([hidden]) .row-level'))
+          .map(node => {
+            const r = node.getBoundingClientRect();
+            return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, key: node.closest('.row').dataset.key };
+          });
+        const overlaps = levels.filter(r => !(tr.right < r.left || tr.left > r.right || tr.bottom < r.top || tr.top > r.bottom));
+        const panel = document.getElementById('panel').getBoundingClientRect();
+        const toastInPanel = tr.left >= panel.left && tr.right <= panel.right && tr.top >= panel.top && tr.bottom <= panel.bottom;
+        return {
+          overlapKeys: overlaps.map(o => o.key),
+          levelCount: levels.length,
+          toastInPanel: toastInPanel,
+          panel: { x: panel.x, y: panel.y, w: panel.width, h: panel.height }
+        };
+      });
+      eq(info.levelCount, 4, '可见行数异常（mock 应为 4 行）');
+      eq(info.overlapKeys.length, 0, 'toast 遮挡了列表行右侧电量数值：' + JSON.stringify(info.overlapKeys));
+      ok(info.toastInPanel, 'toast 越出了面板边界');
+      eq(Math.round(info.panel.w), 720, 'toast 改变了面板宽度');
+      eq(Math.round(info.panel.h), 380, 'toast 改变了面板高度');
+      eq(Math.round(info.panel.x), 30, '面板安全边被改变');
+      eq(Math.round(info.panel.y), 30, '面板安全边被改变');
+      await screenshot(page, 'ui-dev-toast.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ 汇总 ============ */
+  await browser.close();
+  await new Promise(resolve => srv.server.close(resolve));
+
+  console.log('');
+  console.log('  ' + passed + ' passed, ' + failures.length + ' failed');
+  if (failures.length) {
+    console.log('  失败项：');
+    failures.forEach(f => console.log('   - ' + f.name + '：' + f.message));
+    process.exitCode = 1;
+  }
+})().catch(async err => {
+  console.error('测试运行器异常：', err);
+  try { if (browser) await browser.close(); } catch (e) { /* ignore */ }
+  process.exitCode = 1;
+});

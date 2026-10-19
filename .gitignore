@@ -1,0 +1,30 @@
+# --- 构建产物 / 依赖 ---
+/.venv/
+/node_modules/
+/build/
+/dist/
+/src-tauri/target/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# --- 上游参考克隆（不随本仓库分发）---
+/hb/
+
+# --- 大体积媒体与验收证据（保留 JSON/日志/审计 md，截图与录屏不入库）---
+/design/rec/
+/design/demo.gif
+/design/demo.webp
+/design/verify/*.png
+/design/verify/*.webp
+/design/audit/evidence/
+/design/audit/runtime-screens/
+/design/audit/final-runtime-evidence/
+/design/audit/final-runtime-screens/
+
+# --- 系统 ---
+Thumbs.db
+desktop.ini
+.DS_Store
