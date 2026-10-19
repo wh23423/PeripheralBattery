@@ -1,0 +1,35 @@
+setup=D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\PeripheralBattery_0.1.2_x64-setup.exe
+setup_sha256=a667da52e2bd03a7fa7a2bfe99210cad13ac8396a5bd5878000f52f5ccb86ae0
+PASS 前置：无 app 进程 | processes=0
+PASS 安装：静默安装 exit=0 | exit=0 elapsed=998ms
+PASS 安装：app 在目标目录 | C:\Users\28482\AppData\Local\Temp\PB-v012-install\peripheral-battery.exe
+PASS 安装：collector 随包 | collector\collector.exe
+PASS 安装：licenses 随包 | licenses\
+PASS 安装：exe 版本 0.1.2 | file=0.1.2 product=0.1.2
+PASS 安装：随包 collector 与构建产物一致 | e112261ba88a3247062a90b51ac504d73f528acc6eecb99d246f40555d96b1ae
+PASS 安装：注册卸载项存在 | HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\PeripheralBattery
+PASS 安装：DisplayVersion=0.1.2 | version=0.1.2 publisher=peripheralbattery
+PASS 安装：InstallLocation=自定义临时目录 | "C:\Users\28482\AppData\Local\Temp\PB-v012-install"
+exe=C:\Users\28482\AppData\Local\Temp\PB-v012-install\peripheral-battery.exe
+window=found pid=38292
+collector_ready=True
+rect=(1642, 887, 2542, 1362)
+screenshot=D:\desktop\电量显示插件\design\verify\v012-ui-installed.png
+log=D:\desktop\电量显示插件\design\verify\v012-installed-app.log
+log=D:\desktop\电量显示插件\design\verify\v012-installed-collector.log
+
+PASS 安装版：真实设备 UI 截图完成 | exit=0 10090ms
+PASS 安装版：截图文件存在 | v012-ui-installed.png
+PASS 退出：无安装目录 collector 孤儿 | orphans=0
+PASS 退出：无 app 进程残留 | processes=0
+PASS 退出：真实用户数据目录未被污染 | files=8 changed=0
+PASS 安装版：日志显示隔离数据目录 + 版本 0.1.2 | D:\desktop\电量显示插件\design\verify\v012-installed-app.log
+PASS 卸载前：已备份真实 WebView2 profile | 69.3 MB -> C:\Users\28482\AppData\Local\Temp\PB-v012-profile-backup
+PASS 卸载：静默卸载 exit=0 | exit=0
+PASS 卸载：安装目录已删除 | C:\Users\28482\AppData\Local\Temp\PB-v012-install
+PASS 卸载：注册表卸载项已删除 | HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\PeripheralBattery
+PASS 卸载：WebView2 profile 已被清理 | C:\Users\28482\AppData\Local\com.peripheralbattery.app
+PASS 恢复：用户 WebView2 profile 已还原 | C:\Users\28482\AppData\Local\com.peripheralbattery.app
+PASS 卸载：用户数据目录保留（未传 /DELETEAPPDATA） | C:\Users\28482\AppData\Roaming\PeripheralBattery
+
+===== INSTALL/UNINSTALL: ALL PASSED =====

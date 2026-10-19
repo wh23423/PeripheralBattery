@@ -880,6 +880,39 @@ function rect(page, selector) {
       eq(rippleInfo.blend, 'normal', '涟漪仍使用 mix-blend-mode');
       eq(rippleInfo.animation, 'ripple-out', '涟漪动画名异常');
 
+      /* 拖动（pointerdown → move ≥6px → pointerup）不应炸开大涟漪：
+         整面板可拖动后，大涟漪只在「原地点击」时补出。 */
+      await sleep(800);
+      const beforeDrag = await page.$$eval('.ripple', n => n.length);
+      await page.mouse.move(120, 190);
+      await page.mouse.down();
+      await page.mouse.move(180, 240, { steps: 6 });
+      await page.mouse.up();
+      await sleep(180);
+      const dragInfo = await page.evaluate(beforeCount => {
+        const nodes = Array.from(document.querySelectorAll('.ripple'));
+        return {
+          before: beforeCount,
+          count: nodes.length,
+          large: nodes.filter(n => !n.classList.contains('ripple-sm')).length
+        };
+      }, beforeDrag);
+      eq(dragInfo.count, dragInfo.before, '拖动后面板生成了涟漪（大涟漪应只在点击时触发）：' + JSON.stringify(dragInfo));
+
+      /* 行/按钮的小涟漪保持 pointerdown 立即触发 */
+      const rowCenter = await page.evaluate(() => {
+        const r = document.querySelector('.row:not([hidden])').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      });
+      await page.mouse.click(rowCenter.x, rowCenter.y);
+      await sleep(80);
+      const smallRipple = await page.evaluate(() => ({
+        sm: Array.from(document.querySelectorAll('.ripple')).some(n => n.classList.contains('ripple-sm')),
+        large: Array.from(document.querySelectorAll('.ripple')).some(n => !n.classList.contains('ripple-sm'))
+      }));
+      ok(smallRipple.sm, '点击设备行未生成小涟漪（row/button 小涟漪应保持不变）');
+      ok(!smallRipple.large, '点击设备行不应生成大涟漪');
+
       /* Win10 回退：html[data-windows11="false"] 面板给不透明底 */
       await page.evaluate(() => {
         window.__pbMock.appState({
@@ -1301,55 +1334,211 @@ function rect(page, selector) {
     }
   });
 
-  /* ============ A4. 拖拽区 deep（P1-08） ============ */
-  await test('A4 drag-region="deep"：标题/副标题/空白 header 可拖，按钮不在拖拽区内', async () => {
+  /* ============ A4. 整面板拖拽区（P1-08 回归） ============ */
+  await test('A4 drag-region="deep"：整个面板可拖（hero/hero-name/footer），行与按钮仍可交互', async () => {
     const html = fs.readFileSync(path.join(UI_DIR, 'index.html'), 'utf8');
-    /* 去掉 HTML 注释再匹配属性（注释里解释了 P1-08，不能算属性出现） */
+    /* 去掉 HTML 注释再匹配属性（注释里解释了拖拽区，不能算属性出现） */
     const markup = html.replace(/<!--[\s\S]*?-->/g, '');
     const dragTags = markup.match(/<[^>]*data-tauri-drag-region[^>]*>/g) || [];
-    eq(dragTags.length, 1, 'data-tauri-drag-region 应只出现一处（.side-head）');
-    includes(dragTags[0], 'class="side-head"', '拖拽区不在 .side-head 上');
-    includes(dragTags[0], 'data-tauri-drag-region="deep"', '拖拽区不是 deep（裸属性只对元素自身生效）');
+    /* 只允许一处 deep（#panel）；抽屉与 scrim 用 "false" 显式退出整面板拖拽 */
+    const deepTags = dragTags.filter(t => t.includes('data-tauri-drag-region="deep"'));
+    eq(deepTags.length, 1, 'data-tauri-drag-region="deep" 应只出现一处（#panel）');
+    includes(deepTags[0], 'class="panel"', '拖拽区不在 #panel 上');
+    includes(deepTags[0], 'id="panel"', '拖拽区不在 #panel 上');
+    includes(deepTags[0], 'data-tauri-drag-region="deep"', '拖拽区不是 deep（裸属性只对元素自身生效）');
+    const scrimTag = dragTags.find(t => t.includes('id="drawer-scrim"')) || '';
+    const drawerTag = dragTags.find(t => t.includes('id="drawer"')) || '';
+    includes(scrimTag, 'data-tauri-drag-region="false"',
+      'drawer-scrim 未用 "false" 退出拖拽（否则点击关抽屉会被原生拖动吞掉）');
+    includes(drawerTag, 'data-tauri-drag-region="false"',
+      '抽屉未用 "false" 退出拖拽（设置面板空白处不应拖动窗口）');
+    ok(!markup.includes('class="side-head" data-tauri-drag-region'),
+      'side-head 仍保留旧拖拽属性（会造成重复/局部拖拽区）');
 
     const page = await openPage('?mock&freeze&effects=css');
     try {
       const info = await page.evaluate(() => {
-        const head = document.querySelector('.side-head');
-        const headRect = head.getBoundingClientRect();
-        const probe = (x, y) => {
+        const ATTR = 'data-tauri-drag-region';
+        const CLICKABLE_TAGS = ['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'LABEL', 'SUMMARY'];
+        const INTERACTIVE_ROLES = ['button', 'link', 'menuitem', 'tab', 'checkbox', 'radio', 'switch', 'option'];
+        const classOf = el => String((el && el.className && el.className.baseVal !== undefined)
+          ? el.className.baseVal : (el && el.className) || '');
+        const isClickable = (el) => {
+          if (CLICKABLE_TAGS.indexOf(String(el.tagName || '').toUpperCase()) >= 0) return true;
+          const role = el.getAttribute && el.getAttribute('role');
+          if (role && INTERACTIVE_ROLES.indexOf(role) >= 0) return true;
+          if (el.isContentEditable) return true;
+          const tab = el.getAttribute && el.getAttribute('tabindex');
+          return tab !== null && tab !== '-1';
+        };
+        /* 复刻 Tauri 2.12 drag.js 的 isDragRegion：沿 target 祖先链向上，
+           可交互元素会阻断拖拽；deep 命中即整棵子树可拖。 */
+        const regionAt = (x, y) => {
           const node = document.elementFromPoint(x, y);
-          const region = node && node.closest ? node.closest('[data-tauri-drag-region]') : null;
-          return {
-            tag: node ? node.tagName : '',
-            insideHead: !!(node && head.contains(node)),
-            region: region ? String(region.className || '') : ''
-          };
+          if (!node) return { hit: '', drag: false, why: 'no-node', region: '' };
+          const hit = String(node.tagName || '') + '.' + classOf(node);
+          let el = node;
+          while (el && el !== document.documentElement) {
+            const attr = el.getAttribute ? el.getAttribute(ATTR) : null;
+            if (isClickable(el) && attr === null) {
+              return { hit: hit, drag: false, why: 'clickable:' + String(el.tagName) + '.' + classOf(el), region: '' };
+            }
+            if (attr === null) { el = el.parentElement; continue; }
+            if (attr === 'false') return { hit: hit, drag: false, why: 'false-region', region: '' };
+            if (attr === 'deep') return { hit: hit, drag: true, why: 'deep', region: el.id || classOf(el) };
+            if (attr === '' || attr === 'true') {
+              return { hit: hit, drag: el === node, why: 'self', region: el.id || classOf(el) };
+            }
+            el = el.parentElement;
+          }
+          return { hit: hit, drag: false, why: 'no-region', region: '' };
         };
-        const titleRect = document.querySelector('.side-head h1').getBoundingClientRect();
-        const subRect = document.getElementById('subtitle').getBoundingClientRect();
-        const btn = document.getElementById('btn-settings').getBoundingClientRect();
-        const btnNode = document.elementFromPoint(btn.left + btn.width / 2, btn.top + btn.height / 2);
+        const center = (sel) => {
+          const r = document.querySelector(sel).getBoundingClientRect();
+          return [r.left + r.width / 2, r.top + r.height / 2];
+        };
+        const headRect = document.querySelector('.side-head').getBoundingClientRect();
+        const row = document.querySelector('.row:not([hidden])');
+        const rowRect = row.getBoundingClientRect();
+        const firstRow = Array.from(document.querySelectorAll('.row:not([hidden])'))[1];
+        const fr = firstRow.getBoundingClientRect();
         return {
-          attr: head.getAttribute('data-tauri-drag-region'),
-          headH: headRect.height,
-          title: probe(titleRect.left + 2, titleRect.top + titleRect.height / 2),
-          subtitle: probe(subRect.left + 2, subRect.top + subRect.height / 2),
-          /* 标题行与副标题之间的 6px 空白（P1-08 真机唯一能拖的缝隙） */
-          blank: probe(headRect.left + 2, titleRect.bottom + 3),
-          interactiveInHead: head.querySelectorAll('button, input, textarea, select, a, [contenteditable], [tabindex]:not([tabindex="-1"])').length,
-          controlsInHead: head.contains(document.getElementById('controls')),
-          controlsHit: !!(btnNode && (btnNode.id === 'btn-settings' || btnNode.closest('#btn-settings')))
+          panelAttr: document.getElementById('panel').getAttribute(ATTR),
+          headAttr: document.querySelector('.side-head').getAttribute(ATTR),
+          hero: regionAt.apply(null, center('.hero-card')),
+          heroName: regionAt.apply(null, center('.hero-name')),
+          footerHint: regionAt.apply(null, center('.side-foot .hint')),
+          headerBlank: regionAt(headRect.left + 4, headRect.bottom - 4),
+          row: regionAt(rowRect.left + rowRect.width / 2, rowRect.top + rowRect.height / 2),
+          button: regionAt.apply(null, center('#btn-settings')),
+          firstRowKey: firstRow.dataset.key,
+          firstRowName: firstRow.querySelector('.row-name').textContent
         };
       });
-      eq(info.attr, 'deep', '.side-head 的 drag-region 不是 deep');
-      ok(info.headH > 40, 'header 高度异常：' + info.headH);
-      ['title', 'subtitle', 'blank'].forEach(name => {
-        ok(info[name].insideHead, name + ' 命中点不在 .side-head 内：' + JSON.stringify(info[name]));
-        includes(info[name].region, 'side-head', name + ' 命中点不属于 drag-region 子树');
+      eq(info.panelAttr, 'deep', '#panel 的 drag-region 不是 deep');
+      eq(info.headAttr, null, '.side-head 不应再有 drag-region 属性');
+      ok(info.hero.drag, 'hero 大卡空白处不可拖：' + JSON.stringify(info.hero));
+      ok(info.heroName.drag, 'hero 名称处不可拖：' + JSON.stringify(info.heroName));
+      ok(info.footerHint.drag, 'footer 提示处不可拖：' + JSON.stringify(info.footerHint));
+      ok(info.headerBlank.drag, 'header 空白处不可拖：' + JSON.stringify(info.headerBlank));
+      ok(!info.row.drag, '设备行不应是拖拽区（否则无法点击选主卡）：' + JSON.stringify(info.row));
+      includes(info.row.why, 'clickable', '设备行未按可交互元素被排除');
+      ok(!info.button.drag, '控制按钮不应是拖拽区：' + JSON.stringify(info.button));
+      includes(info.button.why, 'clickable', '控制按钮未按可交互元素被排除');
+
+      /* 行仍能点击选主卡（不被拖拽区吞掉） */
+      const rowCenter = await page.evaluate((key) => {
+        const r = document.querySelector('.row[data-key="' + key + '"]').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }, info.firstRowKey);
+      await page.mouse.click(rowCenter.x, rowCenter.y);
+      await sleep(120);
+      const afterRow = await page.evaluate(() => ({
+        hero: document.getElementById('hero-name').textContent
+      }));
+      eq(afterRow.hero, info.firstRowName, '点击设备行未切换主卡片（行点击被拖拽区影响）');
+
+      /* 按钮仍能点击：设置按钮打开抽屉 */
+      const btnCenter = await page.evaluate(() => {
+        const r = document.getElementById('btn-settings').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       });
-      eq(info.interactiveInHead, 0, '拖拽区内仍有可交互元素（deep 会排除它们，但 header 应只有文本）');
-      ok(!info.controlsInHead, '控制按钮簇落入 drag-region 子树，会影响按钮点击');
-      ok(info.controlsHit, '设置按钮中心命中测试失败（按钮被其它层遮挡）');
+      await page.mouse.click(btnCenter.x, btnCenter.y);
+      await sleep(150);
+      const drawer = await page.evaluate(() => ({
+        expanded: document.getElementById('btn-settings').getAttribute('aria-expanded'),
+        open: document.getElementById('drawer').classList.contains('is-open')
+      }));
+      eq(drawer.expanded, 'true', '设置按钮点击未生效（aria-expanded 未更新）');
+      ok(drawer.open, '设置按钮点击未打开抽屉');
+
+      /* scrim 显式退出拖拽（"false"）：点击空白遮罩必须能关抽屉，
+         否则整面板 deep 拖拽会把 mousedown 交给原生 start_dragging，点击被吞。 */
+      const scrimPoint = await page.evaluate(() => {
+        const r = document.getElementById('panel').getBoundingClientRect();
+        return { x: r.left + 30, y: r.top + 30 };
+      });
+      const scrimHit = await page.evaluate(({ x, y }) => {
+        const node = document.elementFromPoint(x, y);
+        const region = node && node.closest ? node.closest('[data-tauri-drag-region]') : null;
+        return {
+          id: node ? String(node.id || node.className || node.tagName) : '',
+          region: region ? (region.id || String(region.className)) : '',
+          attr: region ? region.getAttribute('data-tauri-drag-region') : null
+        };
+      }, scrimPoint);
+      eq(scrimHit.id, 'drawer-scrim', '抽屉打开时面板左上空白应为 scrim：' + JSON.stringify(scrimHit));
+      eq(scrimHit.attr, 'false', 'scrim 未以 "false" 退出拖拽区：' + JSON.stringify(scrimHit));
+      await page.mouse.click(scrimPoint.x, scrimPoint.y);
+      await sleep(180);
+      const closedByScrim = await page.evaluate(() =>
+        document.getElementById('drawer').classList.contains('is-open'));
+      ok(!closedByScrim, '点击 scrim 未关闭抽屉（点击被拖拽区吞掉）');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ A10. left_s_src 渲染（spec ≈ / mains 外接供电 / 旧值不变） ============ */
+  await test('A10 left_s_src：spec→≈ 估算、mains→外接供电、history/缺省保持「约」，无值仍「剩余时间未知」', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      const heroKey = 'logi:046d:c547:unit-12';   /* mock 默认最低电量（12%）→ 主卡片 */
+      const rowKey = 'razer:1532:0099:unit-3';
+      const push = async (device) => {
+        await page.evaluate(d => { window.__pbMock.device(d); }, device);
+        await sleep(120);
+      };
+      const hero = () => page.evaluate(() => {
+        const c = document.getElementById('hero-caption');
+        return { text: c.textContent, title: c.getAttribute('title') || '' };
+      });
+      const row = () => page.evaluate(key => {
+        const el = document.querySelector('.row[data-key="' + key + '"] .row-left');
+        return { text: el.textContent, title: el.getAttribute('title') || '' };
+      }, rowKey);
+
+      /* 1) spec 主卡片：≈ + 估算提示 */
+      await push({ key: heroKey, name: 'Arctis Nova 7', kind: 'headset', transport: '2.4g',
+        level: 12, left_s: 6480, left_s_src: 'spec' });
+      const specHero = await hero();
+      eq(specHero.text, '≈ 1 小时 48 分', 'spec 主卡片剩余时间文案异常：' + specHero.text);
+      includes(specHero.title, '按标称续航估算', 'spec 主卡片缺少估算提示 title');
+
+      /* 2) spec 列表行：紧凑 ≈，且与 humanLeft 的「约」不混用 */
+      await push({ key: rowKey, name: 'Viper V3 Pro', kind: 'mouse', transport: '2.4g',
+        level: 68, left_s: 7500, left_s_src: 'spec' });
+      const specRow = await row();
+      eq(specRow.text, '≈ 2 小时 5 分', 'spec 行剩余时间文案异常：' + specRow.text);
+      includes(specRow.title, '按标称续航估算', 'spec 行缺少估算提示 title');
+
+      /* 3) mains：主卡片与列表行都显示「外接供电」（left_s 仍保留也不再展示时长） */
+      await push({ key: heroKey, name: 'Arctis Nova 7', kind: 'headset', transport: '2.4g',
+        level: 12, left_s: 6480, left_s_src: 'mains' });
+      eq((await hero()).text, '外接供电', 'mains 主卡片未显示「外接供电」');
+      await push({ key: rowKey, name: 'Viper V3 Pro', kind: 'mouse', transport: '2.4g',
+        level: 68, left_s: 7500, left_s_src: 'mains' });
+      eq((await row()).text, '外接供电', 'mains 行未显示「外接供电」');
+
+      /* 4) history：与旧版「约」文案一致，无估算 title */
+      await push({ key: heroKey, name: 'Arctis Nova 7', kind: 'headset', transport: '2.4g',
+        level: 12, left_s: 6480, left_s_src: 'history' });
+      const hist = await hero();
+      eq(hist.text, '约 1 小时 48 分', 'history 主卡片文案被改变：' + hist.text);
+      eq(hist.title, '', 'history 不应带估算提示 title');
+
+      /* 5) 旧 collector（无 left_s_src 字段）：保持原样「约」 */
+      await push({ key: heroKey, name: 'Arctis Nova 7', kind: 'headset', transport: '2.4g',
+        level: 12, left_s: 6480 });
+      eq((await hero()).text, '约 1 小时 48 分', '缺省 left_s_src 时文案被改变');
+
+      /* 6) spec 但无估算值：仍「剩余时间未知」，且不出现 ≈ */
+      await push({ key: rowKey, name: 'Viper V3 Pro', kind: 'mouse', transport: '2.4g',
+        level: 68, left_s: null, left_s_src: 'spec' });
+      const noEst = await row();
+      eq(noEst.text, '剩余时间未知', 'spec 无估算值时文案异常：' + noEst.text);
+      ok(noEst.text.indexOf('≈') < 0, 'spec 无估算值却出现 ≈：' + noEst.text);
+      eq(noEst.title, '', 'spec 无估算值不应带估算提示 title');
     } finally {
       await page.close();
     }

@@ -20,6 +20,9 @@ CAPABILITIES = ["approx", "left_s", "via", "transport"]
 
 KINDS = ("headset", "mouse", "keyboard", "gamepad", "bluetooth")
 TRANSPORTS = ("2.4g", "usb", "bluetooth", "unknown")
+# Where left_s comes from: "" = no estimate, "history" = measured drain,
+# "spec" = vendor/estimated nominal endurance, "mains" = powered, no endurance.
+LEFT_S_SRC = ("", "history", "spec", "mains")
 ALERT_KINDS = ("low", "full", "offline")
 
 UNKNOWN_NAME = "未知设备"
@@ -38,12 +41,15 @@ def make_device(key: str, name: str, level: Optional[int] = None,
                 approx: str = "", left_s: Optional[float] = None,
                 charging: bool = False, online: bool = True,
                 kind: str = "", transport: str = "unknown", via: str = "",
-                updated_unix: Optional[int] = None) -> dict:
+                updated_unix: Optional[int] = None,
+                left_s_src: str = "") -> dict:
     """The exact Device object of protocol.md §1. Never omit a field."""
     if kind not in KINDS:
         kind = "bluetooth" if transport == "bluetooth" else "mouse"
     if transport not in TRANSPORTS:
         transport = "unknown"
+    if left_s_src not in LEFT_S_SRC:
+        left_s_src = ""
     left = None if left_s is None else max(0, int(round(left_s)))
     return {
         "key": str(key),
@@ -51,6 +57,7 @@ def make_device(key: str, name: str, level: Optional[int] = None,
         "level": _normalize_level(level),
         "approx": str(approx or ""),
         "left_s": left,
+        "left_s_src": left_s_src,
         "charging": bool(charging),
         "online": bool(online),
         "kind": kind,
@@ -62,8 +69,8 @@ def make_device(key: str, name: str, level: Optional[int] = None,
 
 # Fields whose change is a semantic change ("only send device on a semantic
 # change", protocol.md §1). updated_unix is deliberately not in this set.
-SEMANTIC_FIELDS = ("name", "level", "approx", "left_s", "charging", "online",
-                   "kind", "transport", "via")
+SEMANTIC_FIELDS = ("name", "level", "approx", "left_s", "left_s_src", "charging",
+                   "online", "kind", "transport", "via")
 
 
 def semantic_equal(a: Optional[dict], b: Optional[dict]) -> bool:

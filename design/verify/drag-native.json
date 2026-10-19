@@ -1,0 +1,110 @@
+{
+  "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe",
+  "generated_at": "2026-10-19T23:07:10+08:00",
+  "elapsed_s": 15.5,
+  "drag_css": {
+    "dx": -90.0,
+    "dy": 0.0
+  },
+  "must_move": [
+    {
+      "name": "header 空白",
+      "x": 460,
+      "y": 30
+    },
+    {
+      "name": "hero 大卡",
+      "x": 120,
+      "y": 120
+    },
+    {
+      "name": "hero 名称",
+      "x": 120,
+      "y": 330
+    },
+    {
+      "name": "列表空白",
+      "x": 500,
+      "y": 330
+    }
+  ],
+  "must_not_move": [
+    {
+      "name": "设备行",
+      "x": 500,
+      "y": 140
+    },
+    {
+      "name": "控制按钮",
+      "x": 650,
+      "y": 32
+    }
+  ],
+  "results": [
+    {
+      "check": "drag: 面板已显示",
+      "ok": true,
+      "detail": "t=true\n2026-10-19 23:06:55.187 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"f798e59\",\"pinned\":false,\"platform\":{\"b"
+    },
+    {
+      "check": "drag: mock collector ready",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "drag: 窗口 = 面板 720×380 DIP",
+      "ok": true,
+      "detail": "rect=(1642, 887, 2542, 1362) scale=1.250"
+    },
+    {
+      "check": "drag: header 空白 (460,30) 可拖动窗口",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    },
+    {
+      "check": "drag: hero 大卡 (120,120) 可拖动窗口",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    },
+    {
+      "check": "drag: hero 名称 (120,330) 可拖动窗口",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    },
+    {
+      "check": "drag: 列表空白 (500,330) 可拖动窗口",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    },
+    {
+      "check": "drag: 设备行 (500,140) 不拖动窗口（可交互元素）",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1642, 887, 2542, 1362)"
+    },
+    {
+      "check": "drag: 控制按钮 (650,32) 不拖动窗口（可交互元素）",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1642, 887, 2542, 1362)"
+    },
+    {
+      "check": "drag: 用例间窗口位置已还原",
+      "ok": true,
+      "detail": "origin=(1642, 887, 2542, 1362) restored=(1642, 887, 2542, 1362)"
+    },
+    {
+      "check": "drag-show: 第二实例唤出面板",
+      "ok": true,
+      "detail": "t=true\n2026-10-19 23:07:06.892 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"f798e59\",\"pinned\":false,\"platform\":{\"b"
+    },
+    {
+      "check": "drag-show: 刚唤出后 header 空白立即可拖",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    },
+    {
+      "check": "drag-show: 刚唤出后 hero 大卡立即可拖",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1530, 887, 2430, 1362) scale=1.250"
+    }
+  ]
+}

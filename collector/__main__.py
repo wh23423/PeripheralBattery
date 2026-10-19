@@ -54,6 +54,8 @@ class ProbeWriter:
             parts.append(f"approx={device['approx']!r}")
         if device.get("left_s") is not None:
             parts.append(f"left_s={device['left_s']}")
+        if device.get("left_s_src"):
+            parts.append(f"left_s_src={device['left_s_src']}")
         parts.append(f"charging={device.get('charging')}")
         parts.append(f"online={device.get('online')}")
         parts.append(f"kind={device.get('kind')}")

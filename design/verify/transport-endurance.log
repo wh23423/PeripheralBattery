@@ -1,0 +1,32 @@
+[t=   0.02s] hello  session=977a9f8a build=unknown capabilities=approx,left_s,via,transport devices=0
+[t=   0.02s] tick   seq=1 devices=0
+[t=   2.11s] device seq=2 bluetooth:0000:0000:c817f5498e4e "FlyDigi BS2PRO" level=94% left_s_src=mains charging=False online=True kind=bluetooth transport=bluetooth
+[t=   3.66s] device seq=3 xinput:0000:0000:u1 "Xbox One Game Controller" level=100% charging=False online=True kind=gamepad transport=unknown
+[t=   6.11s] device seq=4 lunafury:373e:0000:u1 "LunaFury Luna33-W" level=95% left_s=136800 left_s_src=spec charging=False online=True kind=mouse transport=2.4g
+
+=== Summary ===
+  bluetooth:0000:0000:c817f5498e4e "FlyDigi BS2PRO" level=94% left_s_src=mains charging=False online=True kind=bluetooth transport=bluetooth
+  xinput:0000:0000:u1 "Xbox One Game Controller" level=100% charging=False online=True kind=gamepad transport=unknown
+  lunafury:373e:0000:u1 "LunaFury Luna33-W" level=95% left_s=136800 left_s_src=spec charging=False online=True kind=mouse transport=2.4g
+  provider polls: razer=2, audeze=1, wlmouse=2, mchose=2, hyperx_alpha2=1, hyperx_cloud3=1, hyperx=1, keychron=1, pulsar=2, jbl=1, logitech=2, steelseries=2, xinput=1, playstation=1, 8bitdo=1, barracuda=1, nintendo=1, asus=2, gwolves=2, lofree=1, astro=1, corsair=1, lamzu=1, lunafury=1, am_infinity=1, steelseries_elite=1, logitech_centurion=1, hyperx_cloud3s=1, nzxt=1, steam=1
+  device events: 3, ticks: 1, gone: 0, key migrations: 0
+  data dir: C:\Users\28482\AppData\Local\PeripheralBattery
+  diagnostics:
+    [MCHOSE] vid=3837 pid=3026 product='Ace 68 Turbo 16K': no vendor collection
+    [XInput] slot 0: rc=0 type=NiMH level=3
+    [WGI] 'Xbox One Game Controller' 045e:0b00 status=Discharging remain=1000 full=1000 rate=None -> 100%
+    [LunaFury] pid=0033 'Luna33-W'
+      iface=2 usage=ffff:0000
+        reply: 00 a1 00 02 02 00 83 00 5f 00 00 00
+      no reply yet and no earlier level
+
+=== EVIDENCE (NDJSON, from --once) ===
+{"t":"hello","protocol":1,"seq":0,"session":"16b361ff-4952-47ed-9977-9cba025653bc","build":"unknown","capabilities":["approx","left_s","via","transport"],"devices":[{"key":"bluetooth:0000:0000:c817f5498e4e","name":"FlyDigi BS2PRO","level":94,"approx":"","left_s":null,"left_s_src":"mains","charging":false,"online":true,"kind":"bluetooth","transport":"bluetooth","via":"","updated_unix":1792422005},{"key":"xinput:0000:0000:u1","name":"Xbox One Game Controller","level":100,"approx":"","left_s":null,"left_s_src":"","charging":false,"online":true,"kind":"gamepad","transport":"unknown","via":"","updated_unix":1792422008},{"key":"lunafury:373e:0000:u1","name":"LunaFury Luna33-W","level":95,"approx":"","left_s":136800,"left_s_src":"spec","charging":false,"online":true,"kind":"mouse","transport":"2.4g","via":"","updated_unix":1792422010}],"settings":{"poll":{"mouse":5,"keyboard":15,"headset":15,"gamepad":10,"steam":30,"bluetooth":10},"providers":["razer","audeze","wlmouse","mchose","hyperx_alpha2","hyperx_cloud3","hyperx","keychron","pulsar","jbl","logitech","steelseries","xinput","playstation","8bitdo","barracuda","nintendo","asus","gwolves","lofree","astro","corsair","lamzu","lunafury","am_infinity","steelseries_elite","logitech_centurion","hyperx_cloud3s","nzxt","steam","bluetooth"]}}
+{"t":"tick","session":"16b361ff-4952-47ed-9977-9cba025653bc","devices":[{"key":"bluetooth:0000:0000:c817f5498e4e","name":"FlyDigi BS2PRO","level":94,"approx":"","left_s":null,"left_s_src":"mains","charging":false,"online":true,"kind":"bluetooth","transport":"bluetooth","via":"","updated_unix":1792422005},{"key":"xinput:0000:0000:u1","name":"Xbox One Game Controller","level":100,"approx":"","left_s":null,"left_s_src":"","charging":false,"online":true,"kind":"gamepad","transport":"unknown","via":"","updated_unix":1792422008},{"key":"lunafury:373e:0000:u1","name":"LunaFury Luna33-W","level":95,"approx":"","left_s":136800,"left_s_src":"spec","charging":false,"online":true,"kind":"mouse","transport":"2.4g","via":"","updated_unix":1792422010}],"seq":1}
+
+=== CHECKS ===
+lunafury_transport_is_2_4g: True
+lunafury_nominal_left_s_src_spec: True
+bs2pro_left_s_src_mains: True
+bs2pro_has_no_remaining_time: True
+xinput_transport_stays_unknown: True

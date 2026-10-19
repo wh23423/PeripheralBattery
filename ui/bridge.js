@@ -142,6 +142,8 @@
       level: d.level == null ? null : d.level,
       approx: d.approx || '',
       left_s: d.left_s == null ? null : d.left_s,
+      /* 新增（旧 collector 无此字段）：剩余时间来源 history|spec|mains */
+      left_s_src: d.left_s_src == null ? null : d.left_s_src,
       charging: !!d.charging,
       online: d.online !== false,
       kind: d.kind || 'bluetooth',

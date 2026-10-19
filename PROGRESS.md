@@ -10,6 +10,9 @@
 > **v0.1.1（2026-10-19 晚）**：按 `review/REVIEW-REPORT.md` 修复 A1–A14（数据目录/卸载、WebView2、发布安全、
 > 窗口/生命周期/采集器/前端）。v0.1.1 施工记录与 packaging 验收项见 **§8**；Release Notes 见
 > [docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md)。
+>
+> **v0.1.2（2026-10-19 深夜）**：修复用户反馈的三个问题（拖拽死区 / 未知连接 / 剩余时间冷启动未知），
+> 记录见 **§9**；Release Notes 见 [docs/release-notes-v0.1.2.md](docs/release-notes-v0.1.2.md)。
 
 ---
 
@@ -215,3 +218,45 @@ Release Notes：[docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md)。
 - 灰边验收口径：三背景（亮/暗/彩色）下**面板外无灰色矩形**、可见外轮廓 = 面板 12px 圆角；
   透明效果 0/1、完全重启、远程/虚拟显示一致；125% DPI / 托盘定位不回归。
 
+
+---
+
+## 9. v0.1.2 用户反馈修复（2026-10-19 23:00 起）
+
+用户反馈（截图 v0.1.1）：面板“点开后有时候会无法拖动”、设备下方「未知连接」、剩余使用时间「未知」。
+Release Notes 见 [docs/release-notes-v0.1.2.md](docs/release-notes-v0.1.2.md)。
+
+### 9.1 修复
+
+| # | 症状 | 根因 | 修复 |
+|---|---|---|---|
+| B1 | 有时拖不动 | `data-tauri-drag-region="deep"` 只挂在 `.side-head`；hero 卡 / hero 名称 / 列表空白 / 底部提示均非拖拽区 | 拖拽区上移到 `#panel`；抽屉 scrim/抽屉显式 `="false"`；大涟漪改 pointerup + 位移 <6px（拖拽起手不再出涟漪），行/按钮小涟漪不变 |
+| B2 | 「未知连接」 | LunaFury Luna33-W 走 2.4G 接收器（373E:0033），provider 未上报链路，`infer_transport()` 无 lunafury 规则 → unknown | `DeviceStatus.transport` 新字段；LunaFury 检测 0x0033 → `2.4g`、仅 0x0032 → `usb`；`infer_transport` 优先 provider 值，旧启发式兜底；xinput 仍 unknown |
+| B3 | 剩余时间未知 | 只来自实测掉电外推（≥30min 且掉 ≥3%），冷启动 history 为空即一直 null | 新增 `collector/device_specs.py` 标称续航目录；无实测时按 标称续航×电量 回填，协议增量字段 `left_s_src`（history/spec/mains/""）；UI：spec → `≈ X 小时 Y 分`（title「按标称续航估算」）、mains → 「外接供电」、history 原样 |
+
+标称目录：LunaFury Luna33-W 250mAh、厂商无官方续航 → 按 2.4G/1kHz ≈6mA 估 **40h**（注释标注 ESTIMATE，来源 voptronics 产品页）；
+FlyDigi BS2PRO 为 USB-C 供电散热器（Scythe 产品页），`powered=True` → 「外接供电」，其 Windows BLE 94% 为静态值。协议仍为 1（增量字段）。
+
+### 9.2 验证（Lead 复跑）
+
+- collector `pytest` **133 passed**（基线 117 + 16）；`node tools/ui_smoke.js` **22 passed**；`cargo test --release` **55 passed**。
+- 真实 Win32 鼠标拖拽 `tools/verify_drag.py`：修复前 **8/12**（hero 卡 / hero 名称 / 列表空白 / 唤出后 hero 卡 FAIL，复现用户 bug），修复后 **13/13 passed**（证据 `design/verify/drag-native{,-before}.json`）。
+- 真实设备 probe：`lunafury:373e:0000:u1 "LunaFury Luna33-W" ... left_s=136800 left_s_src=spec ... transport=2.4g`；`FlyDigi BS2PRO level=94% left_s_src=mains transport=bluetooth`（`design/verify/transport-endurance.json/.log`）。
+- 真机 UI 截图 `design/verify/v012-ui-real.png`：hero 93% + 「≈ 1 天 13 小时」+ 「2.4 GHz」；列表「蓝牙 · 外接供电」。安装版同一画面见 `design/verify/v012-ui-installed.png`。
+- 安装/卸载验收（新脚本 `tools/verify_install_v012.ps1`，**24 项全 PASS**，日志 `design/verify/v012-install.log`）：
+  /S 安装到自定义 `/D=` 临时目录 → 校验 exe 0.1.2 / collector 哈希 / licenses / 注册表 DisplayVersion → 安装版真实设备启动截图
+  （隔离 APPDATA，真实用户数据 8 文件 0 变化）→ 退出无孤儿 → `/S` 卸载后安装目录、注册表、WebView2 profile 均清理 →
+  profile 先备份后还原（卸载钩子会无条件删除 `%LOCALAPPDATA%\com.peripheralbattery.app`，已恢复 69.3MB 用户 profile）→ 用户数据目录保留。
+
+### 9.3 产物
+
+- 全量构建 `pwsh -File scripts/build.ps1 -NoSign`（日志 `design/verify/v012-build.log`）：PyInstaller collector + Tauri release + NSIS 全部成功。
+- 安装包 `src-tauri/target/release/bundle/nsis/PeripheralBattery_0.1.2_x64-setup.exe`（约 10.65 MiB），
+  哈希与构建信息见同目录 `SHA256SUMS.txt` / `build-info.json`（最终包在干净 commit 上重建后回填）。
+- 代码/文档改动：collector（base/lunafury/state/device_specs/protocol/__main__）、protocol.md、UI（index/app/bridge/styles）、
+  tools（ui_smoke/verify_drag/verify_v012_ui/verify_install_v012/collector_ndjson_check）、README §6.1/§7、版本号 0.1.2。
+
+### 9.4 已知限制
+
+- Luna33-W 的 40h 是估算（厂商无官方续航小时），满 30min / 掉 3% 后自动切实测；未收录设备冷启动仍「未知」。
+- BS2PRO 显示「外接供电」；Xbox 手柄等 unknown 链路仍「未知连接」；dongle+cable 同时存在按 2.4g；updater 未接。

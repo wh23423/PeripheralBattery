@@ -141,6 +141,16 @@ class LunafuryProvider(Provider):
         ordered = sorted(groups, key=lambda p: (p != WIRELESS, p != WIRED))
         name = _name_for(ordered[0], groups[ordered[0]])
 
+        # The dongle and the cable are different pids, so the link is known for a
+        # model in KNOWN_PIDS: dongle present -> 2.4g, cable only -> usb. A model
+        # matched by manufacturer (unknown pid) honestly stays "" (inferred later).
+        if WIRELESS in groups:
+            transport = "2.4g"
+        elif WIRED in groups:
+            transport = "usb"
+        else:
+            transport = ""
+
         readings: List[Reading] = []
         # the cable first: it reports charging, and the dongle has nothing to add then
         for pid in sorted(groups, key=lambda p: p != WIRED):
@@ -162,10 +172,11 @@ class LunafuryProvider(Provider):
         if readings:
             batt, chg = next((r for r in readings if r[1]), readings[0])
             self._last = (batt, chg, time.time())
-            return [DeviceStatus(key, name, batt, chg, True, "lunafury", kind="mouse")]
+            return [DeviceStatus(key, name, batt, chg, True, "lunafury",
+                                 kind="mouse", transport=transport)]
         if self._last and time.time() - self._last[2] < ASLEEP_KEEP:
             return [DeviceStatus(key, name, self._last[0], self._last[1], False,
-                                 "lunafury", kind="mouse")]
+                                 "lunafury", kind="mouse", transport=transport)]
         return []
 
     def diagnostics(self) -> List[str]:

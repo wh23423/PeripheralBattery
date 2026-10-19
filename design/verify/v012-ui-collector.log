@@ -1,0 +1,5 @@
+2026-10-19 23:06:37,562 INFO halo_battery collector 0.1.0 starting (pid 36420, data dir C:\Users\28482\AppData\Local\Temp\pb-verify-v012-ui-807lr7_z\Roaming\PeripheralBattery)
+2026-10-19 23:06:37,564 INFO halo_battery bluetooth watcher: connection check every 30000 ms (bt_watch_ms / PB_BT_WATCH_MS, floor 2000 ms, upstream was 2000 ms); snapshots wake at the earliest due time (connection change +0/+3/+8/+15 s, cold-start retry +3/+8/+15/+30 s, periodic full every 60 s)
+2026-10-19 23:06:39,004 INFO halo_battery [Bluetooth] FlyDigi BS2PRO (C817F5498E4E): 94% connected: WinRT=True PnP=True -> shown [WinRT], kind: unknown
+2026-10-19 23:06:42,944 INFO halo_battery [Bluetooth] WH-1000XM4 (AC800AC6B3D9): 90% connected: WinRT=False PnP=False -> hidden [WinRT], kind: headset
+2026-10-19 23:06:42,944 INFO halo_battery [Bluetooth] FlyDigi BS2PRO (C817F5498E4E): 94% connected: WinRT=True PnP=True -> shown [WinRT], kind: unknown

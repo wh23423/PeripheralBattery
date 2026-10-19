@@ -5,8 +5,9 @@ import json
 
 import pytest
 
-from collector.protocol import (CAPABILITIES, PROTOCOL_VERSION, Protocol,
-                                RecordingSink, make_device, semantic_equal)
+from collector.protocol import (CAPABILITIES, PROTOCOL_VERSION, SEMANTIC_FIELDS,
+                                Protocol, RecordingSink, make_device,
+                                semantic_equal)
 
 
 class SpyWriter:
@@ -81,6 +82,18 @@ def test_device_validation_level_kind_transport():
     assert device["left_s"] == 6480
     assert device["updated_unix"] == 123
     assert device["name"] == "n"
+
+
+def test_left_s_src_is_emitted_validated_and_semantic():
+    assert make_device("k", "n", 50)["left_s_src"] == ""
+    assert make_device("k", "n", 50, left_s=3600,
+                       left_s_src="spec")["left_s_src"] == "spec"
+    assert make_device("k", "n", 50, left_s_src="mains")["left_s_src"] == "mains"
+    assert make_device("k", "n", 50, left_s_src="guess")["left_s_src"] == ""
+    assert "left_s_src" in SEMANTIC_FIELDS
+    spec = make_device("k", "n", 50, left_s=3600, left_s_src="spec")
+    history = make_device("k", "n", 50, left_s=3600, left_s_src="history")
+    assert not semantic_equal(spec, history)   # UX changes: a device event is due
 
 
 def test_device_without_name_gets_placeholder():

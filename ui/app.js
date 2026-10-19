@@ -267,10 +267,25 @@
     if (!d) return '';
     if (d.online === false) return '离线';
     if (d.charging) return '充电中';
+    /* left_s_src=mains：外接供电设备没有「剩余续航」概念（Rust/collector 新字段） */
+    if (d.left_s_src === 'mains') return '外接供电';
     if (levelOf(d) == null) return d.approx || '电量未知';
-    if (d.left_s != null) return humanLeft(d.left_s);
+    if (d.left_s != null) return leftText(d);
     if (d.approx) return d.approx;
     return '剩余时间未知';
+  }
+
+  /* left_s_src=spec：厂商标称续航估算。humanLeft 的「约」前缀换成「≈」，
+     与历史实测（history）区分；无估算值时仍走「剩余时间未知」。 */
+  function specLeft(sec) {
+    const base = humanLeft(sec);
+    if (!base) return base;
+    return /^约/.test(base) ? '≈' + base.slice(1) : '≈ ' + base;
+  }
+
+  function leftText(d) {
+    if (d.left_s == null) return '';
+    return d.left_s_src === 'spec' ? specLeft(d.left_s) : humanLeft(d.left_s);
   }
 
   function ringStateClass(d) {
@@ -485,6 +500,12 @@
       rec.left.textContent = st;
       cache.status = st;
     }
+    /* spec 估算提示（鼠标悬停 title）：与 history/旧 collector 区分 */
+    const leftHint = (d.left_s_src === 'spec' && st.charAt(0) === '≈') ? '按标称续航估算' : '';
+    if (cache.leftHint !== leftHint) {
+      if (leftHint) rec.left.title = leftHint; else rec.left.removeAttribute('title');
+      cache.leftHint = leftHint;
+    }
     rec.dotEl.hidden = !st;
 
     const lvText = displayLevelText(d);
@@ -591,15 +612,22 @@
     el.heroPct.hidden = !hero || lv == null;
 
     let caption = '等待设备';
+    let captionHint = '';
     if (hero) {
       if (hero.online === false) caption = '设备离线';
       else if (hero.charging) caption = '充电中';
+      else if (hero.left_s_src === 'mains') caption = '外接供电';
       else if (lv == null) caption = hero.approx ? '电量未知（档位）' : '电量未知';
-      else if (hero.left_s != null) caption = humanLeft(hero.left_s);
+      else if (hero.left_s != null) {
+        caption = leftText(hero);
+        if (hero.left_s_src === 'spec') captionHint = '按标称续航估算';
+      }
       else if (hero.approx) caption = hero.approx;
       else caption = '剩余时间未知';
     }
     el.heroCaption.textContent = caption;
+    if (captionHint) el.heroCaption.title = captionHint;
+    else el.heroCaption.removeAttribute('title');
 
     const name = hero ? hero.name : '等待设备';
     el.heroName.textContent = name;
@@ -911,6 +939,10 @@
       const n = Number(raw.left_s);
       return Number.isFinite(n) ? Math.max(0, Math.round(n)) : null;
     })(),
+      /* 剩余时间来源：history（历史实测）| spec（厂商标称估算）| mains（外接供电）；
+         旧 collector 无此字段时归一为 ''，显示逻辑保持原样。 */
+      left_s_src: (raw.left_s_src === 'history' || raw.left_s_src === 'spec'
+        || raw.left_s_src === 'mains') ? raw.left_s_src : '',
       charging: !!raw.charging,
       online: raw.online !== false,
       kind: typeof raw.kind === 'string' && raw.kind ? raw.kind : 'bluetooth',
@@ -1559,14 +1591,44 @@
       clearSpotlight();
     });
 
-    /* 点击涟漪：按钮/行一套小涟漪，空白玻璃一套大涟漪 */
+    /* 点击涟漪：按钮/行一套小涟漪（pointerdown 立即触发，手感不变）；
+       空白玻璃的大涟漪改为「无位移的点击」在 pointerup 触发——
+       面板全域可拖动后，若仍在 pointerdown 触发，每次拖拽都会炸开大涟漪。
+       Tauri 在 mousedown 启动原生窗口移动循环，真实拖动时 pointerup 不会
+       送达页面，所以只有原地点击才会补出大涟漪。 */
+    let blankPress = null;
+
+    function isRippleInteractive(node) {
+      return !!(node && node.closest && node.closest(
+        '.row, .ctrl, .all-btn, .banner-btn, button, input, label, a, select, textarea, summary, [tabindex]'
+      ));
+    }
+
     el.panel.addEventListener('pointerdown', function (e) {
       if (state.hidden || prefersReducedMotion()) return;
-      if (drawerOpen && el.drawer.contains(e.target)) return;
+      blankPress = null;
+      /* 抽屉打开时整块遮罩不产生玻璃涟漪 */
+      if (drawerOpen || el.drawer.contains(e.target)) return;
       const target = e.target.closest ? e.target.closest('.row, .ctrl, .all-btn, .banner-btn') : null;
-      if (target) spawnRipple(target, e.clientX, e.clientY, true);
-      else if (!el.drawer.contains(e.target)) spawnRipple(el.panel, e.clientX, e.clientY, false);
+      if (target) { spawnRipple(target, e.clientX, e.clientY, true); return; }
+      if (isRippleInteractive(e.target)) return;
+      blankPress = { id: e.pointerId, x: e.clientX, y: e.clientY };
     });
+
+    el.panel.addEventListener('pointerup', function (e) {
+      const press = blankPress;
+      blankPress = null;
+      if (!press || press.id !== e.pointerId) return;
+      if (state.hidden || prefersReducedMotion() || drawerOpen) return;
+      if (el.drawer.contains(e.target)) return;
+      const dx = e.clientX - press.x;
+      const dy = e.clientY - press.y;
+      /* ≥6px 位移视为拖动（窗口正在被原生拖动），不补涟漪 */
+      if (dx * dx + dy * dy >= 36) return;
+      spawnRipple(el.panel, e.clientX, e.clientY, false);
+    });
+
+    el.panel.addEventListener('pointercancel', function () { blankPress = null; });
 
     /* 全局 Esc 关闭抽屉 */
     document.addEventListener('keydown', function (e) {

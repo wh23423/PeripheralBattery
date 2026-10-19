@@ -26,7 +26,7 @@ import threading
 import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set
 
-from . import protocol
+from . import device_specs, protocol
 from .merge import drop_bluetooth_duplicates, dedupe_controllers
 from .protocol import make_device, semantic_equal
 from .providers.base import DeviceStatus
@@ -75,6 +75,8 @@ def infer_transport(status: DeviceStatus, provider: str) -> str:
     The upstream ``DeviceStatus`` carries no transport field and providers are
     copied unmodified, so this uses what is actually reliable:
 
+    * an explicit valid ``status.transport`` set by the provider wins (a USB
+      dongle's PID says 2.4g even though its name never says so);
     * Bluetooth source / bt: key / ``via="bluetooth"`` -> bluetooth;
     * PlayStation: a MAC in the upstream key means Bluetooth, otherwise USB;
     * Steam: only the 2.4 GHz puck protocol is read -> 2.4g;
@@ -83,6 +85,9 @@ def infer_transport(status: DeviceStatus, provider: str) -> str:
     * ``unknown`` instead of a wrong guess (xinput cannot tell cable from the
       Xbox wireless adapter without WGI's IsWireless field).
     """
+    explicit = (getattr(status, "transport", "") or "").strip().lower()
+    if explicit in protocol.TRANSPORTS and explicit:
+        return explicit
     source = (getattr(status, "source", "") or provider or "").lower()
     key = (status.key or "").lower()
     name = (status.name or "").lower()
@@ -386,18 +391,12 @@ class StateStore:
             name = self._settings.name_for(key) or st.name
             kind = (hints or {}).get("kind") or normalize_kind(st)
             transport = (hints or {}).get("transport") or infer_transport(st, provider)
-            left_s = None
-            if self._history is not None:
-                try:
-                    self._history.record(key, st.level, st.charging, st.online, wall,
-                                         coarse=bool(st.approx))
-                    left_s = self._history.seconds_left(key, st.level)
-                except Exception:                 # history is advisory, never fatal
-                    log.exception("history.record")
+            left_s, left_s_src = self._endurance(key, st, wall)
             device = make_device(
                 key=key, name=name, level=st.level, approx=st.approx,
-                left_s=left_s, charging=st.charging, online=st.online,
-                kind=kind, transport=transport, via=st.via, updated_unix=wall)
+                left_s=left_s, left_s_src=left_s_src, charging=st.charging,
+                online=st.online, kind=kind, transport=transport, via=st.via,
+                updated_unix=wall)
 
             prev = self._devices.get(key)
             changed = bool(replaces) or not semantic_equal(prev, device)
@@ -409,6 +408,41 @@ class StateStore:
                 self._sink.device(dict(device), replaces)
                 self._device_events += 1
                 self._check_alerts(key, dict(device), prev, wall)
+
+    def _endurance(self, key: str, st: DeviceStatus, wall: float):
+        """(left_s, left_s_src) for one device row.
+
+        A mains-powered device (catalogue ``powered``) is never given a
+        remaining time even if it reports a static "level"; otherwise the order
+        of trust is measured drain (``history``) > catalogue nominal endurance
+        (``spec``) > nothing. While charging or offline the last measured drain
+        rate says nothing useful, so no estimate is shown either.
+        """
+        if self._history is not None:
+            try:
+                self._history.record(key, st.level, st.charging, st.online, wall,
+                                     coarse=bool(st.approx))
+            except Exception:                     # history is advisory, never fatal
+                log.exception("history.record")
+        spec = device_specs.lookup(st.name, key)
+        if not st.online or st.charging:
+            return None, ""
+        if spec is not None and spec.powered:
+            return None, "mains"                  # USB-C powered: no endurance at all
+        if self._history is not None:
+            try:
+                measured = self._history.seconds_left(key, st.level)
+            except Exception:                     # ditto
+                log.exception("history.seconds_left")
+                measured = None
+            if measured is not None:
+                return measured, "history"
+        if spec is None or st.level is None or st.approx:
+            return None, ""                       # absent / too rough to extrapolate
+        seconds = device_specs.seconds_left(spec, st.level)
+        if seconds is None:
+            return None, ""
+        return seconds, "spec"
 
     def _provider_of_raw(self, st: DeviceStatus) -> str:
         provider = self._key_provider.get(st.key)

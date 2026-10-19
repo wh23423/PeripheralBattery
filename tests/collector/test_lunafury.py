@@ -100,6 +100,7 @@ def test_wireless_level_and_name(patch):
     assert status.online is True
     assert status.source == "lunafury"
     assert status.kind == "mouse"
+    assert status.transport == "2.4g"          # dongle pid 0x0033: the name says nothing
     # usage 0 (interface 2) is asked first, so the failing collection is never opened
     assert device.opened == b"path-51-2"
     assert device.sent and device.sent[0][:7] == [0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x83]
@@ -175,6 +176,25 @@ def test_known_name_is_used_when_the_product_string_is_missing(patch):
     status = LunafuryProvider().poll()[0]
 
     assert status.name == "LunaFury Luna33-W"
+
+
+def test_cable_only_reports_usb_transport(patch):
+    wired = FakeDevice([reply(55, charging=True)])
+    patch([iface(WIRED, 2, 0x0000, product="Luna33")], [wired])
+
+    status = LunafuryProvider().poll()[0]
+
+    assert status.transport == "usb"
+    assert status.charging is True
+
+
+def test_unknown_pid_keeps_transport_honestly_empty(patch):
+    patch([iface(0x0099, 2, 0x0000, product="Luna33 Pro")],
+          [FakeDevice([reply(42)])])
+
+    status = LunafuryProvider().poll()[0]
+
+    assert status.transport == ""              # unknown pid: don't guess
 
 
 def test_provider_is_registered_everywhere():

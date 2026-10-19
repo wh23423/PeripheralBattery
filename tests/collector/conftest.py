@@ -41,10 +41,10 @@ class FakeClock:
 
 def make_status(key: str, name: str, level=None, charging: bool = False,
                 online: bool = True, source: str = "logitech", approx: str = "",
-                kind: str = "", via: str = "") -> DeviceStatus:
+                kind: str = "", via: str = "", transport: str = "") -> DeviceStatus:
     return DeviceStatus(key=key, name=name, level=level, charging=charging,
                         online=online, source=source, approx=approx, kind=kind,
-                        via=via)
+                        via=via, transport=transport)
 
 
 class Harness:

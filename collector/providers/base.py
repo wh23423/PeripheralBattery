@@ -26,6 +26,11 @@ class DeviceStatus:
                                  # tray's input wake fires only for these - an icon
                                  # greyed because its device is off must not re-poll
                                  # the app on every keystroke (review, #202).
+    transport: str = ""          # "2.4g"/"usb"/"bluetooth"/"unknown" when the
+                                 # provider knows the link; "" = let
+                                 # state.infer_transport() apply its heuristics.
+                                 # Appended last: every existing construction stays
+                                 # valid and new providers must pass it by keyword.
 
 
 class Provider:

@@ -1,6 +1,6 @@
 {
   "name": "peripheral-battery",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "外设电量显示器 — Tauri 2 外壳 + Python 采集器",
   "scripts": {

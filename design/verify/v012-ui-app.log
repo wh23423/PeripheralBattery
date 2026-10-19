@@ -1,0 +1,50 @@
+2026-10-19 23:06:37.320 [INFO] app start version=0.1.2 build=f798e59 pid=28232 exe=D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+2026-10-19 23:06:37.320 [INFO] single-instance: mutex acquired name=Local\PBVerify-v012-ui-104047a243 pid=28232 session=unknown user=29736\iloveyouparadise elevated=true
+2026-10-19 23:06:37.320 [INFO] single-instance: mutex acquired name=Local\PBVerify-v012-ui-104047a243 pid=28232
+2026-10-19 23:06:37.320 [INFO] webview2 runtime version=155.0.4283.62 minimum=118.0.0.0
+2026-10-19 23:06:37.320 [INFO] platform windows_build=26300 windows11=true data_dir=C:\Users\28482\AppData\Local\Temp\pb-verify-v012-ui-807lr7_z\Roaming\PeripheralBattery
+2026-10-19 23:06:37.328 [INFO] app config: app.json 与 config.json 均不存在，创建默认 app.json; created C:\Users\28482\AppData\Local\Temp\pb-verify-v012-ui-807lr7_z\Roaming\PeripheralBattery\app.json
+2026-10-19 23:06:37.328 [INFO] app.json loaded pinned=false path=C:\Users\28482\AppData\Local\Temp\pb-verify-v012-ui-807lr7_z\Roaming\PeripheralBattery\app.json
+2026-10-19 23:06:37.425 [INFO] scale factor cached = 1.250
+2026-10-19 23:06:37.425 [INFO] DWM round corner build=26300 hwnd=0x7808d6 hresult=0x00000000
+2026-10-19 23:06:37.425 [INFO] acrylic enabled build=26300 transparency=Some(true) remote=false
+2026-10-19 23:06:37.425 [INFO] webview2 hardening: context_menus=disabled; accelerator_keys=disabled
+2026-10-19 23:06:37.425 [INFO] panel geometry window=720x380 dip panel=720x380 dip (备选B：窗口=面板，无安全边) outer=900x475 scale=1.250
+2026-10-19 23:06:37.425 [INFO] window created origin=(128,128) size=900x475 scale=1.250 dip=(720.0x380.0)
+2026-10-19 23:06:37.429 [INFO] tray created id=peripheral-battery-tray scale=1.25 icon_color=#94a3b8 pinned=false
+2026-10-19 23:06:37.429 [INFO] sidecar start requested instance=6e48-18dff6ac7dfb3650-f3f7b98bc0 attempt=0 restart_max=5 data_dir=C:\Users\28482\AppData\Local\Temp\pb-verify-v012-ui-807lr7_z\Roaming\PeripheralBattery
+2026-10-19 23:06:37.433 [DEBUG] cleanup residual diagnostic: other collector.exe pids=[30448] same_install=0（只记录，不 kill）
+2026-10-19 23:06:37.433 [INFO] sidecar spawn path=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector\collector.exe args=["--stdio"] cwd=\\?\D:\desktop\电量显示插件\src-tauri\target\release\collector kind=packaged attempt=0
+2026-10-19 23:06:37.438 [INFO] sidecar job assigned=true
+2026-10-19 23:06:37.438 [DEBUG] collector pid file written pid=36420 app_pid=28232 instance=6e48-18dff6ac7dfb3650-f3f7b98bc0
+2026-10-19 23:06:37.438 [INFO] collector-state state=starting pid=Some(36420) code=None protocol=None session=None message=None
+2026-10-19 23:06:37.438 [INFO] sidecar spawned pid=36420 instance=6e48-18dff6ac7dfb3650-f3f7b98bc0 attempt=0
+2026-10-19 23:06:37.438 [INFO] PB_QUIT_AFTER_MS=40000 armed
+2026-10-19 23:06:37.439 [INFO] setup complete
+2026-10-19 23:06:37.516 [INFO] command ui_ready
+2026-10-19 23:06:37.516 [DEBUG] app-state emitted {"acrylic":true,"build":"f798e59","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.2"}
+2026-10-19 23:06:37.516 [INFO] webview memory mode normal: MemoryUsageTargetLevel=NORMAL; Resume ok
+2026-10-19 23:06:37.516 [DEBUG] virtual desktop: CoInitializeEx hr=0x00000001
+2026-10-19 23:06:37.519 [INFO] window virtual desktop reason=ui-ready result=moved-to-current desktop_id=8B0222B5-61B6-4A59-BD69-CFC954219028 ours=unknown IsWindowOnCurrentVirtualDesktop=true(进程相对语义，仅供参考)
+2026-10-19 23:06:37.537 [INFO] window size restored 720x380 dip scale=1.250
+2026-10-19 23:06:37.537 [DEBUG] tray.rect() = (2164,1380 40x60)
+2026-10-19 23:06:37.538 [INFO] panel position origin=(1642,887) size=900x475 scale=1.250 panel=(1642,887 900x475) work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)
+2026-10-19 23:06:37.538 [INFO] window show reason=ui-ready webview IsVisible(true) -> S_OK
+2026-10-19 23:06:37.538 [DEBUG] collector << {"t":"get","what":"snapshot"}
+2026-10-19 23:06:37.538 [INFO] window show reason=ui-ready requested collector snapshot=true
+2026-10-19 23:06:37.538 [DEBUG] app-state emitted {"acrylic":true,"build":"f798e59","pinned":false,"platform":{"build":26300,"windows11":true},"version":"0.1.2"}
+2026-10-19 23:06:37.538 [INFO] window shown reason=ui-ready
+2026-10-19 23:06:37.538 [INFO] window shown origin=(1642,887) size=900x475 scale=1.250 dip=(720.0x380.0)
+2026-10-19 23:06:37.563 [INFO] hello protocol=1 session=1cceaf11-3b48-4b87-a56e-9fe958a2ea7f build=unknown devices=0 capabilities=[approx,left_s,via,transport]
+2026-10-19 23:06:37.563 [INFO] collector-state state=ready pid=Some(36420) code=None protocol=Some(1) session=Some("1cceaf11-3b48-4b87-a56e-9fe958a2ea7f") message=None
+2026-10-19 23:06:39.012 [INFO] tray-state source=rust level=Some(94) charging=false online=true kind=bluetooth
+2026-10-19 23:06:39.012 [DEBUG] collector device key=Some("bluetooth:0000:0000:c817f5498e4e")
+2026-10-19 23:06:39.012 [INFO] tray-update begin source=rust level=Some(94) charging=false online=true kind=bluetooth
+2026-10-19 23:06:39.013 [INFO] tray-update end source=rust icon_ok=true tooltip_ok=true scale=1.25 tooltip=外设电量 · 94%
+2026-10-19 23:06:39.015 [DEBUG] tray-state source=frontend unchanged level=Some(94) online=true
+2026-10-19 23:06:39.439 [DEBUG] ui_ready received; fallback thread exits (window_visible=true)
+2026-10-19 23:06:43.666 [INFO] tray-state source=rust level=Some(93) charging=false online=true kind=mouse
+2026-10-19 23:06:43.666 [DEBUG] collector device key=Some("lunafury:373e:0000:u1")
+2026-10-19 23:06:43.666 [INFO] tray-update begin source=rust level=Some(93) charging=false online=true kind=mouse
+2026-10-19 23:06:43.666 [INFO] tray-update end source=rust icon_ok=true tooltip_ok=true scale=1.25 tooltip=外设电量 · 93%
+2026-10-19 23:06:43.667 [DEBUG] tray-state source=frontend unchanged level=Some(93) online=true

@@ -456,6 +456,138 @@ def test_transport_inference_for_real_provider_keys():
                                        source="razer"), "razer") == "usb"
 
 
+# ------------------------------------------- transport from the provider itself
+def test_provider_transport_wins_over_name_heuristics():
+    from collector.state import infer_transport
+    # A 2.4 GHz dongle (PID 0x0033) whose name never says "2.4"/"dongle": only the
+    # provider can know, so its explicit value must win.
+    assert infer_transport(
+        make_status("lunafury:373e:0033:1", "LunaFury Luna33-W", source="lunafury",
+                    transport="2.4g"), "lunafury") == "2.4g"
+    # The wired variant reports "usb" without a USB word in its name.
+    assert infer_transport(
+        make_status("lunafury:373e:0032:1", "LunaFury Luna33", source="lunafury",
+                    transport="usb"), "lunafury") == "usb"
+    # Unknown/invalid provider values never override the old heuristics.
+    assert infer_transport(
+        make_status("logitech:1", "G502 X PLUS LIGHTSPEED", source="logitech",
+                    transport="bogus"), "logitech") == "2.4g"
+    assert infer_transport(
+        make_status("xinput:0", "Xbox controller", source="xinput",
+                    transport=""), "xinput") == "unknown"
+
+
+def test_lunafury_device_row_carries_2_4g_transport(tmp_path):
+    h = Harness(tmp_path, providers=("lunafury",))
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      70, source="lunafury", kind="mouse",
+                                      transport="2.4g")])
+    device = _only_device(h)
+    assert device["transport"] == "2.4g"
+    assert device["left_s_src"] == "spec"        # cold start: no history yet
+    assert device["left_s"] == int(round(0.70 * 40.0 * 3600.0))
+
+
+# --------------------------------------------------- nominal endurance fallback
+def test_unknown_device_gets_no_endurance_estimate(harness):
+    harness.begin("logitech", "razer")
+    harness.report("logitech", [_mouse()])
+    harness.report("razer", [_headset()])
+    for device in harness.devices().values():
+        assert device["left_s"] is None
+        assert device["left_s_src"] == ""
+
+
+def test_mains_powered_device_is_marked_mains_never_a_remaining_time(tmp_path):
+    h = Harness(tmp_path, providers=("bluetooth",))
+    h.begin()
+    h.report("bluetooth", [make_status("bt:aabbccddeeff", "FlyDigi BS2PRO", 94,
+                                       source="bluetooth", kind="bluetooth",
+                                       transport="bluetooth")])
+    device = _only_device(h)
+    assert device["left_s"] is None             # static 94 % is meaningless
+    assert device["left_s_src"] == "mains"
+    assert device["transport"] == "bluetooth"
+
+
+def test_charging_or_offline_device_gets_no_nominal_estimate(tmp_path):
+    h = Harness(tmp_path, providers=("lunafury",))
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      70, charging=True, source="lunafury",
+                                      kind="mouse")])
+    device = _only_device(h)
+    assert (device["left_s"], device["left_s_src"]) == (None, "")
+
+    h2 = Harness(tmp_path / "offline", providers=("lunafury",))
+    h2.begin()
+    h2.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                       70, online=False, source="lunafury",
+                                       kind="mouse")])
+    device = _only_device(h2)
+    assert (device["left_s"], device["left_s_src"]) == (None, "")
+
+
+def _only_device(h):
+    devices = h.devices()
+    assert len(devices) == 1, devices
+    return next(iter(devices.values()))
+
+
+class _StubHistory:
+    """Minimal history double: the measured estimate is always ``seconds``."""
+
+    def __init__(self, seconds=None):
+        self.seconds = seconds
+        self.records = []
+
+    def record(self, key, level, charging, online, now, coarse=False):
+        self.records.append((key, level, charging, online, coarse))
+
+    def seconds_left(self, key, level):
+        return self.seconds
+
+
+def test_history_wins_over_the_nominal_catalogue(tmp_path):
+    history = _StubHistory(1234.0)
+    h = Harness(tmp_path, providers=("lunafury",), history=history)
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      70, source="lunafury", kind="mouse")])
+    device = _only_device(h)
+    assert device["left_s"] == 1234                 # measured, not the 40 h spec
+    assert device["left_s_src"] == "history"
+    assert history.records[0][1:] == (70, False, True, False)
+
+
+def test_coarse_or_unknown_levels_are_not_extrapolated(tmp_path):
+    h = Harness(tmp_path, providers=("lunafury",))
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      None, source="lunafury", kind="mouse",
+                                      approx="约 55%（中）")])
+    device = _only_device(h)
+    assert (device["left_s"], device["left_s_src"]) == (None, "")
+
+
+def test_left_s_src_change_is_a_semantic_device_change(tmp_path):
+    history = _StubHistory(None)
+    h = Harness(tmp_path, providers=("lunafury",), history=history)
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      70, source="lunafury", kind="mouse")])
+    assert _only_device(h)["left_s_src"] == "spec"
+
+    history.seconds = 999.0         # history becomes available: left_s_src flips
+    h.clock.advance(5.0)
+    h.begin()
+    h.report("lunafury", [make_status("lunafury:373e:0033:1", "LunaFury Luna33-W",
+                                      70, source="lunafury", kind="mouse")])
+    last = h.sink.by_type("device")[-1]["device"]
+    assert (last["left_s"], last["left_s_src"]) == (999, "history")
+
+
 # --------------------------------------------------- P3-7 no providers
 def test_no_enabled_providers_is_ready_immediately(tmp_path):
     h = Harness(tmp_path, providers=())

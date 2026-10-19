@@ -16,7 +16,11 @@
       <span class="specular" id="specular"></span>
     </div>
 
-    <div class="panel" id="panel">
+    <!-- 拖拽区：整个面板（含 hero 大卡、设备列表空白、footer 提示）都可拖动。
+         Tauri 2 的 "deep" 让子树任意位置命中；drag.js 会自动排除
+         button/input/label/a/select/textarea/summary、[tabindex]、role=button 等
+         可交互元素，因此设备行仍是点击选主卡、按钮仍是点击而非拖动。 -->
+    <div class="panel" id="panel" data-tauri-drag-region="deep">
       <!-- 顶部右侧：玻璃药丸控制簇 -->
       <div class="controls" id="controls" role="toolbar" aria-label="面板操作">
         <button type="button" class="ctrl" id="btn-refresh" title="立即刷新" aria-label="刷新">
@@ -66,10 +70,8 @@
 
       <!-- 右：设备列表 -->
       <section class="side" aria-label="设备列表">
-        <!-- P1-08：Tauri 2 的裸 data-tauri-drag-region 只对元素自身生效，标题/副标题
-             命中子元素时不算拖拽区（真机只有约 6px 缝隙可拖）。改为 "deep" 后整个
-             header 子树都可拖；Tauri 的 drag.js 会自动排除 button/input 等可交互元素。 -->
-        <header class="side-head" data-tauri-drag-region="deep">
+        <!-- 拖拽区已上移到 #panel（整面板可拖），header 不再单独声明。 -->
+        <header class="side-head">
           <div class="title-row">
             <h1>外设电量</h1>
             <span class="live" id="live"><i aria-hidden="true"></i><span id="live-text">在线</span></span>
@@ -99,9 +101,11 @@
       <!-- 告警 toast -->
       <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
-      <!-- 设置抽屉：覆盖在 720×380 面板内部，不改变外框尺寸 -->
-      <div class="drawer-scrim" id="drawer-scrim" hidden></div>
-      <aside class="drawer" id="drawer" aria-label="设置" aria-hidden="true" inert>
+      <!-- 设置抽屉：覆盖在 720×380 面板内部，不改变外框尺寸。
+           drag-region="false" 显式退出整面板拖拽：scrim 点击必须能关抽屉，
+           抽屉内空白处拖动也不应把窗口带走（交互控件本来就被 Tauri drag.js 排除）。 -->
+      <div class="drawer-scrim" id="drawer-scrim" data-tauri-drag-region="false" hidden></div>
+      <aside class="drawer" id="drawer" aria-label="设置" aria-hidden="true" data-tauri-drag-region="false" inert>
         <header class="drawer-head">
           <h2>设置</h2>
           <button type="button" class="ctrl drawer-close" id="btn-drawer-close" title="关闭设置" aria-label="关闭设置">

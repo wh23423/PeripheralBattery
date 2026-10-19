@@ -50,7 +50,7 @@ collector.exe (Python, stdio NDJSON)  ⇄  app.exe (Tauri/Rust)  ⇄  WebView2 (
 规则：
 
 - `seq` 单调递增；UI 以 `(session, seq)` 排序，乱序丢弃，`session` 变化 = 全量重置（**不重播入场动画**）。
-- 只在**语义变化**时发 `device`：`level`、`charging`、`online`、`name`、`approx`、`left_s` 任一变。
+- 只在**语义变化**时发 `device`：`level`、`charging`、`online`、`name`、`approx`、`left_s`、`left_s_src` 任一变。
 - `replaces` 出现时，UI 做 morph（保留 DOM/位置/动画）而不是 delete+insert。
 - 合并函数（蓝牙去重、控制器去重）只在**完整快照**上运行，绝不在增量里跑。
 
@@ -63,6 +63,7 @@ collector.exe (Python, stdio NDJSON)  ⇄  app.exe (Tauri/Rust)  ⇄  WebView2 (
   "level": 68,             // int 0..100 | null = 未知
   "approx": "",            // 档位设备的展示文案，如 "约 55%（中）"
   "left_s": 6480,          // 剩余秒数；null = 不估算
+  "left_s_src": "history", // 该 left_s 的来源（见下）；""|history|spec|mains
   "charging": false,
   "online": true,
   "kind": "mouse",         // headset|mouse|keyboard|gamepad|bluetooth
@@ -71,6 +72,13 @@ collector.exe (Python, stdio NDJSON)  ⇄  app.exe (Tauri/Rust)  ⇄  WebView2 (
   "updated_unix": 1760000000
 }
 ```
+
+`left_s_src` 说明 `left_s` 是哪来的（**附加字段，protocol 仍为 1**，老 UI 可忽略）：
+
+- `"history"`：本机实测掉电速率推算，UI 显示「≈ X 小时 Y 分」等真实估算（原有行为）。
+- `"spec"`：设备刚接上、还没有实测历史时，按型号名义续航 × 当前电量做冷启动估算（上游标注为估算值）；UI 与 `history` 一样显示「≈ X 小时 Y 分」，不得当成实测。
+- `"mains"`：设备是**外接供电**（如 USB-C 供电的笔记本散热器），`left_s` 恒为 `null`；UI 显示「外接供电」，**不得**显示电量百分比或剩余时间。
+- `""`：`left_s` 为 `null` 且无以上含义（未知 / 充电中 / 离线）。
 
 UI 必须处理 `level === null`：空心环 + `approx || "未知"`，**不得**按 `<= 15` 判红。
 

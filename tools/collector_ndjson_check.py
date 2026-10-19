@@ -25,8 +25,9 @@ KINDS = {"headset", "mouse", "keyboard", "gamepad", "bluetooth"}
 TRANSPORTS = {"2.4g", "usb", "bluetooth", "unknown"}
 ALERTS = {"low", "full", "offline"}
 EVENTS = {"device", "gone", "tick", "alert", "stat"}
-DEVICE_FIELDS = {"key", "name", "level", "approx", "left_s", "charging", "online",
-                 "kind", "transport", "via", "updated_unix"}
+LEFT_S_SRC = {"", "history", "spec", "mains"}
+DEVICE_FIELDS = {"key", "name", "level", "approx", "left_s", "left_s_src", "charging",
+                 "online", "kind", "transport", "via", "updated_unix"}
 KEY_RE = re.compile(
     r"^[a-z0-9_]+:[0-9a-f]{4}:[0-9a-f]{4}:(?:[a-z0-9]+|unit-[a-z0-9]+|u[0-9]+)$")
 
@@ -73,6 +74,8 @@ def check_device(problems, line_no, device, label="device"):
         problems.error(line_no, f"{label}.updated_unix is not an int")
     if device.get("left_s") is not None and not isinstance(device["left_s"], int):
         problems.error(line_no, f"{label}.left_s is not int/null")
+    if device.get("left_s_src") not in LEFT_S_SRC:
+        problems.error(line_no, f"{label}.left_s_src is not one of {sorted(LEFT_S_SRC)!r}")
 
 
 def main(argv):

@@ -1,6 +1,6 @@
 [package]
 name = "peripheral-battery"
-version = "0.1.1"
+version = "0.1.2"
 description = "外设电量显示器 (Peripheral Battery Monitor)"
 authors = ["peripheral-battery"]
 edition = "2021"
