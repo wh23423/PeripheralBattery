@@ -20,6 +20,7 @@ import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set
 
 from .providers.base import DeviceStatus
+from .settings import GLOBAL_SET_FIELDS
 from .state import StateStore
 
 log = logging.getLogger("halo_battery")
@@ -631,8 +632,13 @@ class Collector:
         if kind == "set":
             key = msg.get("key")
             field = msg.get("field")
-            if isinstance(key, str) and isinstance(field, str):
-                if self.settings.apply_set(key, field, msg.get("value")):
+            # F-04: global fields (low/full_alert) are not tied to a device and
+            # the UI omits "key" for them; name/hidden still need one.
+            global_field = isinstance(field, str) and field in GLOBAL_SET_FIELDS
+            key_ok = isinstance(key, str) or (global_field and key is None)
+            if key_ok and isinstance(field, str):
+                key_arg = key if isinstance(key, str) else ""
+                if self.settings.apply_set(key_arg, field, msg.get("value")):
                     self.state.refresh_from_settings()
                     self.state.on_tick()
                 else:

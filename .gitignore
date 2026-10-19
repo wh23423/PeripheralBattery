@@ -19,6 +19,12 @@ __pycache__/
 /design/demo.webp
 /design/verify/*.png
 /design/verify/*.webp
+/design/verify/**/*.png
+/design/verify/**/*.webp
+/design/verify/**/*.webm
+/design/verify/**/*.gif
+/design/motion-preview.gif
+/design/motion-preview.webp
 /design/audit/evidence/
 /design/audit/runtime-screens/
 /design/audit/final-runtime-evidence/

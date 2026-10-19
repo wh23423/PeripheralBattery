@@ -878,12 +878,7 @@ impl Sidecar {
         crate::tray_mirror::apply_message(&self.app, &parsed);
         match parsed.get("t").and_then(|v| v.as_str()).unwrap_or("") {
             "hello" => self.handle_hello(&parsed),
-            "alert" => crate::log_info!(
-                "collector alert kind={:?} key={:?} level={:?}",
-                parsed.get("kind"),
-                parsed.get("key"),
-                parsed.get("level")
-            ),
+            "alert" => crate::notifications::handle_alert(&self.app, &parsed),
             "stat" => {
                 // F7：providers 字典很长，原先整行截断 400 字符导致 timers_per_s /
                 // key_migrations 永远落在截断之后。改为先打一行关键字段摘要（info 级，

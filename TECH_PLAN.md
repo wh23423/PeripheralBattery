@@ -247,6 +247,8 @@ class DeviceStatus:
 - **采集层配置**（轮询间隔、启用哪些 provider、蓝牙开关）放 collector 的 `config.json`。
 - **UI 配置**（主题、窗口位置、卡片顺序、缩放）放 UI 侧自己的存储。
 - 两边通过 IPC 的 `settings` 事件同步交集部分，避免双写。
+- v0.2.0 落地时细化为三层：系统/进程行为进 `app.json`（Rust 唯一写者）、采集行为进 collector `config.json`、
+  `localStorage` 只留 `reducedMotion`；契约见 §14.1。
 
 ### D6. 图标渲染留在采集层 ✅
 见 §4.5 (a)。理由：新 UI 无论用什么栈，都需要同一个"电量→像素"的映射，集中一份最省事；也便于以后加自定义皮肤。
@@ -457,3 +459,107 @@ node tools/record.js               # design/rec/*.webm（25fps 原片）
 1. 面板从托盘图标弹出 / 收回的位置与缩放动画。
 2. 托盘图标本身的状态色与左右键行为。
 3. 桌面背景真实模糊（`windowEffects: ["acrylic"]`）；CSS `backdrop-filter` 不会模糊桌面。
+
+---
+
+## 14. v0.2.0 契约增补（设置 / 开机自启 / 不透明度 / 通知 / 阈值）
+
+FEATURE_PLAN v1.3 的 v0.2.0 范围（S-01、F-01～F-04）落地后，§5 D5 的“配置归属”细化为三层；
+本节记录实现契约，供后续版本、验收脚本与第三方前端参照。
+
+### 14.1 设置分层（D5 细化）
+
+| 层 | 存储 | 写者 | 内容 |
+|---|---|---|---|
+| 系统 / 进程行为 | `%APPDATA%\PeripheralBattery\app.json`（schema=2） | Rust 外壳 | `schema`、`pinned`、`opacity`、`autostart`、`notify_low`、`notify_full` |
+| 采集行为 | 同目录 `config.json` | collector（唯一写者） | `low`、`full_alert`、`tick_interval` 等 provider 配置 |
+| 仅 UI 偏好 | `localStorage` | 前端 | 只保留 `reducedMotion` |
+
+- `app.json` 默认值：`opacity=60`（clamp 50–100）、`autostart=false`、`notify_low=true`、`notify_full=true`；
+  `schema` 1 → 2 迁移时补默认值。旧 `config.json` 迁入时只迁 `pinned`；迁移失败不阻塞启动（日志告警 + 默认值）。
+- 旧 `localStorage.lowThreshold` 首次启动读取一次、推送给 collector 后删除（见 §14.7）。
+
+### 14.2 app-state 扩展
+
+`app-state` 在原有字段（`pinned`、`acrylic`、`platform`、`build`、`version` 等）上增量：
+
+```json
+{
+  "settings": { "opacity": 60, "autostart": false, "notifyLow": true, "notifyFull": true },
+  "autostart": { "enabled": false, "osDisabled": false, "path": "\"C:\\...\\peripheral-battery.exe\" --autostart" },
+  "autostartLaunch": false
+}
+```
+
+- `autostart.enabled`：是否已写入有效的当前用户启动项；`osDisabled`：是否被系统启动项管理禁用；
+  `path`：**HKCU Run 值的原始数据**（含引号与 `--autostart`，供诊断；无值时不序列化），不是解析后的 exe 路径。
+- `autostartLaunch`：本次进程是否由 `--autostart` 启动（诊断用，非持久化）。
+- 前端只读该事件渲染设置抽屉，不自行推导注册表状态。
+
+### 14.3 IPC：update_settings / get_settings
+
+`get_settings`（无参数）：
+
+```json
+{ "settings": { "opacity": 60, "autostart": false, "notifyLow": true, "notifyFull": true },
+  "autostart": { "enabled": false, "osDisabled": false } }
+```
+
+`update_settings`：参数 `{ "patch": { "opacity"?: u8, "autostart"?: bool, "notifyLow"?: bool, "notifyFull"?: bool } }`
+
+```json
+{ "ok": true, "settings": { ... }, "autostart": { ... } }
+```
+
+- 白名单：未知键、类型错误返回 `{ok:false, error:...}` 且不落盘；`opacity` clamp 到 50–100。
+- 顺序：`autostart=true` 先写注册表、读回校验成功后再写 `app.json`；失败则回滚注册表与内存，
+  返回错误码，前端恢复开关状态。
+- 成功后 emit 一次 `app-state`，托盘/其他窗口同步。
+
+### 14.4 开机启动注册表契约（F-01）
+
+| 项 | 契约 |
+|---|---|
+| Run 键 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` |
+| 值名 | `PeripheralBattery` |
+| 类型 / 数据 | `REG_SZ` / `"<exe 绝对路径>" --autostart`（路径必须加引号） |
+| StartupApproved | `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run\PeripheralBattery`，REG_BINARY 12 字节，**只读探测**；首字节 `0x02`/`0x06`=启用，`0x03`/`0x07`=禁用，其它=未知 |
+
+对账（intent = `app.json.autostart`）：
+
+| intent | 注册表状态 | 动作 |
+|---|---|---|
+| true | 值存在、路径匹配、启用 | Noop |
+| true | 值存在、路径不匹配（安装目录变化） | Rewrite |
+| true | 值缺失 | Write |
+| true | 被系统启动项管理禁用 | 不改写，仅 UI 提示 |
+| false | 值存在 | Delete（Run + StartupApproved） |
+| false | 值缺失 | Noop |
+
+- 启动参数：`--autostart`（或 `--hidden`）静默；`state.autostart_launch=true`；日志 `autostart silent launch`。
+- 单实例：`AlreadyRunning` 且本进程为 `--autostart` 时直接 `exit(0)`，绝不 `signal_existing`。
+- UI 可见性：`show = !silent && (pb_show_on_start || window_visible)`；静默启动永不兜底显示。
+- 卸载：`installer-hooks.nsh` 的 `NSIS_HOOK_POSTUNINSTALL` 删除 Run 与 StartupApproved 两处值。
+
+### 14.5 不透明度契约（F-02）
+
+- `app.json.opacity`：`u8`，50–100，默认 60，`update_settings` 时 clamp；非法/缺失按默认。
+- CSS 变量：`--panel-a1` / `--panel-a2` / `--panel-a3` 分别作用于面板深蓝渐变的三档 alpha；
+  `base=[0.60, 0.52, 0.62]`，`v<=60` 时 `b*v/60`，`v>60` 时 `b + (1-b)*(v-60)/40`。
+- 映射表（50/60/80/100）：`(0.500,0.433,0.517)` / `(0.600,0.520,0.620)` / `(0.800,0.760,0.810)` / `(1.000,1.000,1.000)`。
+- acrylic 不可用时不改值；前端滑块 disabled 并提示，保留当前 `opacity`。
+
+### 14.6 通知契约（F-03）
+
+- 插件：`tauri-plugin-notification`；`app.json.notify_low` / `notify_full`（默认 true）。
+- 触发：仅 `alert` 事件的 `kind=low`（受 collector `low` 阈值控制）与 `kind=full`；
+  同一设备 key + 同一类型 **10 分钟**节流。
+- 文案：`alert.text` 优先，缺省 `"{key} 电量仅剩 {level}%，建议充电"` / `"{key} 已充满"`。
+- 通知发送失败只记 WARN，不影响面板 toast；点击通知打开面板留待 v0.2.1。
+
+### 14.7 低电阈值契约（F-04）
+
+- `collector config.json`：`low`（0–100 int，默认 20）、`full_alert`（bool）；`apply_set` 白名单接受 `low` / `full_alert`。
+- `hello.settings` 增量下发 `low`、`full_alert`、`tick_interval`（协议版本仍 1，旧 UI 忽略）。
+- UI `threshold()` 改为读 `hello.settings.low` 同步值；告警与通知使用同一阈值；
+  `localStorage.lowThreshold` 迁移后删除。

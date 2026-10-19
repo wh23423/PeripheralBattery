@@ -6,10 +6,12 @@
 
 #![windows_subsystem = "windows"]
 
+mod autostart;
 mod commands;
 mod config;
 mod fps;
 mod logging;
+mod notifications;
 mod panel;
 mod paths;
 mod platform;
@@ -40,6 +42,20 @@ fn main() {
             .unwrap_or_default()
     );
 
+    // F-01：开机自启命令行。`--autostart` 由注册表 Run 值写入；`--hidden` 兼容旧
+    // 手工启动项/调试用法。任一出现即静默启动：不抢焦点、不显示面板、已运行则直接退出。
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let autostart_launch = args
+        .iter()
+        .any(|a| a.eq_ignore_ascii_case("--autostart"));
+    let hidden_flag = args.iter().any(|a| a.eq_ignore_ascii_case("--hidden"));
+    let silent_launch = autostart_launch || hidden_flag;
+    if silent_launch {
+        crate::log_info!(
+            "autostart silent launch args={args:?} autostart={autostart_launch} hidden={hidden_flag}"
+        );
+    }
+
     // 单实例（BUILD_PLAN §1.3）：互斥体必须在创建窗口/托盘/collector 之前。
     // 已有实例时先通知它激活面板（命名事件），失败再 ShowWindow 兜底，然后本进程正常退出。
     let instance_name = std::env::var("PB_SINGLE_INSTANCE_NAME")
@@ -48,6 +64,14 @@ fn main() {
     let mut activation_event: Option<isize> = None;
     match single_instance::acquire(&instance_name) {
         single_instance::AcquireResult::AlreadyRunning { pid } => {
+            // F-01：开机自启时已有实例在跑（用户已打开面板），绝不能再激活/弹窗，
+            // 直接静默退出即可（§6.4）。
+            if silent_launch {
+                crate::log_info!(
+                    "autostart silent launch: existing pid={pid:?} name={instance_name} → exit(0) (不激活窗口)"
+                );
+                return;
+            }
             let signaled = single_instance::signal_existing(&instance_name);
             let activated = if signaled {
                 false
@@ -110,12 +134,31 @@ fn main() {
         crate::log_info!("app config: {w}");
     }
     crate::log_info!(
-        "app.json loaded pinned={} path={}",
+        "app.json loaded pinned={} opacity={} autostart={} notify_low={} notify_full={} path={}",
         cfg.pinned,
+        cfg.opacity,
+        cfg.autostart,
+        cfg.notify_low,
+        cfg.notify_full,
         paths.app_config.display()
     );
 
+    // F-01：启动时按用户意图自愈注册表（路径变更重写、被安全软件删掉则重建）。
+    // 失败只记日志，不能阻塞启动；UI 抽屉里会通过 app-state 显示真实三态。
+    match autostart::apply(cfg.autostart) {
+        Ok(status) => crate::log_info!(
+            "autostart reconcile intent={} enabled={} os_disabled={} path={:?}",
+            cfg.autostart,
+            status.enabled,
+            status.os_disabled,
+            status.path
+        ),
+        Err(e) => crate::log_warn!("autostart reconcile failed: {e}"),
+    }
+
     let app = tauri::Builder::default()
+        // F-03：系统通知插件（WinRT Toast）。Rust 侧直接调用，不依赖 WebView。
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
             commands::ui_ready,
             commands::collector_send,
@@ -125,12 +168,20 @@ fn main() {
             commands::window_action,
             commands::collector_status,
             commands::report_fps,
+            commands::update_settings,
+            commands::get_settings,
         ])
         .setup(move |app| {
             let handle = app.handle().clone();
             let sidecar = Arc::new(sidecar::Sidecar::new(handle.clone(), paths.clone()));
-            let app_state =
-                state::AppState::new(paths.clone(), cfg.clone(), sidecar.clone(), windows_build);
+            let app_state = state::AppState::new(
+                paths.clone(),
+                cfg.clone(),
+                sidecar.clone(),
+                windows_build,
+                silent_launch,
+                autostart_launch,
+            );
             app.manage(app_state);
 
             panel::apply_platform(&handle, windows11, windows_build);
@@ -152,11 +203,18 @@ fn main() {
                     let h = fallback.clone();
                     let _ = fallback.run_on_main_thread(move || {
                         // 默认启动是 hidden（只驻留托盘）；只有显式 PB_SHOW_ON_START=1
-                        // 才在 ui_ready 缺失时兜底显示。
+                        // 才在 ui_ready 缺失时兜底显示。开机自启（silent）永远不兜底显示。
                         if !state::env_flag("PB_SHOW_ON_START") {
                             return;
                         }
                         if let Some(app_state) = h.try_state::<state::AppState>() {
+                            if app_state.silent_launch {
+                                crate::log_debug!(
+                                    "silent launch; ui-ready fallback disabled (autostart_launch={})",
+                                    app_state.autostart_launch
+                                );
+                                return;
+                            }
                             // F4：ui_ready 已收到就绝不兜底——窗口不可见可能只是失焦自动隐藏
                             // 或用户主动关闭，不能重新拉起。
                             if app_state.ui_ready_received() {

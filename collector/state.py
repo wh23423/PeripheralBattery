@@ -476,7 +476,8 @@ class StateStore:
             self._low_alerted.discard(key)
         elif level <= low and key not in self._low_alerted:
             self._low_alerted.add(key)
-            self._sink.alert("low", key, level, f"{name} 电量低（{level}%）")
+            self._sink.alert("low", key, level,
+                             f"{name} 电量仅剩 {level}%，建议充电")
 
         # full battery: only for a device that was seen charging *below* 100%.
         # A device first seen at 100 % + charging must stay silent (audit P3-9).
@@ -570,8 +571,15 @@ class StateStore:
 
     # ------------------------------------------------------------ misc
     def settings_payload(self) -> Dict[str, Any]:
+        """Settings carried by ``hello`` (F-04: thresholds live in config.json)."""
         poll = dict(self._settings.get("poll") or {})
-        return {"poll": poll, "providers": list(self._providers)}
+        return {
+            "poll": poll,
+            "providers": list(self._providers),
+            "low": int(self._settings.low),
+            "full_alert": bool(self._settings.get("full_alert", True)),
+            "tick_interval": float(self._settings.tick_interval),
+        }
 
     def reset_alerts(self, key: Optional[str] = None) -> None:
         with self._lock:

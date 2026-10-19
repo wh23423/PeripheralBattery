@@ -37,17 +37,32 @@
   const TOAST_MS = 4200;
   const STATE_CLASSES = ['state-normal', 'state-low', 'state-amber', 'state-charging', 'state-offline', 'state-unknown', 'state-empty'];
 
+  /* F-02 不透明度（§7.4）：面板深蓝底色三档 alpha；默认 60 = v0.1.2 观感 */
+  const OPACITY_DEFAULT = 60;
+  const OPACITY_MIN = 50;
+  const OPACITY_MAX = 100;
+  const OPACITY_DEBOUNCE_MS = 300;
+  const PANEL_ALPHA_BASE = [0.60, 0.52, 0.62];
+
+  /* F-04 低电阈值：唯一来源 collector hello.settings.low（协议 0–100，默认 20） */
+  const LOW_DEFAULT = 20;
+  const LOW_MIN = 0;
+  const LOW_MAX = 100;
+
   /* ========================================================== 设置 */
 
+  /* 设置分层（FEATURE_PLAN §5.1 / §9 F-04）：
+     - 低电阈值唯一来源 = collector hello.settings.low（state.collectorLow）；
+     - 面板不透明度 / 自启 / 通知开关 = Rust app.json（app-state.settings）；
+     - localStorage 只保留 reducedMotion / pinned 等 UI 偏好，不再存 lowThreshold。 */
   function loadSettings() {
-    const def = { lowThreshold: 15, reducedMotion: false, pinned: false };
+    const def = { reducedMotion: false, pinned: false };
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (!raw) return def;
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return def;
       return {
-        lowThreshold: clamp(Number(parsed.lowThreshold) || def.lowThreshold, 5, 50),
         reducedMotion: !!parsed.reducedMotion,
         pinned: !!parsed.pinned
       };
@@ -60,7 +75,32 @@
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* ignore */ }
   }
 
+  /* F-04 一次性迁移：读旧版本 localStorage 里的 lowThreshold 并立刻删除该字段
+     （localStorage 之后只保留 reducedMotion/pinned）。返回值待首个 hello 到达、
+     确认 collector 低电阈值仍是默认 20 时推送一次 {"t":"set","field":"low","value":N}。 */
+  function readLegacyLowThreshold() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      if (parsed.lowThreshold == null) return null;
+      const n = Math.round(Number(parsed.lowThreshold));
+      delete parsed.lowThreshold;
+      try {
+        if (Object.keys(parsed).length) localStorage.setItem(SETTINGS_KEY, JSON.stringify(parsed));
+        else localStorage.removeItem(SETTINGS_KEY);
+      } catch (e) { /* ignore */ }
+      if (!Number.isFinite(n)) return null;
+      const v = clamp(n, LOW_MIN, LOW_MAX);
+      return v === 15 ? null : v;
+    } catch (e) {
+      return null;
+    }
+  }
+
   const settings = loadSettings();
+  const legacyLowThreshold = readLegacyLowThreshold();
 
   /* ========================================================== 状态 */
 
@@ -84,7 +124,19 @@
     dirty: false,
     lastUpdate: 0,
     helloReceived: false,
-    lastSnapshotRequest: 0
+    lastSnapshotRequest: 0,
+    /* S-01：Rust app.json 设置事实源（app-state.settings） */
+    appSettings: { opacity: OPACITY_DEFAULT, autostart: false, notifyLow: true, notifyFull: true },
+    /* 自启运行时探测（app-state.autostart）：enabled=注册表值存在且路径匹配；
+       osDisabled=任务管理器「启动」中被禁用（StartupApproved），此时开关显示为关 + ⚠ 文案 */
+    autostartStatus: { enabled: false, osDisabled: false, path: '' },
+    autostartLaunch: false,
+    /* F-02：最近一次确认持久化成功的不透明度（保存失败时的回滚目标） */
+    confirmedOpacity: OPACITY_DEFAULT,
+    /* F-04：低电阈值唯一来源 = collector hello.settings.low（协议 0–100，默认 20） */
+    collectorLow: LOW_DEFAULT,
+    tickInterval: 30,
+    legacyLowPushed: false
   };
 
   /* 隐藏期间收到的用户动作只记状态，等窗口恢复显示后再写 DOM / 播动画 */
@@ -142,7 +194,13 @@
     pendingSpin: false,
     deviceKeys: [],
     heroKey: null,
-    lowThreshold: settings.lowThreshold,
+    lowThreshold: LOW_DEFAULT,
+    /* S-01 / F-02 / F-04 调试快照（ui_smoke 会读；value 在 render 时回填） */
+    collectorLow: LOW_DEFAULT,
+    autostart: { enabled: false, osDisabled: false },
+    autostartLaunch: false,
+    panelAlphas: PANEL_ALPHA_BASE.slice(),
+    opacityLocked: false,
     lastRenderAt: 0,
     snapshotAt: 0
   };
@@ -158,6 +216,9 @@
       'hero-caption', 'hero-name', 'hero-icon', 'hero-transport', 'hero-alert',
       'btn-refresh', 'btn-pin', 'btn-settings', 'btn-min', 'btn-close', 'btn-restart',
       'btn-all', 'btn-drawer-close', 'drawer', 'drawer-scrim', 'toasts', 'ripple-layer',
+      'low-veil', 'set-autostart', 'autostart-status', 'autostart-note',
+      'set-opacity', 'set-opacity-out', 'opacity-note',
+      'set-notify-low', 'set-notify-full',
       'set-threshold', 'set-threshold-out', 'set-reduced', 'set-pinned',
       'info-build', 'info-protocol', 'info-version', 'info-platform', 'info-session'
     ].forEach(function (id) {
@@ -239,11 +300,140 @@
     return Number.isFinite(n) ? clamp(n, 0, 100) : null;
   }
 
-  function threshold() { return settings.lowThreshold; }
+  /* F-04：低电阈值唯一来源 = collector 同步值（state.collectorLow）。
+     主卡低电告警 / 环状态 / ranklow / 阈值滑块全部读这里，不再有 localStorage 影子语义。 */
+  function threshold() { return state.collectorLow; }
+
+  /* 阈值输入的健壮解析：协议 0–100，0 是合法值（不能用 `|| DEFAULT` 把 0 吞成 20）。 */
+  function readThresholdInput() {
+    const raw = Number(el['set-threshold'] ? el['set-threshold'].value : NaN);
+    return clamp(Number.isFinite(raw) ? Math.round(raw) : LOW_DEFAULT, LOW_MIN, LOW_MAX);
+  }
 
   function prefersReducedMotion() {
     if (settings.reducedMotion) return true;
     try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+  }
+
+  /* ========================================================== S-01 / F-02 设置 UI */
+
+  /* F-02：不透明度 v(50-100) → 深蓝底色三档 alpha（§7.4.1 四档映射的公式版）。
+     v<=60 从 0 线性压到 base；v>60 从 base 线性逼近 1（100 = 完全不透明）。
+     50→[.500,.433,.517] / 60→[.600,.520,.620] / 80→[.800,.760,.810] / 100→[1,1,1]。 */
+  function panelAlphas(v) {
+    const value = clamp(Math.round(Number(v) || OPACITY_DEFAULT), OPACITY_MIN, OPACITY_MAX);
+    return PANEL_ALPHA_BASE.map(function (base) {
+      const a = value <= 60 ? base * value / 60 : base + (1 - base) * (value - 60) / 40;
+      return Number(a.toFixed(4));
+    });
+  }
+
+  /* 只写 3 个自定义属性（不重排）；隐藏态也允许（与 data-acrylic 同模式，§7.6） */
+  function applyPanelOpacity(v) {
+    const alphas = panelAlphas(v);
+    root.style.setProperty('--panel-a1', String(alphas[0]));
+    root.style.setProperty('--panel-a2', String(alphas[1]));
+    root.style.setProperty('--panel-a3', String(alphas[2]));
+    D.panelAlphas = alphas;
+    return alphas;
+  }
+
+  function prefersReducedTransparency() {
+    try { return window.matchMedia('(prefers-reduced-transparency: reduce)').matches; } catch (e) { return false; }
+  }
+
+  /* §7.4.2 降级矩阵：acrylic 不可用（data-acrylic=off）/ Win10 / 系统「降低透明度」→
+     滑块禁用并锁定为不透明背景；保留当前值不重置，acrylic 恢复时重新解锁。 */
+  function opacityLocked() {
+    return root.dataset.acrylic === 'off' ||
+      root.dataset.windows11 === 'false' ||
+      prefersReducedTransparency();
+  }
+
+  function setControlValue(input, value) {
+    if (!input) return;
+    const str = String(value);
+    if (input.value !== str) input.value = str;
+  }
+
+  function updateOpacityUi() {
+    const value = clamp(Math.round(Number(state.appSettings.opacity) || OPACITY_DEFAULT), OPACITY_MIN, OPACITY_MAX);
+    const slider = el['set-opacity'];
+    setControlValue(slider, value);
+    const out = el['set-opacity-out'];
+    if (out && out.textContent !== value + '%') out.textContent = value + '%';
+    if (slider) slider.setAttribute('aria-valuetext', value + '%，面板不透明度');
+    const locked = opacityLocked();
+    if (slider) slider.disabled = locked;
+    if (el['opacity-note']) el['opacity-note'].hidden = !locked;
+    D.opacityLocked = locked;
+  }
+
+  /* 自启三态文案：已启用 / 未启用 / 被系统启动项管理禁用（⚠ 提示）。
+     被系统禁用时开关视觉显示为关，但文案说明原因（§6.1，不静默改回）。 */
+  function updateAutostartUi() {
+    const st = state.autostartStatus || {};
+    const osDisabled = !!st.osDisabled;
+    const enabled = !!st.enabled && !osDisabled;
+    const box = el['set-autostart'];
+    if (box && box.checked !== enabled) box.checked = enabled;
+    const line = el['autostart-status'];
+    if (line) {
+      let text = '未启用';
+      let stateName = 'off';
+      if (osDisabled) { text = '被系统启动项管理禁用'; stateName = 'os-disabled'; }
+      else if (enabled) { text = '已启用'; stateName = 'on'; }
+      if (line.textContent !== text) line.textContent = text;
+      line.setAttribute('data-state', stateName);
+    }
+    if (el['autostart-note']) el['autostart-note'].hidden = !osDisabled;
+    D.autostart = { enabled: !!st.enabled, osDisabled: osDisabled };
+  }
+
+  function updateNotifyUi() {
+    if (el['set-notify-low']) el['set-notify-low'].checked = !!state.appSettings.notifyLow;
+    if (el['set-notify-full']) el['set-notify-full'].checked = !!state.appSettings.notifyFull;
+  }
+
+  function updateLowThresholdUi() {
+    setControlValue(el['set-threshold'], state.collectorLow);
+    const out = el['set-threshold-out'];
+    if (out && out.textContent !== state.collectorLow + '%') out.textContent = state.collectorLow + '%';
+    if (el['set-threshold']) el['set-threshold'].setAttribute('aria-valuetext', state.collectorLow + '%，低电阈值');
+    D.collectorLow = state.collectorLow;
+    D.lowThreshold = state.collectorLow;
+  }
+
+  /* 设置抽屉里所有受 app-state 驱动的控件回填；隐藏态一律不写 DOM（恢复显示时 render 回填） */
+  function applySettingsUi() {
+    if (state.hidden) { state.dirty = true; return; }
+    applyPanelOpacity(state.appSettings.opacity);
+    updateOpacityUi();
+    updateAutostartUi();
+    updateNotifyUi();
+    updateLowThresholdUi();
+  }
+
+  /* F-02 持久化：300ms 防抖后调用 update_settings({patch:{opacity}})。
+     失败（ok=false / invoke 抛错）→ toast 提示 + 回滚到上次确认值。 */
+  function saveOpacity(value) {
+    const previous = state.confirmedOpacity;
+    bridge.call('update_settings', { patch: { opacity: value } }).then(function (res) {
+      if (!res || res.ok === false) {
+        state.appSettings.opacity = previous;
+        if (!state.hidden) { applyPanelOpacity(previous); updateOpacityUi(); }
+        showToast('warn', (res && res.error) ? ('不透明度保存失败：' + res.error) : '不透明度保存失败，已恢复原值');
+        return;
+      }
+      state.confirmedOpacity = value;
+      if (res.settings) applyAppSettingsPayload(res.settings);
+      if (res.autostart) applyAutostartPayload(res.autostart);
+      if (!state.hidden) applySettingsUi();
+    }).catch(function () {
+      state.appSettings.opacity = previous;
+      if (!state.hidden) { applyPanelOpacity(previous); updateOpacityUi(); }
+      showToast('warn', '不透明度保存失败，已恢复原值');
+    });
   }
 
   function transportText(t) { return TRANSPORT_TEXT[t] || String(t || '未知连接'); }
@@ -897,6 +1087,7 @@
     syncTray();
     updateInfo();
     updatePinUI();
+    applySettingsUi();
 
     el.empty.hidden = state.devices.size !== 0;
     el.list.hidden = state.devices.size === 0 ? true : false;
@@ -914,7 +1105,21 @@
     D.session = state.session;
     D.seq = state.seq;
     D.trayPrimed = trayPrimed;
-    D.settings = { lowThreshold: settings.lowThreshold, reducedMotion: settings.reducedMotion, pinned: state.pinned };
+    D.settings = {
+      lowThreshold: state.collectorLow,
+      low: state.collectorLow,
+      opacity: state.appSettings.opacity,
+      autostart: state.appSettings.autostart,
+      notifyLow: state.appSettings.notifyLow,
+      notifyFull: state.appSettings.notifyFull,
+      reducedMotion: settings.reducedMotion,
+      pinned: state.pinned
+    };
+    D.collectorLow = state.collectorLow;
+    D.autostart = { enabled: !!state.autostartStatus.enabled, osDisabled: !!state.autostartStatus.osDisabled };
+    D.autostartLaunch = !!state.autostartLaunch;
+    D.panelAlphas = panelAlphas(state.appSettings.opacity);
+    D.opacityLocked = opacityLocked();
     D.effects = root.dataset.effects || 'none';
     D.acrylic = root.dataset.acrylic || '';
     D.reducedMotion = prefersReducedMotion();
@@ -1001,6 +1206,57 @@
     if (state.heroKey === key) state.heroKey = null;
   }
 
+  /* ========================================================== S-01 / F-04 设置同步 */
+
+  /* F-04：低电阈值同步。collector 侧配置变化会随 hello.settings 下发（low/tick_interval；
+     full_alert 由 collector 负责告警推送，UI 仅解析不存死状态）；UI 以 low 为准，
+     收到即按协议 0–100 clamp 后回填滑块/output 并重新渲染（hidden 走 dirty 模式）。 */
+  function applyCollectorSettings(payload) {
+    if (!payload || typeof payload !== 'object') return;
+    if (payload.tick_interval != null && Number.isFinite(Number(payload.tick_interval))) {
+      state.tickInterval = Number(payload.tick_interval);
+    }
+    if (payload.low != null) {
+      const raw = Number(payload.low);
+      if (Number.isFinite(raw)) {
+        const next = clamp(Math.round(raw), LOW_MIN, LOW_MAX);
+        D.collectorLow = next;
+        D.lowThreshold = next;
+        if (next !== state.collectorLow) {
+          state.collectorLow = next;
+          if (state.hidden) {
+            state.dirty = true;
+          } else {
+            updateLowThresholdUi();
+            render('collector-low');
+          }
+        }
+      }
+    }
+    /* F-04 一次性迁移：首个 hello 到达、collector 低电阈值仍是默认 20 时，
+       把旧版本 localStorage 覆盖值推给 collector 一次；之后以 collector 为准。 */
+    if (!state.legacyLowPushed && state.helloReceived && legacyLowThreshold != null && state.collectorLow === LOW_DEFAULT) {
+      state.legacyLowPushed = true;
+      sendCollectorSetLow(legacyLowThreshold);
+    }
+  }
+
+  /* 乐观更新：collector 不 ack、不回滚；协议 §9 字段为 low，无 key。 */
+  function sendCollectorSetLow(value) {
+    const raw = Number(value);
+    const v = clamp(Number.isFinite(raw) ? Math.round(raw) : LOW_DEFAULT, LOW_MIN, LOW_MAX);
+    state.collectorLow = v;
+    D.collectorLow = v;
+    D.lowThreshold = v;
+    bridge.call('collector_send', { line: JSON.stringify({ t: 'set', field: 'low', value: v }) });
+    if (state.hidden) {
+      state.dirty = true;
+    } else {
+      updateLowThresholdUi();
+      render('set-low');
+    }
+  }
+
   function resetSession(hello) {
     D.sessions++;
     state.session = hello && hello.session ? hello.session : state.session;
@@ -1017,6 +1273,7 @@
       if (hello.protocol != null) state.protocol = hello.protocol;
       state.collectorState = state.collectorState && (state.collectorState.state === 'error' || state.collectorState.state === 'exited') ? state.collectorState : { state: 'ready' };
       (hello.devices || []).forEach(function (raw) { upsertDevice(raw, ''); });
+      applyCollectorSettings(hello.settings);
     }
     lastHero.key = null;
     lastHero.level = null;
@@ -1041,7 +1298,11 @@
         render('version-error');
         return;
       }
-      if (state.session && ev.session === state.session) return; /* 重复 hello */
+      if (state.session && ev.session === state.session) {
+        /* F-04：同一 session 的 hello 可能携带更新后的 settings.low（collector 配置变更） */
+        applyCollectorSettings(ev.settings);
+        return;
+      }
       state.helloReceived = true;
       resetSession(ev);
       return;
@@ -1109,6 +1370,37 @@
     render('collector-state');
   }
 
+  /* S-01：应用 app-state.settings（opacity / autostart / notifyLow / notifyFull）。
+     opacity 只改 html 级 CSS 变量（隐藏态也允许，§7.6 与 data-acrylic 同模式）；
+     控件回填统一由 applySettingsUi() 负责，隐藏态不写控件 DOM。 */
+  function applyAppSettingsPayload(payload) {
+    if (!payload || typeof payload !== 'object') return;
+    let opacityChanged = false;
+    if (payload.opacity != null && Number.isFinite(Number(payload.opacity))) {
+      const next = clamp(Math.round(Number(payload.opacity)), OPACITY_MIN, OPACITY_MAX);
+      if (next !== state.appSettings.opacity) {
+        state.appSettings.opacity = next;
+        opacityChanged = true;
+      }
+      state.confirmedOpacity = state.appSettings.opacity;
+    }
+    if (typeof payload.autostart === 'boolean') state.appSettings.autostart = payload.autostart;
+    if (typeof payload.notifyLow === 'boolean') state.appSettings.notifyLow = payload.notifyLow;
+    if (typeof payload.notifyFull === 'boolean') state.appSettings.notifyFull = payload.notifyFull;
+    if (opacityChanged) applyPanelOpacity(state.appSettings.opacity);
+  }
+
+  /* 自启运行时探测：enabled=注册表 Run 值存在且路径匹配；osDisabled=任务管理器启动项被禁用。
+     前端只读不猜：被系统禁用时开关显示为关 + ⚠ 文案，不静默改回（§6.1）。 */
+  function applyAutostartPayload(payload) {
+    if (!payload || typeof payload !== 'object') return;
+    state.autostartStatus = {
+      enabled: !!payload.enabled,
+      osDisabled: !!payload.osDisabled,
+      path: typeof payload.path === 'string' ? payload.path : ''
+    };
+  }
+
   function handleAppState(as) {
     if (!as || typeof as !== 'object') return;
     /* A14 / P2-46 / §10.3：Rust 会在窗口显示前也 emit app-state（此时前端可能仍是
@@ -1137,6 +1429,11 @@
     }
     if (typeof as.build === 'string' && as.build) state.build = as.build;
     if (typeof as.version === 'string' && as.version) state.appVersion = as.version;
+    /* S-01 / F-02：app-state.settings 是 app.json 设置事实源（opacity/autostart/通知开关）；
+       autostart 子对象是运行时探测结果；autostartLaunch 为顶层诊断字段。 */
+    if (as.settings && typeof as.settings === 'object') applyAppSettingsPayload(as.settings);
+    if (as.autostart && typeof as.autostart === 'object') applyAutostartPayload(as.autostart);
+    if (typeof as.autostartLaunch === 'boolean') state.autostartLaunch = as.autostartLaunch;
     if (state.hidden) {
       state.dirty = true;
       /* A12：隐藏态 WebView 可能已暂停；pin 状态先记在 D.pendingPin，
@@ -1146,6 +1443,7 @@
     }
     updateInfo();
     updatePinUI();
+    applySettingsUi();
   }
 
   /* ========================================================== 告警 toast */
@@ -1258,8 +1556,12 @@
     /* 隐藏期间挂起的告警与 toast 计时 */
     flushPendingAlerts();
     Array.from(el.toasts.children).forEach(function (t) { scheduleToastDismiss(t, 2600); });
-    /* 隐藏期间收到的托盘动作（设置/刷新）在恢复后补做 */
+    /* 隐藏期间收到/挂起的 tray 动作与抽屉遮罩状态在恢复后补做 */
     applyPendingUi();
+    if (drawerOpen) {
+      const scrim = el['drawer-scrim'];
+      if (scrim) { scrim.hidden = false; scrim.classList.add('is-visible'); }
+    }
     D.introActive = document.body.classList.contains('intro');
   }
 
@@ -1451,6 +1753,31 @@
 
   let drawerOpen = false;
   let focusBeforeDrawer = null;
+  let scrimHideTimer = null;
+  let opacitySaveTimer = null;
+
+  /* §21.2-②：遮罩淡入淡出。打开时先移除 hidden（display 恢复），下一帧再加
+     .is-visible 触发 200ms opacity 过渡；关闭时先移除类，200ms 后再 hidden。 */
+  function showScrim() {
+    const scrim = el['drawer-scrim'];
+    if (!scrim) return;
+    if (scrimHideTimer != null) { clearT(scrimHideTimer); scrimHideTimer = null; }
+    scrim.hidden = false;
+    raf(function () {
+      if (drawerOpen && el['drawer-scrim']) el['drawer-scrim'].classList.add('is-visible');
+    });
+  }
+
+  function hideScrim() {
+    const scrim = el['drawer-scrim'];
+    if (!scrim) return;
+    scrim.classList.remove('is-visible');
+    if (scrimHideTimer != null) clearT(scrimHideTimer);
+    scrimHideTimer = setT(function () {
+      scrimHideTimer = null;
+      if (!drawerOpen && el['drawer-scrim']) el['drawer-scrim'].hidden = true;
+    }, 200);
+  }
 
   function setDrawer(open) {
     if (state.hidden) {
@@ -1465,17 +1792,23 @@
     el.drawer.classList.toggle('is-open', drawerOpen);
     el.drawer.setAttribute('aria-hidden', String(!drawerOpen));
     el['btn-settings'].setAttribute('aria-expanded', String(drawerOpen));
-    el['drawer-scrim'].hidden = !drawerOpen;
     if (drawerOpen) {
+      showScrim();
       el.drawer.removeAttribute('inert');
       focusBeforeDrawer = document.activeElement;
-      if (el['set-threshold']) {
-        try { el['set-threshold'].focus(); } catch (e) { /* ignore */ }
+      /* §5.4：抽屉打开后焦点落在第一个控件（启动组开关，保持 id 兼容时回退阈值滑块）。
+         preventScroll：抽屉关闭态在视口右侧之外，聚焦时不得让文档/容器横向滚动。 */
+      const first = el['set-autostart'] || el['set-threshold'];
+      if (first) {
+        try { first.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
       }
+      if (document.documentElement.scrollLeft) document.documentElement.scrollLeft = 0;
+      if (document.body.scrollLeft) document.body.scrollLeft = 0;
     } else {
+      hideScrim();
       el.drawer.setAttribute('inert', '');
       if (focusBeforeDrawer && focusBeforeDrawer.focus) {
-        try { focusBeforeDrawer.focus(); } catch (e) { /* ignore */ }
+        try { focusBeforeDrawer.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
       }
       focusBeforeDrawer = null;
     }
@@ -1567,12 +1900,84 @@
     el.drawer.addEventListener('keydown', onDrawerKeydown);
 
     /* 设置项 */
+    /* S-01 启动组：开机静默启动开关。底层原生 checkbox，UI 视觉自定义；
+       变更走 update_settings({patch:{autostart}})，失败回滚 + toast。 */
+    el['set-autostart'].addEventListener('change', function () {
+      const want = el['set-autostart'].checked;
+      bridge.call('update_settings', { patch: { autostart: want } }).then(function (res) {
+        if (!res || res.ok === false) {
+          if (!state.hidden) updateAutostartUi();
+          showToast('warn', (res && res.error) ? ('开机启动设置失败：' + res.error) : '开机启动设置失败');
+          return;
+        }
+        state.appSettings.autostart = want;
+        if (res.settings) applyAppSettingsPayload(res.settings);
+        if (res.autostart) applyAutostartPayload(res.autostart);
+        if (!state.hidden) applySettingsUi();
+      }).catch(function () {
+        if (!state.hidden) updateAutostartUi();
+        showToast('warn', '开机启动设置失败');
+      });
+    });
+
+    /* S-01 / F-02 外观组：不透明度滑块。input 实时写 3 个 CSS 变量（不重排），
+       change 后 300ms 防抖 → update_settings({patch:{opacity}})。 */
+    el['set-opacity'].addEventListener('input', function () {
+      const v = clamp(Math.round(Number(el['set-opacity'].value) || OPACITY_DEFAULT), OPACITY_MIN, OPACITY_MAX);
+      state.appSettings.opacity = v;
+      applyPanelOpacity(v);
+      if (el['set-opacity-out']) el['set-opacity-out'].textContent = v + '%';
+      el['set-opacity'].setAttribute('aria-valuetext', v + '%，面板不透明度');
+      D.panelAlphas = panelAlphas(v);
+    });
+    el['set-opacity'].addEventListener('change', function () {
+      const v = clamp(Math.round(Number(el['set-opacity'].value) || OPACITY_DEFAULT), OPACITY_MIN, OPACITY_MAX);
+      if (opacitySaveTimer != null) clearT(opacitySaveTimer);
+      opacitySaveTimer = setT(function () {
+        opacitySaveTimer = null;
+        saveOpacity(v);
+      }, OPACITY_DEBOUNCE_MS);
+    });
+
+    /* S-01 提醒组：系统通知开关（app.json 持久化，失败回滚 + toast） */
+    function bindNotifyToggle(id, key) {
+      const box = el[id];
+      if (!box) return;
+      box.addEventListener('change', function () {
+        const want = box.checked;
+        const patch = {};
+        patch[key] = want;
+        bridge.call('update_settings', { patch: patch }).then(function (res) {
+          if (!res || res.ok === false) {
+            if (!state.hidden) updateNotifyUi();
+            showToast('warn', '通知设置保存失败');
+            return;
+          }
+          state.appSettings[key] = want;
+          if (res.settings) applyAppSettingsPayload(res.settings);
+          if (!state.hidden) updateNotifyUi();
+        }).catch(function () {
+          if (!state.hidden) updateNotifyUi();
+          showToast('warn', '通知设置保存失败');
+        });
+      });
+    }
+    bindNotifyToggle('set-notify-low', 'notifyLow');
+    bindNotifyToggle('set-notify-full', 'notifyFull');
+
+    /* F-04 提醒组：低电阈值。唯一来源 = collector hello.settings.low；
+       input 乐观更新 + 实时 render，change 发 collector set（无 key）。 */
     el['set-threshold'].addEventListener('input', function () {
-      settings.lowThreshold = clamp(Math.round(Number(el['set-threshold'].value) || 15), 5, 50);
-      el['set-threshold-out'].textContent = settings.lowThreshold + '%';
-      D.lowThreshold = settings.lowThreshold;
-      saveSettings();
+      const v = readThresholdInput();
+      state.collectorLow = v;
+      D.collectorLow = v;
+      D.lowThreshold = v;
+      el['set-threshold-out'].textContent = v + '%';
+      el['set-threshold'].setAttribute('aria-valuetext', v + '%，低电阈值');
       if (!state.hidden) render('threshold');
+    });
+    el['set-threshold'].addEventListener('change', function () {
+      sendCollectorSetLow(readThresholdInput());
     });
     el['set-reduced'].addEventListener('change', function () {
       settings.reducedMotion = el['set-reduced'].checked;
@@ -1644,12 +2049,22 @@
 
   function boot() {
     cacheDom();
-    el['set-threshold'].value = String(settings.lowThreshold);
-    el['set-threshold-out'].textContent = settings.lowThreshold + '%';
+    /* F-02：CSS 内已写默认值（等价 60）；这里再同步一次 CSS 变量并回填控件。
+       F-04：阈值初始 = collector 默认 20，hello 到达后由 applyCollectorSettings 回填。 */
+    applyPanelOpacity(state.appSettings.opacity);
+    updateLowThresholdUi();
     applyReducedMotion();
     updatePinUI();
     updateInfo();
     bindEvents();
+
+    /* §7.4.2：系统「降低透明度」偏好变化时立即重新求值滑块可用性 */
+    try {
+      const mq = window.matchMedia('(prefers-reduced-transparency: reduce)');
+      if (mq && mq.addEventListener) {
+        mq.addEventListener('change', function () { if (!state.hidden) updateOpacityUi(); });
+      }
+    } catch (e) { /* ignore */ }
 
     /* 入场只播一次；session 变化不会重播 */
     document.body.classList.add('intro');

@@ -112,6 +112,11 @@ LIMITS = {"low": (0, 100), "tick_interval": (1.0, 3600.0),
           "stat_interval": (5.0, 3600.0), "tick_hz": (0.2, 1.0), "threads": (1, 16),
           "bt_watch_ms": (2000, 300000)}
 
+# Fields the ``set`` command may rewrite without a device key (F-04).  The
+# settings drawer sends ``{"t":"set","field":"low","value":25}``; these values
+# are global, so the ``key`` argument is irrelevant for them.
+GLOBAL_SET_FIELDS = frozenset({"low", "full_alert"})
+
 
 def _env_data_dir() -> str:
     override = os.environ.get("PB_DATA_DIR")
@@ -315,8 +320,15 @@ class Settings:
             return frozenset(self._values.get("hidden") or ())
 
     def apply_set(self, key: str, field: str, value: Any) -> bool:
-        """The protocol's ``{"t":"set"}`` command. Persists immediately."""
-        if field == "name":
+        """The protocol's ``{"t":"set"}`` command. Persists immediately.
+
+        Global fields (``GLOBAL_SET_FIELDS``) ignore *key* so the UI can send
+        the command without one; per-device fields still need a stable key.
+        """
+        if isinstance(field, str) and field in GLOBAL_SET_FIELDS:
+            if not self.set(field, value):
+                return False
+        elif field == "name":
             if not isinstance(value, str):
                 return False
             self.set_name(key, value)

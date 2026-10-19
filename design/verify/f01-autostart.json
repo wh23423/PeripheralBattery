@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-10-20T02:08:12.5850326+08:00",
+  "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe",
+  "exe_sha256": "6990ca2874406e3a23ba2bfe41ea2d7f4ead7bbd8acd3d82597de618eb61a2ac",
+  "exe_version": "0.2.0",
+  "wait_seconds": 4,
+  "passed": true,
+  "checks": [
+    {
+      "name": "F-01 场景1：写入 Run 值（模拟用户开启自启动）",
+      "ok": true,
+      "detail": "Run\\PeripheralBattery = \"D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe\" --autostart"
+    },
+    {
+      "name": "F-01 场景1：--autostart 进程存活",
+      "ok": true,
+      "detail": "pid=23272 elapsed=4.1s"
+    },
+    {
+      "name": "F-01 场景1：主窗口不可见（静默启动）",
+      "ok": true,
+      "detail": "panelHandle=20057414 panel class=Tauri Window title=外设电量 visible=False"
+    },
+    {
+      "name": "F-01 场景1：日志记录 autostart silent launch",
+      "ok": true,
+      "detail": "log=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-autostart-verify-20261020-020806\\logs\\app.log"
+    },
+    {
+      "name": "F-01 场景2：第二次 --autostart 自行退出（单实例）",
+      "ok": true,
+      "detail": "pid=39412 exited=True"
+    },
+    {
+      "name": "F-01 场景2：第二次 --autostart exit=0",
+      "ok": true,
+      "detail": "exit=0"
+    },
+    {
+      "name": "F-01 场景2：没有第二个 app 进程残留",
+      "ok": true,
+      "detail": "processes=1 pids=23272"
+    },
+    {
+      "name": "F-01 场景3：测试进程已全部结束",
+      "ok": true,
+      "detail": "remaining=0"
+    },
+    {
+      "name": "F-01 场景3：删除 Run 值后断言不存在",
+      "ok": true,
+      "detail": "Run\\PeripheralBattery 已删除"
+    },
+    {
+      "name": "F-01 场景4：应用按设置写入 HKCU Run 值",
+      "ok": true,
+      "detail": "value=\"D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe\" --autostart proc_exited=False"
+    },
+    {
+      "name": "F-01 场景4：Run 值以引号路径开头且含 --autostart",
+      "ok": true,
+      "detail": "value=\"D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe\" --autostart"
+    },
+    {
+      "name": "F-01 场景4：Run 值的路径指向被测 exe",
+      "ok": true,
+      "detail": "run_path=D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe exe=D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe"
+    },
+    {
+      "name": "F-01 场景4：关闭设置后应用删除 Run 值",
+      "ok": true,
+      "detail": "before=\"D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe\" --autostart now=（不存在）"
+    },
+    {
+      "name": "F-01 场景4：关闭设置后应用同时删除 StartupApproved 值",
+      "ok": true,
+      "detail": "StartupApproved\\Run"
+    }
+  ]
+}

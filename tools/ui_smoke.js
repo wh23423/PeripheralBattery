@@ -736,7 +736,7 @@ function rect(page, selector) {
   });
 
   /* ============ 附加 B. 设置抽屉 / 键盘 / 持久化 ============ */
-  await test('A2 设置抽屉：键盘可操作、阈值生效、localStorage 持久化', async () => {
+  await test('A2 设置抽屉：键盘可操作、分组结构、阈值唯一来源 collector、UI 偏好持久化', async () => {
     const page = await openPage('?mock&freeze&effects=css');
     try {
       await page.evaluate(() => localStorage.removeItem('pb.settings.v1'));
@@ -757,7 +757,68 @@ function rect(page, selector) {
       eq(opened.expanded, 'true', '按钮 aria-expanded 未更新');
       eq(opened.ariaHidden, 'false', '抽屉 aria-hidden 未更新');
       ok(!opened.inert, '打开后抽屉仍有 inert');
-      eq(opened.focus, 'set-threshold', '打开抽屉后焦点未进入第一个设置项');
+      eq(opened.focus, 'set-autostart', '打开抽屉后焦点未进入第一个设置项（S-01 启动组）');
+
+      /* S-01：抽屉分组结构 / 控件语义 / 新设置项存在性 */
+      const groups = await page.evaluate(() => {
+        const groups = Array.from(document.querySelectorAll('#drawer fieldset.group'));
+        const legends = groups.map(n => (n.querySelector(':scope > legend') || {}).textContent || '');
+        const box = document.getElementById('set-autostart');
+        const label = box && box.closest('label');
+        const op = document.getElementById('set-opacity');
+        const opOut = document.getElementById('set-opacity-out');
+        const th = document.getElementById('set-threshold');
+        const thOut = document.getElementById('set-threshold-out');
+        return {
+          count: groups.length,
+          legends: legends.map(t => t.trim()),
+          autostartType: box ? box.type : '',
+          autostartLabel: label ? label.textContent.trim() : '',
+          opacityType: op ? op.type : '',
+          opacityMin: op ? op.min : '',
+          opacityMax: op ? op.max : '',
+          opacityStep: op ? op.step : '',
+          opacityValue: op ? op.value : '',
+          opacityOut: opOut ? opOut.textContent : '',
+          opacityOutFor: opOut ? opOut.getAttribute('for') : '',
+          thresholdType: th ? th.type : '',
+          thresholdMin: th ? th.min : '',
+          thresholdMax: th ? th.max : '',
+          thresholdStep: th ? th.step : '',
+          thresholdValue: th ? th.value : '',
+          thresholdOut: thOut ? thOut.textContent : '',
+          thresholdOutFor: thOut ? thOut.getAttribute('for') : '',
+          notifyLow: document.getElementById('set-notify-low').checked,
+          notifyFull: document.getElementById('set-notify-full').checked,
+          pinned: !!document.getElementById('set-pinned'),
+          veil: !!document.getElementById('low-veil'),
+          statusState: document.getElementById('autostart-status').getAttribute('data-state')
+        };
+      });
+      eq(groups.count, 5, '抽屉应分为 5 个设置分组（启动/外观/提醒/面板/关于）');
+      eq(groups.legends.join(','), '启动,外观,提醒,面板,关于', '设置分组 legend 文案/顺序');
+      eq(groups.autostartType, 'checkbox', '自启开关底层应为原生 checkbox');
+      includes(groups.autostartLabel, '开机静默启动', '自启开关 label 文案');
+      eq(groups.opacityType, 'range', '不透明度应为 range 滑块');
+      eq(groups.opacityMin, '50', '不透明度下限应为 50');
+      eq(groups.opacityMax, '100', '不透明度上限应为 100');
+      eq(groups.opacityStep, '1', '不透明度步长应为 1');
+      eq(groups.opacityValue, '60', '不透明度默认值应为 60');
+      eq(groups.opacityOut, '60%', '不透明度 output 初始值');
+      eq(groups.opacityOutFor, 'set-opacity', '不透明度 output 未用 for 关联滑块');
+      /* F-04 / P2-4：阈值范围与 collector 协议一致（0–100，不再 5–50） */
+      eq(groups.thresholdType, 'range', '低电阈值应为 range 滑块');
+      eq(groups.thresholdMin, '0', '低电阈值下限应为协议下限 0');
+      eq(groups.thresholdMax, '100', '低电阈值上限应为协议上限 100');
+      eq(groups.thresholdStep, '1', '低电阈值步长应为 1');
+      eq(groups.thresholdValue, '20', '低电阈值初值应来自 collector hello.settings.low=20');
+      eq(groups.thresholdOut, '20%', '低电阈值 output 初始值');
+      eq(groups.thresholdOutFor, 'set-threshold', '低电阈值 output 未用 for 关联滑块');
+      eq(groups.notifyLow, true, '低电系统通知默认勾选');
+      eq(groups.notifyFull, true, '充满系统通知默认勾选');
+      ok(groups.pinned, '固定面板开关缺失');
+      ok(groups.veil, '低电卡片预烘焙高光层 #low-veil 缺失');
+      eq(groups.statusState, 'off', '自启状态初始应为未启用');
 
       /* 抽屉是覆盖层，不能改变 720×380 面板外框/在预览视口中的居中位置 */
       const panelWhileOpen = await page.evaluate(() => {
@@ -769,20 +830,37 @@ function rect(page, selector) {
       eq(Math.round(panelWhileOpen.x), (W - 720) / 2, '打开设置后面板在预览视口中的位置被改变');
       eq(Math.round(panelWhileOpen.y), (H - 380) / 2, '打开设置后面板在预览视口中的位置被改变');
 
-      /* 调整低电阈值：32 → 55% 的 Arctis 7P 不应再被判低电之外，检查阈值写入生效 */
+      /* F-04：调整低电阈值 → 唯一来源是 collector。input 乐观更新 UI，
+         change 发 collector_send {"t":"set","field":"low","value":N}（无 key），
+         不再写 localStorage（localStorage 只保留 reducedMotion / pinned 等 UI 偏好）。 */
       await page.evaluate(() => {
         const input = document.getElementById('set-threshold');
         input.value = '32';
         input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       });
-      const thresholdInfo = await page.evaluate(() => ({
-        debug: window.__pbDebug.settings.lowThreshold,
-        out: document.getElementById('set-threshold-out').textContent,
-        stored: JSON.parse(localStorage.getItem('pb.settings.v1') || '{}').lowThreshold
-      }));
-      eq(thresholdInfo.debug, 32, '低电阈值未生效（debug）');
+      await sleep(80);
+      const thresholdInfo = await page.evaluate(() => {
+        const sent = window.__pbBridge.calls.filter(c => c.cmd === 'collector_send');
+        const last = sent.length ? JSON.parse(sent[sent.length - 1].args.line) : null;
+        const stored = JSON.parse(localStorage.getItem('pb.settings.v1') || '{}');
+        return {
+          debug: window.__pbDebug.settings.lowThreshold,
+          collectorLow: window.__pbBridge.collectorLow,
+          out: document.getElementById('set-threshold-out').textContent,
+          sent: last,
+          storedLow: Object.prototype.hasOwnProperty.call(stored, 'lowThreshold')
+        };
+      });
+      eq(thresholdInfo.debug, 32, '低电阈值未生效（debug.settings.lowThreshold）');
+      eq(thresholdInfo.collectorLow, 32, 'collector 未收到低电阈值（collector set 未生效）');
       eq(thresholdInfo.out, '32%', '低电阈值输出未更新');
-      eq(thresholdInfo.stored, 32, '低电阈值未写入 localStorage');
+      ok(thresholdInfo.sent, 'change 后未发送 collector_send');
+      eq(thresholdInfo.sent.t, 'set', 'collector 消息类型应为 set');
+      eq(thresholdInfo.sent.field, 'low', 'collector set 字段应为 low');
+      eq(thresholdInfo.sent.value, 32, 'collector set 值应为 32');
+      eq(Object.prototype.hasOwnProperty.call(thresholdInfo.sent, 'key'), false, 'collector set 不应带 key');
+      eq(thresholdInfo.storedLow, false, '低电阈值不应再写入 localStorage（唯一来源 = collector）');
 
       /* 降低动效勾选 */
       await page.evaluate(() => {
@@ -809,18 +887,719 @@ function rect(page, selector) {
       eq(closed.expanded, 'false', '关闭后 aria-expanded 未复位');
       eq(closed.focus, 'btn-settings', '关闭后焦点未回到设置按钮');
 
-      /* 刷新后设置仍在 */
+      /* 刷新后：阈值回到 collector 的 hello.settings.low（mock 默认 20），
+         降低动效是 UI 偏好仍从 localStorage 恢复（F-04 后阈值不再持久化在本机 UI 层） */
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+      await page.waitForFunction(() => window.__pbDebug.settings && window.__pbDebug.settings.lowThreshold === 20, null, { timeout: 5000 });
       const persisted = await page.evaluate(() => ({
         threshold: document.getElementById('set-threshold').value,
         reduced: document.getElementById('set-reduced').checked,
         debug: window.__pbDebug.settings.lowThreshold
       }));
-      eq(persisted.threshold, '32', '刷新后阈值未恢复');
-      eq(persisted.debug, 32, '刷新后 debug 阈值未恢复');
+      eq(persisted.threshold, '20', '刷新后阈值应回到 collector 的默认 20（mock hello low=20）');
+      eq(persisted.debug, 20, '刷新后 debug 阈值应为 collector 值');
       eq(persisted.reduced, true, '刷新后降低动效未恢复');
       await page.evaluate(() => localStorage.removeItem('pb.settings.v1'));
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ S1. F-02 不透明度：四档映射 / CSS 变量 / 防抖持久化 / 降级锁定 ============ */
+  await test('S1 不透明度 F-02：四档映射、实时 CSS 变量、防抖持久化、acrylic 降级锁定', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      await sleep(120);
+      const init = await page.evaluate(() => ({
+        value: document.getElementById('set-opacity').value,
+        out: document.getElementById('set-opacity-out').textContent,
+        disabled: document.getElementById('set-opacity').disabled,
+        noteHidden: document.getElementById('opacity-note').hidden,
+        acrylic: document.documentElement.dataset.acrylic,
+        alphas: window.__pbDebug.panelAlphas
+      }));
+      eq(init.value, '60', '不透明度默认应 60');
+      eq(init.out, '60%', '不透明度 output 初始值');
+      eq(init.disabled, false, 'acrylic 可用时不透明度滑块应可操作');
+      eq(init.noteHidden, true, 'acrylic 可用时不应显示降级文案');
+      eq(init.acrylic, 'on', 'mock app-state 应带 acrylic=true');
+      eq(init.alphas.map(n => n.toFixed(4)).join(','), '0.6000,0.5200,0.6200', '默认 60 的 panelAlphas');
+
+      /* §7.4.1 四档映射：实时改 --panel-a1/2/3（只改自定义属性，不重排） */
+      const buckets = [
+        { v: 50, a: ['0.5', '0.4333', '0.5167'] },
+        { v: 60, a: ['0.6', '0.52', '0.62'] },
+        { v: 80, a: ['0.8', '0.76', '0.81'] },
+        { v: 100, a: ['1', '1', '1'] }
+      ];
+      for (const b of buckets) {
+        const got = await page.evaluate(v => {
+          const input = document.getElementById('set-opacity');
+          input.value = String(v);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          const rootStyle = document.documentElement.style;
+          return {
+            raw: [rootStyle.getPropertyValue('--panel-a1').trim(),
+              rootStyle.getPropertyValue('--panel-a2').trim(),
+              rootStyle.getPropertyValue('--panel-a3').trim()],
+            out: document.getElementById('set-opacity-out').textContent,
+            alphas: window.__pbDebug.panelAlphas
+          };
+        }, b.v);
+        eq(got.raw.join(','), b.a.join(','), '不透明度 ' + b.v + ' 的 --panel-a1/2/3 映射');
+        eq(got.out, b.v + '%', '不透明度 ' + b.v + ' 的 output');
+        eq(got.alphas.map(n => Number(n.toFixed(4))).join(','), b.a.map(Number).join(','),
+          '不透明度 ' + b.v + ' 的 panelAlphas');
+      }
+
+      /* 仅 input 不持久化；change 后 300ms 防抖才调 update_settings({patch:{opacity}}) */
+      const callsBefore = await page.evaluate(() => window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').length);
+      await page.evaluate(() => {
+        const input = document.getElementById('set-opacity');
+        input.value = '66';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await sleep(450);
+      const callsAfterInput = await page.evaluate(() => window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').length);
+      eq(callsAfterInput, callsBefore, '仅 input 不应触发持久化（change 才防抖保存）');
+
+      await page.evaluate(() => {
+        const input = document.getElementById('set-opacity');
+        input.value = '75';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await sleep(500);
+      const saved = await page.evaluate(() => {
+        const calls = window.__pbBridge.calls.filter(c => c.cmd === 'update_settings');
+        const last = calls.length ? calls[calls.length - 1] : null;
+        const rootStyle = document.documentElement.style;
+        const stored = JSON.parse(localStorage.getItem('pb.settings.v1') || '{}');
+        return {
+          count: calls.length,
+          patch: last ? last.args.patch : null,
+          mock: window.__pbBridge.settings.opacity,
+          value: document.getElementById('set-opacity').value,
+          out: document.getElementById('set-opacity-out').textContent,
+          raw: [rootStyle.getPropertyValue('--panel-a1').trim(),
+            rootStyle.getPropertyValue('--panel-a2').trim(),
+            rootStyle.getPropertyValue('--panel-a3').trim()],
+          alphas: window.__pbDebug.panelAlphas,
+          storedOpacity: Object.prototype.hasOwnProperty.call(stored, 'opacity')
+        };
+      });
+      ok(saved.count >= 1, 'change 后未调用 update_settings');
+      eq(saved.patch.opacity, 75, 'update_settings 未传 opacity=75');
+      eq(saved.mock, 75, 'mock 设置事实源未更新 opacity');
+      eq(saved.value, '75', '不透明度滑块值被重置');
+      eq(saved.out, '75%', '不透明度 output 未更新');
+      eq(saved.raw.join(','), '0.75,0.7,0.7625', '75 的三档 alpha 映射');
+      eq(saved.alphas.map(n => Number(n.toFixed(4))).join(','), '0.75,0.7,0.7625', '75 的 panelAlphas');
+      eq(saved.storedOpacity, false, '不透明度不应写 localStorage（§7.6 唯一持久化在 app.json）');
+
+      /* §7.4.2 降级：acrylic=off → 禁用 + 文案，保留当前值；恢复后解锁 */
+      await page.evaluate(() => window.__pbMock.appState({ acrylic: false }));
+      await sleep(140);
+      const degraded = await page.evaluate(() => ({
+        disabled: document.getElementById('set-opacity').disabled,
+        noteHidden: document.getElementById('opacity-note').hidden,
+        note: document.getElementById('opacity-note').textContent,
+        value: document.getElementById('set-opacity').value
+      }));
+      eq(degraded.disabled, true, 'acrylic=off 时应禁用不透明度滑块');
+      eq(degraded.noteHidden, false, 'acrylic=off 时应显示降级文案');
+      includes(degraded.note, '当前系统不支持玻璃模糊，已锁定为不透明背景', '降级文案');
+      eq(degraded.value, '75', '降级时不应重置当前不透明度值');
+
+      await page.evaluate(() => window.__pbMock.appState({ acrylic: true }));
+      await sleep(140);
+      const restored = await page.evaluate(() => ({
+        disabled: document.getElementById('set-opacity').disabled,
+        noteHidden: document.getElementById('opacity-note').hidden
+      }));
+      eq(restored.disabled, false, 'acrylic 恢复后应解锁不透明度滑块');
+      eq(restored.noteHidden, true, 'acrylic 恢复后应隐藏降级文案');
+
+      /* Win10（windows11=false）同样锁定；恢复 Win11 后解锁 */
+      await page.evaluate(() => window.__pbMock.appState({ platform: { windows11: false, build: 19045 }, acrylic: true }));
+      await sleep(140);
+      eq(await page.evaluate(() => document.getElementById('set-opacity').disabled), true, 'Win10 应锁定不透明度滑块');
+      await page.evaluate(() => window.__pbMock.appState({ platform: { windows11: true, build: 22631 }, acrylic: true }));
+      await sleep(140);
+      eq(await page.evaluate(() => document.getElementById('set-opacity').disabled), false, 'Win11 恢复后应解锁');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ S2. S-01 抽屉分组 / 自启三态 / 键盘开关 / 通知 IPC ============ */
+  await test('S2 设置抽屉 S-01：分组语义、自启三态、键盘开关、通知持久化 IPC', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      await page.evaluate(() => document.getElementById('btn-settings').click());
+      await page.waitForSelector('#drawer.is-open', { timeout: 2000 });
+
+      const initial = await page.evaluate(() => ({
+        checked: document.getElementById('set-autostart').checked,
+        status: document.getElementById('autostart-status').textContent,
+        state: document.getElementById('autostart-status').dataset.state,
+        noteHidden: document.getElementById('autostart-note').hidden
+      }));
+      eq(initial.checked, false, '默认自启开关应为关');
+      eq(initial.status, '未启用', '默认自启文案');
+      eq(initial.state, 'off', '默认自启 data-state');
+      eq(initial.noteHidden, true, '系统禁用提示默认隐藏');
+
+      /* 键盘操作：焦点在启动组开关上按 Space → update_settings({patch:{autostart:true}}) */
+      await page.evaluate(() => document.getElementById('set-autostart').focus());
+      await page.keyboard.press('Space');
+      await page.waitForFunction(() => window.__pbBridge.settings.autostart === true, null, { timeout: 2000 });
+      await sleep(140);
+      const on = await page.evaluate(() => {
+        const calls = window.__pbBridge.calls.filter(c => c.cmd === 'update_settings');
+        const last = calls.length ? calls[calls.length - 1] : null;
+        return {
+          checked: document.getElementById('set-autostart').checked,
+          status: document.getElementById('autostart-status').textContent,
+          state: document.getElementById('autostart-status').dataset.state,
+          noteHidden: document.getElementById('autostart-note').hidden,
+          patch: last ? last.args.patch : null,
+          mock: window.__pbBridge.settings.autostart,
+          autostart: window.__pbBridge.autostartStatus
+        };
+      });
+      eq(on.checked, true, '键盘 Space 未打开自启开关');
+      eq(on.status, '已启用', '自启开启后文案');
+      eq(on.state, 'on', '自启开启后 data-state');
+      eq(on.noteHidden, true, '自启开启后不应显示系统禁用提示');
+      eq(on.mock, true, 'mock 设置事实源未更新 autostart');
+      ok(on.patch && on.patch.autostart === true, 'update_settings 未发送 patch.autostart');
+      ok(on.autostart && on.autostart.enabled === true, 'mock 运行时 enabled 未同步');
+
+      /* 被系统启动项管理禁用：intent 仍为 true，但运行时探测 osDisabled → 开关显示为关 + ⚠ 提示，
+         不静默改回（§6.1）。这里走 mock 的独立运行时状态注入（镜像 Rust 的注册表探测）。 */
+      await page.evaluate(() => window.__pbMock.setAutostartStatus({
+        enabled: true, osDisabled: true, path: 'C:\\Apps\\PerimeterBattery.exe'
+      }));
+      await sleep(140);
+      const osDisabled = await page.evaluate(() => ({
+        checked: document.getElementById('set-autostart').checked,
+        status: document.getElementById('autostart-status').textContent,
+        state: document.getElementById('autostart-status').dataset.state,
+        noteHidden: document.getElementById('autostart-note').hidden,
+        note: document.getElementById('autostart-note').textContent,
+        debug: window.__pbDebug.autostart
+      }));
+      eq(osDisabled.checked, false, '被系统禁用时开关应显示为关');
+      includes(osDisabled.status, '被系统启动项管理禁用', '被系统禁用文案');
+      eq(osDisabled.state, 'os-disabled', '被系统禁用 data-state');
+      eq(osDisabled.noteHidden, false, '被系统禁用时应显示 ⚠ 提示');
+      includes(osDisabled.note, '任务管理器', '系统禁用提示应指引任务管理器');
+      ok(osDisabled.debug && osDisabled.debug.osDisabled, 'debug 未回填 osDisabled');
+
+      /* osDisabled 时点击开关：必须显式发 update_settings({patch:{autostart:true}})；
+         mock 镜像 Rust apply_with(true, true) 清掉 StartupApproved 禁用标记，响应后显示「已启用」。 */
+      const beforeEnableCalls = await page.evaluate(() => window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').length);
+      await page.evaluate(() => document.getElementById('set-autostart').click());
+      await page.waitForFunction(() => {
+        const s = document.getElementById('autostart-status');
+        return s && s.textContent === '已启用' && s.dataset.state === 'on';
+      }, null, { timeout: 4000 });
+      const reEnabled = await page.evaluate((before) => {
+        const added = window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').slice(before);
+        return {
+          added: added.length,
+          patch: added.length ? added[added.length - 1].args.patch : null,
+          checked: document.getElementById('set-autostart').checked,
+          status: window.__pbBridge.autostartStatus
+        };
+      }, beforeEnableCalls);
+      ok(reEnabled.added >= 1, 'osDisabled 时点击开关未发 update_settings');
+      ok(reEnabled.patch && reEnabled.patch.autostart === true, 'osDisabled 时点击开关必须发送 autostart:true 补丁');
+      eq(reEnabled.checked, true, '启用后开关应显示为开');
+      ok(reEnabled.status && reEnabled.status.enabled && !reEnabled.status.osDisabled,
+        'mock 运行时状态未镜像 Rust 显式开启语义（清 osDisabled）');
+
+      /* Run 被外部删除：intent=true 但运行时 enabled=false → 显示「未启用」；
+         点击开关仍必须发 patch（P1-1 修复：不因 intent 相同而跳过 UI 侧显式开启）。 */
+      await page.evaluate(() => window.__pbMock.setAutostartStatus({ enabled: false, osDisabled: false, path: null }));
+      await sleep(140);
+      const external = await page.evaluate(() => ({
+        intent: window.__pbBridge.settings.autostart,
+        checked: document.getElementById('set-autostart').checked,
+        status: document.getElementById('autostart-status').textContent,
+        state: document.getElementById('autostart-status').dataset.state
+      }));
+      eq(external.intent, true, '外部删除场景 intent 应保持 true');
+      eq(external.checked, false, '运行时 enabled=false 时开关应显示为关');
+      eq(external.status, '未启用', '外部删除 Run 后应显示未启用');
+      const beforePatch = await page.evaluate(() => window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').length);
+      await page.evaluate(() => document.getElementById('set-autostart').click());
+      await page.waitForFunction((before) => {
+        return window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').length > before;
+      }, beforePatch, { timeout: 4000 });
+      const rePatch = await page.evaluate((before) => {
+        const added = window.__pbBridge.calls.filter(c => c.cmd === 'update_settings').slice(before);
+        return added.length ? added[added.length - 1].args.patch : null;
+      }, beforePatch);
+      ok(rePatch && rePatch.autostart === true, 'intent 已为 true 时点击开关仍须发送 autostart:true 补丁');
+
+      /* 通知开关：取消低电通知 → update_settings({patch:{notifyLow:false}}) */
+      await page.evaluate(() => document.getElementById('set-notify-low').click());
+      await sleep(160);
+      const notify = await page.evaluate(() => {
+        const calls = window.__pbBridge.calls.filter(c => c.cmd === 'update_settings');
+        const last = calls.length ? calls[calls.length - 1] : null;
+        return {
+          patch: last ? last.args.patch : null,
+          mock: window.__pbBridge.settings.notifyLow,
+          low: document.getElementById('set-notify-low').checked,
+          full: document.getElementById('set-notify-full').checked
+        };
+      });
+      eq(notify.mock, false, '通知设置未写入 mock 事实源');
+      eq(notify.low, false, '低电通知开关回填失败');
+      ok(notify.patch && notify.patch.notifyLow === false, 'update_settings 未发送 notifyLow 补丁');
+      eq(notify.full, true, '充满通知默认勾选不应被影响');
+
+      /* 通知/不透明度以 app-state 为事实源：显式 emit 后控件跟随 */
+      await page.evaluate(() => window.__pbMock.appState({
+        pinned: false, acrylic: true,
+        settings: { opacity: 75, autostart: false, notifyLow: true, notifyFull: false },
+        autostart: { enabled: false, osDisabled: false },
+        platform: { windows11: true, build: 22631 }
+      }));
+      await sleep(160);
+      const echoed = await page.evaluate(() => ({
+        low: document.getElementById('set-notify-low').checked,
+        full: document.getElementById('set-notify-full').checked,
+        opacity: document.getElementById('set-opacity').value
+      }));
+      eq(echoed.low, true, 'app-state 未回填低电通知开关');
+      eq(echoed.full, false, 'app-state 未回填充满通知开关');
+      eq(echoed.opacity, '75', 'app-state 未回填不透明度');
+
+      await screenshot(page, 'ui-dev-settings-groups.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ S3. F-04 低电阈值统一 / 一次性 legacy 迁移 ============ */
+  await test('S3 F-04 低电阈值：collector 唯一来源、乐观更新、ring/告警联动、一次性迁移', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      await page.waitForFunction(() => window.__pbDebug.devices === 5, null, { timeout: 5000 });
+      const init = await page.evaluate(() => ({
+        slider: document.getElementById('set-threshold').value,
+        out: document.getElementById('set-threshold-out').textContent,
+        debug: window.__pbDebug.settings.lowThreshold,
+        collectorLow: window.__pbBridge.collectorLow,
+        alarm: !document.getElementById('hero-alert').hidden,
+        lowClass: document.getElementById('panel').classList.contains('is-low'),
+        ring: document.getElementById('hero-ring').getAttribute('class')
+      }));
+      eq(init.slider, '20', '阈值初始值应来自 collector hello.settings.low=20');
+      eq(init.out, '20%', '阈值 output 初始值');
+      eq(init.debug, 20, 'debug 阈值应为 collector 值');
+      eq(init.collectorLow, 20, 'mock collectorLow 初始应为 20');
+      ok(init.alarm, '默认阈值 20 下 12% 主卡应显示低电告警');
+      ok(init.lowClass, '默认阈值下主卡应带 is-low（预烘焙高光层可见）');
+      includes(init.ring, 'state-low', '默认阈值下环状态应为低电');
+
+      /* 阈值调低到 5：告警/环状态/高光层全部由 collectorLow 驱动而解除 */
+      await page.evaluate(() => {
+        const input = document.getElementById('set-threshold');
+        input.value = '5';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await sleep(140);
+      const low5 = await page.evaluate(() => {
+        const sent = window.__pbBridge.calls.filter(c => c.cmd === 'collector_send');
+        const last = sent.length ? JSON.parse(sent[sent.length - 1].args.line) : null;
+        return {
+          alarm: !document.getElementById('hero-alert').hidden,
+          lowClass: document.getElementById('panel').classList.contains('is-low'),
+          ring: document.getElementById('hero-ring').getAttribute('class'),
+          sent: last,
+          collectorLow: window.__pbBridge.collectorLow,
+          debug: window.__pbDebug.settings.lowThreshold
+        };
+      });
+      eq(low5.alarm, false, '阈值 5 时 12% 不应仍判低电');
+      eq(low5.lowClass, false, '阈值 5 时主卡 is-low 应移除');
+      ok(low5.ring.indexOf('state-low') < 0, '阈值 5 时环不应是低电状态');
+      includes(low5.ring, 'state-amber', '阈值 5 时 12% 应降为 amber 档');
+      eq(low5.collectorLow, 5, 'collector 未收到 low=5');
+      eq(low5.debug, 5, 'UI 阈值未乐观更新');
+      ok(low5.sent, 'change 后未发送 collector_send');
+      eq(low5.sent.t, 'set', 'collector 消息类型应为 set');
+      eq(low5.sent.field, 'low', 'collector set 字段应为 low');
+      eq(low5.sent.value, 5, 'collector set 值应为 5');
+      eq(Object.prototype.hasOwnProperty.call(low5.sent, 'key'), false, 'collector set 不应带 key');
+
+      /* 收到 hello.settings.low 变化 → 滑块/output/渲染同步（hidden 走 dirty 由 G6 覆盖） */
+      await page.evaluate(() => window.__pbMock.hello({ settings: { low: 15 } }));
+      await sleep(180);
+      const synced = await page.evaluate(() => ({
+        slider: document.getElementById('set-threshold').value,
+        out: document.getElementById('set-threshold-out').textContent,
+        debug: window.__pbDebug.settings.lowThreshold,
+        alarm: !document.getElementById('hero-alert').hidden
+      }));
+      eq(synced.slider, '15', 'hello.settings.low 变化未同步滑块');
+      eq(synced.out, '15%', 'hello.settings.low 变化未同步 output');
+      eq(synced.debug, 15, 'hello.settings.low 变化未同步 debug');
+      ok(synced.alarm, '阈值 15 时 12% 应重新低电告警');
+
+      /* P2-4 边界：协议 0–100。0 是合法阈值（不能在 `Number(...) || 默认值` 里被吞成 20），
+         100 也合法；入站 hello.settings.low 越界时只按 0–100 clamp。 */
+      await page.evaluate(() => {
+        const input = document.getElementById('set-threshold');
+        input.value = '0';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await page.waitForFunction(() => window.__pbBridge.collectorLow === 0, null, { timeout: 4000 });
+      const low0 = await page.evaluate(() => {
+        const sent = window.__pbBridge.calls.filter(c => c.cmd === 'collector_send');
+        let last = null;
+        for (let i = sent.length - 1; i >= 0; i--) {
+          try {
+            const obj = JSON.parse(sent[i].args.line);
+            if (obj && obj.t === 'set' && obj.field === 'low') { last = obj; break; }
+          } catch (e) { /* ignore */ }
+        }
+        return {
+          slider: document.getElementById('set-threshold').value,
+          out: document.getElementById('set-threshold-out').textContent,
+          sent: last,
+          debug: window.__pbDebug.settings.lowThreshold,
+          alarm: !document.getElementById('hero-alert').hidden,
+          lowClass: document.getElementById('panel').classList.contains('is-low')
+        };
+      });
+      eq(low0.slider, '0', '阈值 0 应同步滑块');
+      eq(low0.out, '0%', '阈值 0 应同步 output');
+      ok(low0.sent, '拖动到 0 后未发送 collector_send');
+      eq(low0.sent.value, 0, '拖动到 0 必须发送 low=0（不能退化为默认 20）');
+      eq(Object.prototype.hasOwnProperty.call(low0.sent, 'key'), false, '边界 set 仍不应带 key');
+      eq(low0.debug, 0, '阈值 0 应乐观更新 debug');
+      eq(low0.alarm, false, '阈值 0 时 12% 不应告警');
+      eq(low0.lowClass, false, '阈值 0 时主卡不应 is-low');
+
+      /* 100 边界：hello 下发 100 → 12% 必告警（阈值上限） */
+      await page.evaluate(() => window.__pbMock.hello({ settings: { low: 100 } }));
+      await page.waitForFunction(() => document.getElementById('set-threshold').value === '100', null, { timeout: 4000 });
+      const low100 = await page.evaluate(() => ({
+        out: document.getElementById('set-threshold-out').textContent,
+        debug: window.__pbDebug.settings.lowThreshold,
+        alarm: !document.getElementById('hero-alert').hidden,
+        lowClass: document.getElementById('panel').classList.contains('is-low')
+      }));
+      eq(low100.out, '100%', '阈值 100 应同步 output');
+      eq(low100.debug, 100, 'hello low=100 应原样保留');
+      ok(low100.alarm, '阈值 100 时 12% 应告警');
+      ok(low100.lowClass, '阈值 100 时主卡应带 is-low');
+
+      /* 入站越界 clamp：-10 → 0，150 → 100 */
+      await page.evaluate(() => window.__pbMock.hello({ settings: { low: -10 } }));
+      await page.waitForFunction(() => window.__pbDebug.settings.lowThreshold === 0, null, { timeout: 4000 });
+      const clampLow = await page.evaluate(() => ({
+        slider: document.getElementById('set-threshold').value,
+        out: document.getElementById('set-threshold-out').textContent
+      }));
+      eq(clampLow.slider, '0', 'hello low=-10 应 clamp 到 0');
+      eq(clampLow.out, '0%', 'hello low=-10 clamp 后 output 同步');
+      await page.evaluate(() => window.__pbMock.hello({ settings: { low: 150 } }));
+      await page.waitForFunction(() => document.getElementById('set-threshold').value === '100', null, { timeout: 4000 });
+      const clampHigh = await page.evaluate(() => document.getElementById('set-threshold-out').textContent);
+      eq(clampHigh, '100%', 'hello low=150 应 clamp 到 100');
+    } finally {
+      await page.close();
+    }
+
+    /* 一次性迁移：旧 localStorage.lowThreshold=35 且 collector 仍默认 20 → 只推送一次 set low=35，
+       随后删除 localStorage 的 lowThreshold（localStorage 只保留 UI 偏好） */
+    const legacy = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2 });
+    try {
+      await legacy.addInitScript(() => {
+        localStorage.setItem('pb.settings.v1', JSON.stringify({ lowThreshold: 35, reducedMotion: false, pinned: false }));
+      });
+      await legacy.goto(baseUrl + '?mock&freeze&effects=css', { waitUntil: 'networkidle' });
+      await legacy.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+      await sleep(320);
+      const migrated = await legacy.evaluate(() => {
+        const lows = [];
+        window.__pbBridge.calls.filter(c => c.cmd === 'collector_send').forEach(c => {
+          try {
+            const obj = JSON.parse(c.args.line);
+            if (obj && obj.t === 'set' && obj.field === 'low') lows.push(obj);
+          } catch (e) { /* ignore */ }
+        });
+        const stored = JSON.parse(localStorage.getItem('pb.settings.v1') || '{}');
+        return {
+          count: lows.length,
+          sent: lows.length ? lows[lows.length - 1] : null,
+          collectorLow: window.__pbBridge.collectorLow,
+          slider: document.getElementById('set-threshold').value,
+          debug: window.__pbDebug.settings.lowThreshold,
+          storedHasLow: Object.prototype.hasOwnProperty.call(stored, 'lowThreshold'),
+          storedReduced: stored.reducedMotion
+        };
+      });
+      eq(migrated.count, 1, '旧 lowThreshold 应只推送一次');
+      eq(migrated.sent.value, 35, '迁移推送值应为旧 lowThreshold');
+      eq(migrated.collectorLow, 35, '迁移后 collector low 应为 35');
+      eq(migrated.slider, '35', '迁移后滑块应显示 35');
+      eq(migrated.debug, 35, '迁移后 debug 阈值应为 35');
+      eq(migrated.storedHasLow, false, '迁移后 localStorage 应删除 lowThreshold');
+      eq(migrated.storedReduced, false, 'localStorage 其它 UI 偏好应保留');
+    } finally {
+      await legacy.close();
+    }
+  });
+
+  /* ============ S4. §21.2 动效契约：低电高光层 / 遮罩 / 开关 / 滑块 ============ */
+  await test('S4 §21.2 动效契约：250ms 低电高光/无 box-shadow 过渡、遮罩淡入淡出、开关与滑块过渡', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    const step = async (label, fn) => { try { return await fn(); } catch (e) { throw new Error(label + ' :: ' + e.message); } };
+    try {
+      await waitIntroDone(page);
+      await sleep(120);
+      const cs = await page.evaluate(() => {
+        const panel = getComputedStyle(document.getElementById('panel'));
+        const veil = getComputedStyle(document.getElementById('low-veil'));
+        const drawer = getComputedStyle(document.getElementById('drawer'));
+        const scrim = getComputedStyle(document.getElementById('drawer-scrim'));
+        return {
+          panelTransition: panel.transitionProperty + '|' + panel.transitionDuration,
+          veilPosition: veil.position,
+          veilPointer: veil.pointerEvents,
+          veilTransition: veil.transitionProperty + '|' + veil.transitionDuration,
+          veilWidth: veil.width,
+          veilOpacity: veil.opacity,
+          drawerTransition: drawer.transitionProperty + '|' + drawer.transitionDuration,
+          scrimTransition: scrim.transitionProperty + '|' + scrim.transitionDuration,
+          scrimHidden: document.getElementById('drawer-scrim').hidden
+        };
+      });
+      includes(cs.panelTransition, 'border-color', '面板过渡应包含 border-color');
+      includes(cs.panelTransition, '0.25s', '面板 border-color 过渡时长应为 250ms');
+      ok(cs.panelTransition.indexOf('box-shadow') < 0, 'box-shadow 不得进入 transition（§21.4）');
+      eq(cs.veilPosition, 'absolute', '低电高光层应为绝对定位');
+      eq(cs.veilPointer, 'none', '低电高光层不应拦截指针事件');
+      includes(cs.veilTransition, 'opacity', '低电高光层过渡应为 opacity');
+      includes(cs.veilTransition, '0.25s', '低电高光层过渡时长应为 250ms');
+      ok(Math.abs(parseFloat(cs.veilWidth) - 718) <= 2, '低电高光层应覆盖整个面板（除 1px 边框内）');
+      includes(cs.drawerTransition, 'transform', '抽屉过渡应包含 transform');
+      includes(cs.drawerTransition, '0.26s', '抽屉 transform 过渡应为 260ms');
+      includes(cs.scrimTransition, 'opacity', '遮罩过渡应为 opacity');
+      includes(cs.scrimTransition, '0.2s', '遮罩过渡应为 200ms');
+      eq(cs.scrimHidden, true, '遮罩初始应为 hidden');
+
+      /* 遮罩打开：JS 移除 hidden → 下一帧 .is-visible → 200ms 淡入；关闭先移类 200ms 后 hidden */
+      await step('open-1', () => page.evaluate(() => document.getElementById('btn-settings').click()));
+      await step('scrim-show-1', () => page.waitForFunction(() => !document.getElementById('drawer-scrim').hidden && document.getElementById('drawer-scrim').classList.contains('is-visible'), null, { timeout: 6000 }));
+      await step('scrim-fade-1', () => page.waitForFunction(() => parseFloat(getComputedStyle(document.getElementById('drawer-scrim')).opacity) >= 0.999, null, { timeout: 6000 }));
+      const scrimOpen = await page.evaluate(() => ({
+        hidden: document.getElementById('drawer-scrim').hidden,
+        visible: document.getElementById('drawer-scrim').classList.contains('is-visible'),
+        opacity: parseFloat(getComputedStyle(document.getElementById('drawer-scrim')).opacity)
+      }));
+      eq(scrimOpen.hidden, false, '打开抽屉时遮罩不应 hidden');
+      eq(scrimOpen.visible, true, '打开抽屉后遮罩应带 is-visible');
+      ok(scrimOpen.opacity >= 0.999, '遮罩打开后 opacity 应为 1');
+
+      await step('esc', () => page.keyboard.press('Escape'));
+      await step('scrim-hide-class', () => page.waitForFunction(() => !document.getElementById('drawer-scrim').classList.contains('is-visible'), null, { timeout: 6000 }));
+      const closing = await page.evaluate(() => ({
+        visible: document.getElementById('drawer-scrim').classList.contains('is-visible'),
+        hidden: document.getElementById('drawer-scrim').hidden
+      }));
+      ok(!closing.visible, '关闭抽屉时遮罩应立即移除 is-visible');
+      eq(closing.hidden, false, '遮罩淡出 200ms 内不应立刻 hidden');
+      await step('scrim-hidden-later', () => page.waitForFunction(() => document.getElementById('drawer-scrim').hidden === true, null, { timeout: 6000 }));
+
+      /* 点击遮罩空白处关闭抽屉（打开后可点空白关闭） */
+      await step('open-2', () => page.evaluate(() => document.getElementById('btn-settings').click()));
+      await step('scrim-show-2', () => page.waitForFunction(() => !document.getElementById('drawer-scrim').hidden && document.getElementById('drawer-scrim').classList.contains('is-visible'), null, { timeout: 6000 }));
+      const scrimBox = await page.evaluate(() => {
+        const r = document.getElementById('drawer-scrim').getBoundingClientRect();
+        return { x: r.x, y: r.y, w: r.width, h: r.height };
+      });
+      await step('click-scrim', () => page.mouse.click(scrimBox.x + 30, scrimBox.y + scrimBox.h / 2));
+      await step('drawer-closed-by-scrim', () => page.waitForFunction(() => !document.getElementById('drawer').classList.contains('is-open'), null, { timeout: 6000 }));
+
+      /* 静态兜底：开关 160ms / 滑块 thumb 140ms 按下态 / 低电过渡不碰 box-shadow */
+      const css = fs.readFileSync(path.join(UI_DIR, 'styles.css'), 'utf8');
+      includes(css, 'scale(1.15)', '不透明度滑块 thumb 按下态缺少 scale(1.15)');
+      includes(css, '0.14s', '滑块 thumb 过渡应为 140ms');
+      includes(css, '0.16s', '开关过渡应为 160ms');
+      includes(css, '--panel-a1', 'CSS 缺少面板不透明度变量 --panel-a1');
+      const cssNoComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      ok(!/transition[^;{}]*box-shadow/.test(cssNoComments), 'CSS 中不得有 box-shadow 过渡（§21.4）');
+      ok(/backdrop-filter/.test(css), '评审模式 backdrop-filter 规则丢失');
+      const appSrc = fs.readFileSync(path.join(UI_DIR, 'app.js'), 'utf8');
+      includes(appSrc, 'panelAlphas', 'app.js 缺少 panelAlphas');
+      includes(appSrc, 'update_settings', 'app.js 缺少 update_settings 持久化调用');
+      includes(appSrc, 'collector_send', 'app.js 缺少 collector_send 阈值同步');
+      await screenshot(page, 'ui-dev-motion-contract.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ S5. 复审回归：mock 运行时自启状态 / 失败回滚 / mock 版本号 ============ */
+  await test('S5 复审回归：update_settings 失败回滚（不透明度/自启）+ warn toast、mock 版本 0.2.0', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      /* P3-6：mock 版本号 0.2.0 经 app-state 落到「关于」 */
+      await page.waitForFunction(() => {
+        const n = document.getElementById('info-version');
+        return n && n.textContent.trim() === '0.2.0';
+      }, null, { timeout: 4000 });
+      await page.evaluate(() => document.getElementById('btn-settings').click());
+      await page.waitForSelector('#drawer.is-open', { timeout: 2000 });
+
+      /* P3-9③：不透明度保存失败 → 回滚到上次确认值（60）+ toast，真实等待异步回滚 */
+      await page.evaluate(() => window.__pbMock.failUpdateSettings(true));
+      await page.evaluate(() => {
+        const input = document.getElementById('set-opacity');
+        input.value = '75';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await page.waitForFunction(() => document.getElementById('set-opacity').value === '60', null, { timeout: 4000 });
+      const rollbackOpacity = await page.evaluate(() => ({
+        slider: document.getElementById('set-opacity').value,
+        out: document.getElementById('set-opacity-out').textContent,
+        a1: document.documentElement.style.getPropertyValue('--panel-a1').trim(),
+        a2: document.documentElement.style.getPropertyValue('--panel-a2').trim(),
+        a3: document.documentElement.style.getPropertyValue('--panel-a3').trim(),
+        mock: window.__pbBridge.settings.opacity,
+        failedCall: window.__pbBridge.calls.some(c => c.cmd === 'update_settings' && c.args && c.args.patch && c.args.patch.opacity === 75),
+        toasts: Array.from(document.querySelectorAll('.toast')).map(n => ({
+          cls: n.className,
+          text: n.textContent,
+          border: getComputedStyle(n).borderTopColor
+        }))
+      }));
+      eq(rollbackOpacity.slider, '60', '失败后不透明度滑块未回滚到上次确认值');
+      eq(rollbackOpacity.out, '60%', '失败后不透明度 output 未回滚');
+      eq(rollbackOpacity.a1, '0.6', '失败后 --panel-a1 未回滚');
+      eq(rollbackOpacity.a2, '0.52', '失败后 --panel-a2 未回滚');
+      eq(rollbackOpacity.a3, '0.62', '失败后 --panel-a3 未回滚');
+      eq(rollbackOpacity.mock, 60, '失败后 mock 不透明度不应变化');
+      ok(rollbackOpacity.failedCall, '未观察到失败的 update_settings 调用（patch.opacity=75）');
+      const warnToast = rollbackOpacity.toasts.find(t => t.cls.split(/\s+/).indexOf('is-warn') >= 0);
+      ok(warnToast, '不透明度保存失败未出现 warn toast');
+      includes(warnToast.text, '不透明度保存失败', 'warn toast 文案');
+      includes(warnToast.border, '255, 194, 75', 'warn toast 未应用 amber 边框配色（.toast.is-warn）');
+
+      /* P3-9③：自启保存失败 → 开关回滚原状态（关）+ toast */
+      await page.evaluate(() => document.getElementById('set-autostart').click());
+      await page.waitForFunction(() => {
+        const box = document.getElementById('set-autostart');
+        const status = document.getElementById('autostart-status');
+        return box && box.checked === false && status && status.dataset.state === 'off';
+      }, null, { timeout: 4000 });
+      const rollbackAuto = await page.evaluate(() => ({
+        checked: document.getElementById('set-autostart').checked,
+        status: document.getElementById('autostart-status').textContent,
+        mock: window.__pbBridge.settings.autostart,
+        toasts: Array.from(document.querySelectorAll('.toast')).map(n => n.textContent)
+      }));
+      eq(rollbackAuto.checked, false, '自启保存失败后开关未回滚为关');
+      eq(rollbackAuto.status, '未启用', '自启保存失败后状态文案未回滚');
+      eq(rollbackAuto.mock, false, '自启保存失败后 mock intent 不应变化');
+      ok(rollbackAuto.toasts.some(t => t.indexOf('开机启动设置失败') >= 0), '自启保存失败未出现 toast');
+
+      /* 解除失败注入后设置可正常保存（切换回滚路径不影响后续成功路径） */
+      await page.evaluate(() => window.__pbMock.failUpdateSettings(false));
+      await page.evaluate(() => document.getElementById('set-autostart').click());
+      await page.waitForFunction(() => window.__pbBridge.settings.autostart === true, null, { timeout: 4000 });
+      await page.waitForFunction(() => document.getElementById('autostart-status').textContent === '已启用', null, { timeout: 4000 });
+      await screenshot(page, 'ui-dev-settings-rollback.png');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ S6. prefers-reduced-transparency 降级锁：滑块禁用 + 文案 + 保留当前值 ============ */
+  await test('S6 prefers-reduced-transparency 降级：锁定不透明度滑块、提示文案、不重置当前值、恢复后解锁', async () => {
+    const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 2 });
+    try {
+      await page.addInitScript(() => {
+        const real = window.matchMedia.bind(window);
+        let rtMatches = true;
+        const rtListeners = [];
+        window.matchMedia = function (query) {
+          const q = String(query || '');
+          if (q.indexOf('prefers-reduced-transparency') >= 0) {
+            return {
+              get matches() { return rtMatches; },
+              media: q,
+              onchange: null,
+              addEventListener: function (type, fn) {
+                if (type === 'change' && typeof fn === 'function') rtListeners.push(fn);
+              },
+              removeEventListener: function () {},
+              addListener: function (fn) { if (typeof fn === 'function') rtListeners.push(fn); },
+              removeListener: function () {},
+              dispatchEvent: function () { return false; }
+            };
+          }
+          return real(query);
+        };
+        window.__pbRT = {
+          set: function (matches) {
+            rtMatches = !!matches;
+            rtListeners.forEach(function (fn) { try { fn({ matches: rtMatches }); } catch (e) { /* ignore */ } });
+          }
+        };
+      });
+      await page.goto(baseUrl + '?mock&freeze&effects=css', { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+      await waitIntroDone(page);
+      await page.evaluate(() => document.getElementById('btn-settings').click());
+      await page.waitForSelector('#drawer.is-open', { timeout: 2000 });
+      const locked = await page.evaluate(() => ({
+        disabled: document.getElementById('set-opacity').disabled,
+        value: document.getElementById('set-opacity').value,
+        out: document.getElementById('set-opacity-out').textContent,
+        noteHidden: document.getElementById('opacity-note').hidden,
+        note: document.getElementById('opacity-note').textContent,
+        a1: document.documentElement.style.getPropertyValue('--panel-a1').trim(),
+        acrylic: document.documentElement.dataset.acrylic,
+        reducedMotion: document.documentElement.dataset.reducedMotion || ''
+      }));
+      eq(locked.disabled, true, '降低透明度命中时滑块应禁用');
+      eq(locked.value, '60', '降级锁不应重置当前值');
+      eq(locked.out, '60%', '降级锁不应重置 output');
+      eq(locked.noteHidden, false, '降级提示应可见');
+      includes(locked.note, '当前系统不支持玻璃模糊，已锁定为不透明背景', '降级提示文案');
+      eq(locked.a1, '0.6', '降级锁不应重置已应用的 --panel-a1');
+      eq(locked.acrylic, 'on', '降级锁不应改写 data-acrylic');
+      eq(locked.reducedMotion, '', '仅 reduced-transparency 命中不应触发 reduced-motion 降级');
+
+      /* 系统偏好恢复（matchMedia change 事件）→ 重新求值解锁，值保持不变 */
+      await page.evaluate(() => window.__pbRT.set(false));
+      await page.waitForFunction(() => !document.getElementById('set-opacity').disabled, null, { timeout: 4000 });
+      const unlocked = await page.evaluate(() => ({
+        value: document.getElementById('set-opacity').value,
+        noteHidden: document.getElementById('opacity-note').hidden,
+        a1: document.documentElement.style.getPropertyValue('--panel-a1').trim()
+      }));
+      eq(unlocked.value, '60', '解锁后当前值不应被重置');
+      eq(unlocked.noteHidden, true, '解锁后降级提示应隐藏');
+      eq(unlocked.a1, '0.6', '解锁不应改变已应用的面板不透明度');
     } finally {
       await page.close();
     }
@@ -1042,7 +1821,7 @@ function rect(page, selector) {
       }));
       ok(opened.open, '可见态托盘 settings 未打开抽屉');
       eq(opened.expanded, 'true', 'aria-expanded 未同步');
-      eq(opened.focus, 'set-threshold', '打开抽屉后焦点未进入设置项');
+      eq(opened.focus, 'set-autostart', '打开抽屉后焦点未进入设置项（S-01 启动组）');
       await screenshot(vis, 'ui-dev-tray-settings.png');
     } finally {
       await vis.close();

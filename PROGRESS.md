@@ -262,3 +262,47 @@ FlyDigi BS2PRO 为 USB-C 供电散热器（Scythe 产品页），`powered=True` 
 
 - Luna33-W 的 40h 是估算（厂商无官方续航小时），满 30min / 掉 3% 后自动切实测；未收录设备冷启动仍「未知」。
 - BS2PRO 显示「外接供电」；Xbox 手柄等 unknown 链路仍「未知连接」；dongle+cable 同时存在按 2.4g；updater 未接。
+
+---
+
+## 10. v0.2.0 设置 / 启动 / 通知（2026-10-20 起）
+
+FEATURE_PLAN v1.3 的 v0.2.0 范围（S-01、F-01～F-04）；Release Notes 见
+[docs/release-notes-v0.2.0.md](docs/release-notes-v0.2.0.md)，契约见 TECH_PLAN §14。
+
+### 10.1 本轮范围
+
+| # | 功能 | 实现 | 验收 |
+|---|---|---|---|
+| S-01 | 设置基础设施 | `app.json` schema=2（`opacity` / `autostart` / `notify_low` / `notify_full`）；IPC `update_settings` / `get_settings`；`app-state` 增 `settings` / `autostart` / `autostartLaunch`；设置抽屉分组：启动 / 外观 / 提醒 / 面板 / 关于；三层存储（app.json / collector config.json / localStorage 仅 reducedMotion） | ui_smoke；`cargo test` |
+| F-01 | 开机静默启动 | `autostart.rs`：Run 值 + StartupApproved 只读探测、6 行对账（Write/Rewrite/Delete/Noop/提示）、写后读回、失败回滚；`--autostart` 静默启动、单实例已运行 exit(0)；NSIS 卸载清理两处启动项 | `tools/verify_autostart.ps1`、`tools/verify_install_uninstall.ps1` |
+| F-02 | 面板不透明度 | `app.json` opacity 50–100（默认 60，clamp）；CSS 变量 `--panel-a1/2/3`；acrylic 不可用时滑块锁定并提示 | ui_smoke；真机视觉 |
+| F-03 | 低电/充满系统通知 | `tauri-plugin-notification`；开关存 `app.json`；同一设备/类型 10 分钟节流；面板 toast 保留 | `cargo test` 全绿（含 notifications 节流纯函数单测）；真机通知 |
+| F-04 | 低电阈值统一 | collector `config.json` 的 `low` / `full_alert`，经 `hello.settings` 下发；UI 读同步值；旧 `localStorage.lowThreshold` 首次迁移后删除 | pytest；真实设备 probe |
+
+### 10.2 验证
+
+- Rust：`cd src-tauri; cargo test` → **70 passed, 0 failed**（v0.1.2 基线 55 项；新增 config v2 / autostart reconcile / notifications 节流纯函数单测）。
+- collector：`.venv\Scripts\python -m pytest tests\collector -q` → **142 passed**（v0.1.2 基线 133 项）。
+- UI：`node tools/ui_smoke.js` → **28 passed, 0 failed**（v0.1.2 基线 22 项；新增 S1–S6 设置/透明度/动效回归）。
+- 运行时：`python tools/verify_runtime.py`。
+- F-01：`pwsh -File tools/verify_autostart.ps1` → **14 通过 / 0 失败**（v0.2.0 release exe 实跑：Run 值写入与读回、`--autostart` 静默启动主面板 `IsWindowVisible=false`、二次 `--autostart` 单实例 exit(0) 无第二进程、应用侧按 `app.json` 自写/自删 Run+StartupApproved；JSON 证据 `design/verify/f01-autostart.json`）。
+- 安装/卸载：`pwsh -File tools/verify_install_uninstall.ps1`（含卸载后 `Run` / `StartupApproved\Run` 清理断言；本轮未在用户机器上执行，避免覆盖已安装版本）。
+
+> 回归数字与 F-01 端到端结果由 Lead 于 2026-10-20 实跑补入；后续版本以测试输出为准。
+
+### 10.3 产物
+
+- 版本号 0.2.0（`tauri.conf.json` / `Cargo.toml` / `package.json` 一致）。
+- 安装包 `src-tauri/target/release/bundle/nsis/PeripheralBattery_0.2.0_x64-setup.exe`：
+  **11,335,823 B / 10.81 MiB**，SHA-256 `77a981b7cb424e5c050e2c1a621ab6efa957b185df71873ee72d6d45c2289e86`；
+  `peripheral-battery.exe`（11,763,712 B，`6990ca28…`）、`collector.exe`（2,140,776 B，`7967e53f…`）同记录在
+  `SHA256SUMS.txt` / `build-info.json`；`signed=false`（未配置证书）。
+- 文档：`docs/release-notes-v0.2.0.md`、README §9、TECH_PLAN §14；NSIS 钩子与两个验收脚本。
+
+### 10.4 已知限制 / 待办
+
+- 未签名构建下系统通知标题可能显示通用名称；通知点击打开面板、记住窗口位置、F-05 设备分组为 v0.2.1 候选。
+- Win10 / 系统透明效果关闭 / 远程桌面时透明度滑块锁定为不透明背景；真实 Win10 未实测。
+- 自动更新（updater）仍未接线；整链签名需证书（见 README §4）。
+- 本轮构建与回归已由 Lead 完成（2026-10-20）：release exe + NSIS 0.2.0 已产出并记录 SHA-256，三套测试全绿，F-01 端到端 14/14 PASS；`verify_install_uninstall.ps1` 未在用户机器上执行（避免覆盖已安装版本，可选自测）。

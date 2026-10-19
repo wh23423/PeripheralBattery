@@ -147,6 +147,19 @@
     !endif
 
     ; ------------------------------------------------------------------
+    ; 5b) F-01 autostart: the app writes "PeripheralBattery" under the
+    ;     per-user Run key when the user enables "start at login". Windows
+    ;     also records a StartupApproved marker in a separate key when the
+    ;     user toggles the entry in Task Manager / Settings. Remove both so
+    ;     an uninstall leaves no orphaned startup entry behind (a leftover
+    ;     StartupApproved value would otherwise make a future reinstall
+    ;     look "disabled by the system" before the user ever touched it).
+    ;     Both keys are HKCU-only: no elevation required.
+    ; ------------------------------------------------------------------
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "PeripheralBattery"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" "PeripheralBattery"
+
+    ; ------------------------------------------------------------------
     ; 6) Install dir leftovers (v0.1.0 kept config/logs here, so the
     ;    template's non-recursive RMDir leaves the folder behind).
     ;    Guarded: never recurse into a filesystem/user/system root.

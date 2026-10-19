@@ -2,7 +2,7 @@
 
 **[下载安装包](https://github.com/wh23423/PeripheralBattery/releases/latest)** · MIT License
 
-> 当前版本 **v0.1.2**（拖拽 / 未知连接 / 剩余时间三项用户反馈修复，见 §6.1 与 [Release Notes](docs/release-notes-v0.1.2.md)）。
+> 当前版本 **v0.2.0**（设置抽屉 / 开机静默启动 / 面板不透明度 / 低电与充满系统通知 / 低电阈值统一到采集器，见 §9 与 [Release Notes](docs/release-notes-v0.2.0.md)）。
 
 Windows 托盘常驻的外设电量面板：鼠标 / 键盘 / 耳机 / 手柄，覆盖 2.4G 接收器、USB、蓝牙三条链路。
 外观为液态玻璃浮动面板（720×380 DIP 窗口 = 面板尺寸 / 12px 圆角，acrylic 只铺满面板）。
@@ -16,7 +16,7 @@ Windows 托盘常驻的外设电量面板：鼠标 / 键盘 / 耳机 / 手柄，
 | 磁盘 | 安装约 120 MB（WebView2 Runtime 另计） |
 | 权限 | 默认当前用户安装（`%LOCALAPPDATA%\PeripheralBattery`），**无需管理员**；静默部署见 §4「发布」 |
 
-> 施工依据：[BUILD_PLAN.md](BUILD_PLAN.md)（构建方案 v1.1，含 18 条对抗性审查处置）、[TECH_PLAN.md](TECH_PLAN.md)（架构与视觉规范）、[protocol.md](protocol.md)（三方通信协议，施工后定稿）。
+> 施工依据：[BUILD_PLAN.md](BUILD_PLAN.md)（构建方案 v1.1，含 18 条对抗性审查处置）、[TECH_PLAN.md](TECH_PLAN.md)（架构与视觉规范）、[FEATURE_PLAN.md](FEATURE_PLAN.md)（v0.2.0 范围与契约，v1.3）、[protocol.md](protocol.md)（三方通信协议，施工后定稿）。
 
 ## 预览
 
@@ -56,10 +56,10 @@ collector.exe (Python, stdio NDJSON)  ⇄  app.exe (Tauri 2 / Rust)  ⇄  WebVie
 | `collector/` | Python 采集器（`providers/` 原样复制自 HaloBattery；`state.py`/`keys.py`/`collector.py`/`transport.py`/`fake.py`） |
 | `collector_entry.py` | PyInstaller 入口（包内相对导入，不能直接打包 `collector/__main__.py`） |
 | `src-tauri/` | Tauri 2 外壳（窗口、托盘、sidecar、Job Object、单实例、IsVisible、命令/事件） |
-| `src-tauri/nsis/` | NSIS 安装/卸载钩子 `installer-hooks.nsh`（卸载清注册表 / WebView2 profile / 数据目录 / `RMDir /r $INSTDIR`） |
+| `src-tauri/nsis/` | NSIS 安装/卸载钩子 `installer-hooks.nsh`（卸载清注册表 / WebView2 profile / 数据目录 / `RMDir /r $INSTDIR` / 开机启动项 `Run`+`StartupApproved\Run`） |
 | `ui/` | 静态前端（`bridge.js` IPC 桥、`app.js` keyed diff、`styles.css` 液态玻璃 + 性能改造） |
-| `tests/collector/` | 采集器 pytest（v0.1.1：117 项） |
-| `tools/` | 截图/录屏/性能/验收脚本（`ui_smoke.js`、`verify_runtime.py`、`verify_fps.js`、`collector_demo.ps1`） |
+| `tests/collector/` | 采集器 pytest（回归数字见 Release Notes / 测试输出） |
+| `tools/` | 截图/录屏/性能/验收脚本（`ui_smoke.js`、`verify_runtime.py`、`verify_fps.js`、`collector_demo.ps1`、`verify_autostart.ps1`、`verify_install_uninstall.ps1`） |
 | `scripts/` | `build-collector.ps1`、`build.ps1`（签名 + SHA256SUMS/build-info）、`sign.ps1`、`verify-uninstall.ps1`、`dev.ps1`、`verify-*.ps1` |
 | `design/` | 设计稿、演示素材、`design/verify/` 验收证据 |
 | `dist/collector/` | PyInstaller onedir 产物（打包时映射到安装目录 `collector/`） |
@@ -97,10 +97,13 @@ $env:PB_SHOW_ON_START="1"; .\src-tauri\target\debug\peripheral-battery.exe
 .\scripts\build.ps1 -Debug -NoBundle      # 只编译 debug exe，不做安装包
 
 # 测试
+cd src-tauri; cargo test                  # Rust 外壳（设置 / autostart reconcile / 通知节流）
 .\.venv\Scripts\python.exe -m pytest tests\collector -q
 node tools\ui_smoke.js
 node tools\ui_shots.js                    # 评审截图 -> design/verify/ui-*.png
 powershell -File tools\collector_demo.ps1 # collector 端到端 demo（probe/stdio/--once）
+pwsh -File tools\verify_autostart.ps1     # F-01 开机静默启动验收（无 exe/已有实例时 SKIP）
+pwsh -File tools\verify_install_uninstall.ps1  # 安装→校验→卸载→校验（需先构建安装包）
 ```
 
 ### 发布：签名 / 校验和 / 部署参数
@@ -157,6 +160,13 @@ $env:PB_SIGN_TIMESTAMP_URL = "http://timestamp.digicert.com"   # 可选，默认
 验收脚本（Optional）：`pwsh -File scripts\verify-uninstall.ps1`。默认静默安装到 `%TEMP%` 下的自定义目录，
 不碰默认安装路径；默认只验证“保留用户数据”路径，`-DeleteAppData -ConfirmDeleteAppData` 才测试数据删除。
 真实默认路径的安装/卸载由 maintainer 最终复验（脚本会先检查已有安装并拒绝，除非 `-Force`）。
+
+v0.2.0 另有两个验收脚本（会改动当前用户的 HKCU 启动项，脚本均自行快照并在结束时恢复现场）：
+
+- `pwsh -File tools\verify_autostart.ps1`：F-01 开机静默启动验收——写入 `Run` 值 → `--autostart` 启动断言无可见窗口
+  → 第二次启动断言单实例 exit 0 且无第二个进程 → 清理进程并删除 `Run` 值。无已构建 exe 或已有实例运行时输出 SKIP 并退出 0。
+- `pwsh -File tools\verify_install_uninstall.ps1`：默认路径安装 → 首启迁移 → 写入开机启动项 → `/S` 卸载，
+  断言卸载钩子清掉 `HKCU` 的 `Run` 与 `StartupApproved\Run\PeripheralBattery`（脚本自行快照/恢复启动项）。
 
 采集器单独使用：
 
@@ -307,6 +317,12 @@ PyInstaller onedir collector 独立运行；NSIS 安装包（**8.92 MiB**，13:1
   实际续航随回报率/灯光/DPI/电池老化变化。该值只用于冷启动参考，累计 ≥30min 且掉电 ≥3% 后自动切换为实测。
   BS2PRO 的 94% 是 Windows 蓝牙侧静态值，显示「外接供电」而非剩余时间。未收录设备冷启动仍显示「剩余时间未知」。
 - **Xbox 手柄链路**：没有可靠 API 区分有线与无线适配器（需 WGI `IsWireless`），仍显示「未知连接」而不猜测。
+- **v0.2.0 开机启动**：启动项写在当前用户 `HKCU`，无需管理员；若 Windows「设置 → 应用 → 启动」里被关闭，
+  设置页只显示「被系统启动项管理禁用」并提示，不会改写系统记录。RDP/快速用户切换场景未实测。
+- **v0.2.0 系统通知**：NotSigned 构建下 Windows Toast 标题可能显示通用应用名（依赖 AppUserModelID / 开始菜单快捷方式注册）；
+  通知点击打开面板未实现（v0.2.1 候选）。
+- **v0.2.0 不透明度**：Windows 10、系统关闭「透明效果」、远程桌面或 `PB_DISABLE_ACRYLIC=1` 时滑块锁定为不透明背景；
+  Win11 开启透明效果时可调节。
 
 ## 8. 配置与日志
 
@@ -317,8 +333,8 @@ Rust 解析后会回写该环境变量，collector sidecar 继承同一目录）
 
 ```
 %APPDATA%\PeripheralBattery\          # 用户数据（卸载默认保留）
-  app.json             # 外壳配置（pinned 等），Rust 写
-  config.json          # 采集层配置，collector 独占
+  app.json             # 外壳配置（schema/opacity/autostart/notify_*、pinned），Rust 写
+  config.json          # 采集层配置（low/full_alert/tick_interval 等），collector 独占
   aliases.json         # 稳定 key 映射 + 迁移历史
   history.json         # 剩余时间历史样本
   logs\app.log         # Rust 外壳日志（5×2MB 轮转，含 build=/data_dir=）
@@ -337,5 +353,67 @@ Rust 解析后会回写该环境变量，collector sidecar 继承同一目录）
 - 开发/验收：`PB_SHOW_ON_START`、`PB_HIDE_AFTER_MS`、`PB_QUIT_AFTER_MS`、`PB_COLLECTOR`、`PB_PYTHON`、`PB_SINGLE_INSTANCE_NAME`、`PB_FPS_PROBE`（rAF 采样）、`PB_BT_WATCH_MS`（蓝牙连接检测间隔，collector 用，默认 30000）
 - 仅 debug 构建：`PB_TEST_*` 验收注入钩子（如 `PB_TEST_TRAY_ACTION`、`PB_TEST_TRAY_CLICK`；release 不编译/不生效）
 - 构建/签名：`PB_BUILD_SHA` / `PB_BUILD`（无 `.git` 时注入构建号）、`PB_SIGN_THUMBPRINT`、`PB_SIGN_CERT_PATH`、`PB_SIGN_CERT_PASSWORD`、`PB_SIGN_TIMESTAMP_URL`
+
+## 9. v0.2.0 新增功能（FEATURE_PLAN v1.3，2026-10）
+
+v0.2.0 把设置、开机启动、外观与提醒收敛成完整的用户设置层；版本号 0.2.0
+（`tauri.conf.json` / `Cargo.toml` / `package.json` 一致），Release Notes 见
+[docs/release-notes-v0.2.0.md](docs/release-notes-v0.2.0.md)。
+
+| 功能 | 用户可见变化 | 配置键 |
+|---|---|---|
+| S-01 设置基础设施 | 右上角齿轮打开设置抽屉，分组：启动 / 外观 / 提醒 / 面板 / 关于；开关与滑块即时生效并持久化 | `app.json` schema=2 |
+| F-01 开机静默启动 | 开启后开机驻留托盘、不弹面板；第二次 `--autostart` 直接退出；三态：已启用 / 未启用 / 被系统启动项管理禁用 | `autostart` |
+| F-02 面板不透明度 | 「外观」滑块 50–100%，默认 60%，实时调整面板三档 alpha | `opacity` |
+| F-03 低电/充满系统通知 | Windows 系统通知；同一设备/类型 10 分钟节流；可在「提醒」关闭；面板内 toast 保留 | `notify_low` / `notify_full` |
+| F-04 低电阈值统一 | 阈值只存采集器，主卡告警与系统通知使用同一阈值；旧 `localStorage.lowThreshold` 首次升级迁移后删除 | collector `config.json: low` / `full_alert` |
+
+### 9.1 设置分层
+
+| 层 | 存储 | v0.2.0 字段 |
+|---|---|---|
+| 系统 / 进程行为（Rust 外壳） | `%APPDATA%\PeripheralBattery\app.json` | `schema`（=2）、`pinned`、`opacity`（50–100，默认 60）、`autostart`（bool，默认 false）、`notify_low` / `notify_full`（bool，默认 true） |
+| 采集行为（collector 独占） | 同目录 `config.json` | `low`（0–100，低电阈值，默认 20）、`full_alert`（bool，充满提醒）、`tick_interval` 等 |
+| 仅 UI 偏好 | `localStorage` | 仅 `reducedMotion` |
+
+- 首启迁移：`app.json` schema 1 → 2 补默认值；旧 `config.json` 只迁移 `pinned`；迁移失败不阻塞启动。
+- IPC 契约（详见 [TECH_PLAN.md](TECH_PLAN.md) §14）：
+  - `get_settings`（无参）→ `{settings:{opacity,autostart,notifyLow,notifyFull}, autostart:{enabled,osDisabled,path}}`；
+  - `update_settings {patch:{opacity?,autostart?,notifyLow?,notifyFull?}}` → `{ok, settings, autostart, error?}`，
+    白名单 + 数值 clamp；autostart 写注册表失败会回滚内存与磁盘并返回错误；
+  - `app-state` 增量字段：`settings`、`autostart`、`autostartLaunch`（旧字段保留）。
+
+### 9.2 开机启动注册表契约（F-01）
+
+| 项 | 值 |
+|---|---|
+| 键 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` |
+| 值名 / 类型 | `PeripheralBattery` / `REG_SZ` |
+| 数据 | `"<安装目录>\peripheral-battery.exe" --autostart`（路径带引号） |
+| 系统启动项记录（只读探测） | `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run\PeripheralBattery`（REG_BINARY 12 字节；首字节 `0x02`/`0x06` 启用、`0x03`/`0x07` 禁用） |
+
+- 启动参数：`--autostart` / `--hidden` 静默（不显示面板）；已有实例运行时新进程直接 `exit(0)`，不激活已有窗口。
+- 开关与 `app.json` 的 `autostart` 对账：路径不匹配时改写、缺失时写入、关闭时删除；被系统启动项管理禁用时只提示不改写。
+- 卸载：`NSIS_HOOK_POSTUNINSTALL` 删除上述 `Run` 与 `StartupApproved\Run` 两处值（`tools/verify_install_uninstall.ps1` 断言）。
+
+### 9.3 不透明度与 CSS 变量（F-02）
+
+面板深蓝渐变三档 alpha 改为 CSS 变量 `--panel-a1/--panel-a2/--panel-a3`，由 `opacity` 映射：
+
+| 滑块 | a1 | a2 | a3 |
+|---:|---:|---:|---:|
+| 50% | 0.500 | 0.433 | 0.517 |
+| 60%（默认） | 0.600 | 0.520 | 0.620 |
+| 80% | 0.800 | 0.760 | 0.810 |
+| 100% | 1.000 | 1.000 | 1.000 |
+
+acrylic 不可用（Win10、系统透明效果关闭、远程桌面、`PB_DISABLE_ACRYLIC=1`、`prefers-reduced-transparency`）时，
+滑块置灰并提示「当前系统不支持玻璃模糊，已锁定为不透明背景」，保留当前值。
+
+### 9.4 升级与回滚
+
+- 升级：v0.1.2 直接覆盖安装；安装目录 / 卸载注册表键 / 数据目录不变，`app.json` schema=2 自动迁移。
+- 回滚到 v0.1.2：旧版忽略 `app.json` 新字段；若已开启开机自启，需先卸载 v0.2.0（或手动删除 `Run` 与
+  `StartupApproved\Run\PeripheralBattery`）再装旧版，否则系统仍会静默启动。
 
 

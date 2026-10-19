@@ -1,0 +1,507 @@
+/* ============================================================
+   潮息 · Tidal Breath — 动效语言令牌层 v1
+   ------------------------------------------------------------
+   这是一层「可选启用」的动效覆盖，不是改版：
+   只有 html[data-motion="tidal"] 存在时才生效；删掉这个属性，
+   面板立刻回到 v0.1.2 的现行动效。方便对比、灰度、回滚。
+
+   启用（将来落地时）：<html data-motion="tidal"> + 引入本文件，
+   放在 styles.css 之后。演示见 motion-lab.html。
+
+   硬约束（沿用 BUILD_PLAN / FEATURE_PLAN）：
+   · 只动 transform / opacity；唯一例外是入场的一次性 blur。
+   · 生产 0 个 backdrop-filter，0 个 mix-blend-mode。
+   · box-shadow 不参与 transition。
+   · 所有循环动画必须能被 getAnimations().pause() 收口。
+   · 降低动效不是「全关」，见文件末尾。
+   ============================================================ */
+
+:root {
+  /* 全局速度倍率：1 = 正常，4 = 0.25× 慢放（评审/演示用）。
+     所有时长令牌都乘以它，所以慢放不会破坏层次比例。 */
+  --td-speed: 1;
+
+  /* ---------- 时长：八级，按「呼吸一次」为最高量级 ---------- */
+  --m-0: 0ms;                                 /* 焦点环：即时，不等 */
+  --m-1: calc(80ms * var(--td-speed));        /* 按下 */
+  --m-2: calc(120ms * var(--td-speed));       /* 即时反馈：hover 进入 */
+  --m-3: calc(180ms * var(--td-speed));       /* 反馈收束：hover 离开、按钮回弹 */
+  --m-4: calc(240ms * var(--td-speed));       /* 状态切换：颜色、标签、点 */
+  --m-5: calc(320ms * var(--td-speed));       /* 内容承接：文案交叉、数字滚动 */
+  --m-6: calc(440ms * var(--td-speed));       /* 连续位移：抽屉、banner、重排 */
+  --m-7: calc(600ms * var(--td-speed));       /* 叙事：面板入场、交接主段 */
+  --m-8: calc(720ms * var(--td-speed));       /* 圆环追值、交接收束 */
+
+  /* ---------- 缓动：只有五条，各司其职 ---------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* 到达：所有「出现」 */
+  --ease-in: cubic-bezier(0.5, 0, 0.9, 0.4);      /* 离场：所有「消失」 */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);  /* 两端都慢的空间位移 */
+  --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);  /* 呼吸：吸与呼的对称底 */
+  --ease-press: cubic-bezier(0.3, 0, 0.3, 1);     /* 按下：不弹，只压实 */
+
+  /* ---------- 位移与形变：全部为 1–10px 级，拒绝大位移 ---------- */
+  --m-lift-row: -1px;      /* 行悬停抬升 */
+  --m-lift-card: -2px;     /* 主卡悬停抬升 */
+  --m-press: 0.988;        /* 行/卡片按下缩放 */
+  --m-press-btn: 0.94;     /* 图标按钮按下缩放 */
+  --m-in-y: 8px;           /* 入场位移 */
+  --m-out-y: 6px;          /* 退场位移 */
+  --m-handoff-y: 6px;      /* 主卡交接时内容交接位移 */
+  --m-panel-in-y: 10px;    /* 面板从托盘出现 */
+  --m-panel-in-scale: 0.98;
+
+  /* ---------- 错峰：列表与级联的节拍 ---------- */
+  --m-stagger: calc(40ms * var(--td-speed));
+  --m-stagger-max: 4;      /* 最多 4 级，总延迟 ≤160ms，超过不再错峰 */
+
+  /* ---------- 呼吸时钟：全部落在 1.8s 基准脉冲的整数比上 ----------
+     1.8s 是基准脉冲；下面四条周期都是它的整数倍或半倍，
+     相位共用同一张网格，叠在一起不会互相追赶。
+       空态等待 10.8s（×6）  呼吸 7.2s（×4）
+       充电     5.4s（×3）    低电 3.6s（×2）
+     相位偏移让光从「心脏」向外传播：主环 0s → 主卡 +0.35s → 外晕 +0.7s。 */
+  --m-pulse: calc(1800ms * var(--td-speed));
+  --m-breath: calc(7200ms * var(--td-speed));
+  --m-breath-charge: calc(5400ms * var(--td-speed));
+  --m-breath-low: calc(3600ms * var(--td-speed));
+  --m-breath-wait: calc(10800ms * var(--td-speed));
+  --m-phase-ring: 0ms;
+  --m-phase-card: calc(350ms * var(--td-speed));
+  --m-phase-ambient: calc(700ms * var(--td-speed));
+
+  /* 吸气占 34%，屏息到 44%，呼气 56% —— 呼气比吸气长，才有「松」的感觉。 */
+  --m-inhale-stop: 34%;
+  --m-hold-stop: 44%;
+}
+
+/* ============================================================
+   关键帧
+   ============================================================ */
+
+/* 呼吸：所有环境层的唯一波形。振幅由每个元素自己的 --td-lo / --td-hi 给。 */
+@keyframes td-breathe {
+  0%   { opacity: var(--td-lo, 0.3); }
+  34%  { opacity: var(--td-hi, 0.8); }
+  44%  { opacity: var(--td-hi, 0.8); }
+  100% { opacity: var(--td-lo, 0.3); }
+}
+
+/* 主环上的一次「潮痕」：每个呼吸周期扫过一段高光，只出现一次，不循环成跑马灯。 */
+@keyframes td-sweep {
+  0%, 58%   { opacity: 0; transform: rotate(-30deg); }
+  62%       { opacity: 0.14; }
+  84%       { opacity: 0.14; transform: rotate(200deg); }
+  88%, 100% { opacity: 0; transform: rotate(206deg); }
+}
+
+/* 充电电流：一小段弧沿环匀速巡游，与 5.4s 充电呼吸同周期。 */
+@keyframes td-current {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 低电心跳：双击「lub-dub」，只跳 3 次就收，不做无限警告。 */
+@keyframes td-beat {
+  0%   { transform: scale(1); }
+  5%   { transform: scale(1.006); }
+  11%  { transform: scale(1); }
+  17%  { transform: scale(1.005); }
+  23%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* 面板入场：唯一允许动 filter 的地方（一次性，600ms 后 will-change 撤掉）。 */
+@keyframes td-panel-in {
+  from { opacity: 0; transform: translateY(var(--m-panel-in-y)) scale(var(--m-panel-in-scale)); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* 通用「升起」：入场级联、行出现、空态出现。 */
+@keyframes td-rise-in {
+  from { opacity: 0; transform: translateY(var(--m-in-y)); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 行退场：先淡出、轻推右移，再删节点；绝不塌高度（布局不抖）。 */
+@keyframes td-row-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateX(4px); }
+}
+
+/* 收起：交接时旧内容下沉让位，新内容升起接位。 */
+@keyframes td-sink-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(6px); }
+}
+
+/* toast：进场 260/退场 180，退场比进场快。 */
+@keyframes td-toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes td-toast-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(4px); }
+}
+
+/* 恢复的「松一口气」：低电解除时的一次舒展，只播一次。 */
+@keyframes td-release {
+  0%   { transform: scale(1); opacity: 0.9; }
+  40%  { transform: scale(1.008); opacity: 0.55; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ============================================================
+   环境潮汐（常驻，只有 3 个合成层）
+   ============================================================ */
+
+html[data-motion="tidal"] .stage::before {
+  --td-lo: 0.30;
+  --td-hi: 0.85;
+  animation: td-breathe var(--m-breath) var(--ease-breath) infinite;
+}
+
+/* 主环的呼吸用「双层交叉淡化」切换节律：
+   常态层 7.2s / 充电层 5.4s，两层同时存在、只交叉 opacity，
+   永远不修改正在运行的 animation-duration（那会造成相位跳变）。
+   内层 .glow 负责呼吸，外层 <g> 负责交叉淡化，互不抢 opacity。 */
+html[data-motion="tidal"] .ring-lg .glow { animation: none; }
+html[data-motion="tidal"] .ring-lg .breath-normal .glow {
+  --td-lo: 0.06;
+  --td-hi: 0.24;
+  animation: td-breathe var(--m-breath) var(--ease-breath) calc(-1 * var(--m-phase-card)) infinite;
+}
+html[data-motion="tidal"] .ring-lg .breath-charge .glow {
+  --td-lo: 0.10;
+  --td-hi: 0.36;
+  animation: td-breathe var(--m-breath-charge) var(--ease-breath) calc(-1 * var(--m-phase-card)) infinite;
+  animation-play-state: paused; /* 不在充电就不跑，省一层合成 */
+}
+html[data-motion="tidal"] .ring.state-charging .breath-charge .glow {
+  animation-play-state: running;
+}
+html[data-motion="tidal"] .ring-lg .breath-charge {
+  opacity: 0;
+  transition: opacity var(--m-7) var(--ease-breath);
+}
+html[data-motion="tidal"] .ring.state-charging .breath-charge { opacity: 1; }
+html[data-motion="tidal"] .ring.state-charging .breath-normal { opacity: 0; }
+
+html[data-motion="tidal"] .ring-lg .shine {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: td-sweep var(--m-breath) linear infinite;
+  opacity: 0.14;
+}
+
+html[data-motion="tidal"] .live i {
+  --td-lo: 0.66;
+  --td-hi: 1;
+  animation: td-breathe calc(var(--m-breath) / 2) var(--ease-breath) calc(-1 * var(--m-phase-ambient)) infinite;
+}
+
+/* 充电：电流弧出现；呼吸节律由上面的双层交叉淡化接管。 */
+html[data-motion="tidal"] .ring .current {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  transition: opacity var(--m-7) var(--ease-out);
+}
+html[data-motion="tidal"] .ring.state-charging .current {
+  opacity: 0.42;
+  animation: td-current var(--m-breath-charge) linear infinite;
+}
+
+/* 低电：呼吸变浅、变快；心跳只跳 3 次。
+   低电是「事件」，心跳结束后仍有缓慢的环境呼吸，不是永久警报。 */
+html[data-motion="tidal"] .ring.state-low .breath-normal .glow {
+  --td-lo: 0.08;
+  --td-hi: 0.22;
+  animation-duration: var(--m-breath-low);
+}
+html[data-motion="tidal"] .ring-lg.is-alerting {
+  animation: td-beat var(--m-pulse) var(--ease-in-out) 3 both;
+}
+
+/* 离线：停止呼吸。没有信号，就不该有生命体征。
+   注意呼吸跑在内层 .glow 上，所以要连 .glow 一起停，否则「静帧」仍在偷偷耗帧。 */
+html[data-motion="tidal"] .ring.state-offline .breath-normal,
+html[data-motion="tidal"] .ring.state-offline .breath-charge,
+html[data-motion="tidal"] .ring.state-unknown .breath-normal,
+html[data-motion="tidal"] .ring.state-unknown .breath-charge {
+  opacity: 1;
+}
+html[data-motion="tidal"] .ring.state-offline .glow,
+html[data-motion="tidal"] .ring.state-unknown .glow {
+  animation: none;
+  opacity: 0.06;
+}
+html[data-motion="tidal"] .ring.state-offline .slide,
+html[data-motion="tidal"] .ring.state-unknown .slide { opacity: 0; }
+/* 潮痕也停：没有信号时，环上不该还有光在扫。 */
+html[data-motion="tidal"] .ring.state-offline .shine,
+html[data-motion="tidal"] .ring.state-unknown .shine {
+  animation: none;
+  opacity: 0;
+}
+
+/* 空态等待：更慢的一次扫描，像在听。 */
+html[data-motion="tidal"] .ring.state-empty .slide {
+  opacity: 0.10;
+  animation: td-current var(--m-breath-wait) linear infinite;
+}
+html[data-motion="tidal"] .ring.state-empty .breath-normal .glow {
+  --td-lo: 0.04;
+  --td-hi: 0.10;
+  animation-duration: var(--m-breath-wait);
+}
+
+/* 行内小环的充电呼吸：同一条波形，只是幅度小、周期跟充电层一致。 */
+html[data-motion="tidal"] .ring-sm.state-charging .glow {
+  --td-lo: 0.10;
+  --td-hi: 0.34;
+  animation: td-breathe var(--m-breath-charge) var(--ease-breath) infinite;
+}
+
+/* ============================================================
+   新增的 SVG 层（结构改动，落实现时按此加三个 <circle>）
+   ============================================================ */
+
+/* 潮痕：每个呼吸周期在环上扫过一段极淡的高光，证明玻璃是活的。 */
+html[data-motion="tidal"] .ring .shine {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 52 230.74;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 扫描弧：空态/等待时慢慢绕一圈，像在听。 */
+html[data-motion="tidal"] .ring .slide {
+  fill: none;
+  stroke: var(--glow);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 46 236.74;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 液面：环末端一小段亮弧，读作水位线，随电量转到同一角度。 */
+html[data-motion="tidal"] .ring .meniscus {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 2.5 280.24;
+  opacity: 0.9;
+}
+
+html[data-motion="tidal"] .ring-sm .shine,
+html[data-motion="tidal"] .ring-sm .slide { stroke-dasharray: 26 256.74; }
+html[data-motion="tidal"] .ring-sm .meniscus { stroke-dasharray: 2 280.74; }
+html[data-motion="tidal"] .ring-sm .shine,
+html[data-motion="tidal"] .ring-sm .slide,
+html[data-motion="tidal"] .ring-sm .meniscus { stroke-width: 3; }
+
+/* ============================================================
+   组件接管（只覆盖时间，不改形）
+   ============================================================ */
+
+html[data-motion="tidal"] .ctrl {
+  transition: color var(--m-2) var(--ease-out),
+              background-color var(--m-2) var(--ease-out),
+              transform var(--m-1) var(--ease-press);
+}
+html[data-motion="tidal"] .ctrl:active { transform: scale(var(--m-press-btn)); }
+html[data-motion="tidal"] .ctrl::before { transition: opacity var(--m-2) var(--ease-out); }
+html[data-motion="tidal"] .ctrl svg { transition: transform var(--m-3) var(--ease-out); }
+
+html[data-motion="tidal"] .hero-card {
+  transition: transform var(--m-3) var(--ease-out),
+              border-color var(--m-4) var(--ease-out);
+}
+html[data-motion="tidal"] .hero-card:hover { transform: translateY(var(--m-lift-card)) scale(1.012); }
+html[data-motion="tidal"] .ring-lg { transition: transform var(--m-3) var(--ease-out); }
+html[data-motion="tidal"] .hero-card::before { transition: opacity var(--m-2) var(--ease-out); }
+
+html[data-motion="tidal"] .row {
+  transition: transform var(--m-3) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              border-color var(--m-4) var(--ease-out);
+}
+html[data-motion="tidal"] .row:hover { transform: translateY(var(--m-lift-row)); }
+html[data-motion="tidal"] .row:active { transform: scale(var(--m-press)); }
+html[data-motion="tidal"] .row::before { transition: opacity var(--m-2) var(--ease-out); }
+html[data-motion="tidal"] .row::after { transition: opacity var(--m-3) var(--ease-out); }
+html[data-motion="tidal"] .row .caret {
+  transition: opacity var(--m-3) var(--ease-out),
+              transform var(--m-3) var(--ease-out);
+}
+html[data-motion="tidal"] .ring-sm svg { transition: transform var(--m-3) var(--ease-out); }
+
+html[data-motion="tidal"] .ring .fill {
+  transition: stroke-dashoffset var(--m-8) var(--ease-out),
+              stroke var(--m-4) var(--ease-out);
+}
+/* 液面：环的末端的一小段亮弧，随电量一起转，读作「水位」。 */
+html[data-motion="tidal"] .ring .meniscus {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform var(--m-8) var(--ease-out), opacity var(--m-4) var(--ease-out);
+  opacity: 0.9;
+}
+html[data-motion="tidal"] .ring.state-unknown .meniscus,
+html[data-motion="tidal"] .ring.state-empty .meniscus,
+html[data-motion="tidal"] .ring.state-offline .meniscus { opacity: 0; }
+
+html[data-motion="tidal"] .alert-tag {
+  transition: opacity var(--m-4) var(--ease-out),
+              transform var(--m-4) var(--ease-out),
+              color var(--m-4) var(--ease-out),
+              background-color var(--m-4) var(--ease-out);
+}
+html[data-motion="tidal"] .tag {
+  transition: color var(--m-4) var(--ease-out),
+              background-color var(--m-4) var(--ease-out);
+}
+
+/* 低电泛色：用一个预烘焙 tint 层做 opacity 过渡，不改面板背景图。 */
+html[data-motion="tidal"] .low-tint {
+  transition: opacity var(--m-7) var(--ease-breath);
+  opacity: 0;
+}
+html[data-motion="tidal"] .panel.is-low .low-tint { opacity: 1; }
+
+html[data-motion="tidal"] .row.is-offline { opacity: 0.62; }
+
+html[data-motion="tidal"] .banner {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  padding: 0;
+  border-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: grid-template-rows var(--m-6) var(--ease-out),
+              margin-top var(--m-6) var(--ease-out),
+              padding var(--m-6) var(--ease-out),
+              border-color var(--m-4) var(--ease-out),
+              opacity var(--m-4) var(--ease-out);
+}
+html[data-motion="tidal"] .banner.is-shown {
+  grid-template-rows: 1fr;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border-color: rgba(255, 92, 108, 0.4);
+  opacity: 1;
+  pointer-events: auto;
+}
+html[data-motion="tidal"] .banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+html[data-motion="tidal"] .empty { animation: td-rise-in var(--m-5) var(--ease-out) both; }
+
+html[data-motion="tidal"] .toast { animation: td-toast-in calc(260ms * var(--td-speed)) var(--ease-out) both; }
+html[data-motion="tidal"] .toast.is-leaving { animation: td-toast-out var(--m-3) var(--ease-in) both; }
+
+html[data-motion="tidal"] .drawer {
+  /* visibility 的延迟只负责「关闭」：等滑出结束再隐藏；进场必须立刻可见。 */
+  transition: transform var(--m-5) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              visibility 0s linear var(--m-5);
+}
+html[data-motion="tidal"] .drawer.is-open {
+  transition: transform var(--m-5) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              visibility 0s;
+}
+html[data-motion="tidal"] .drawer-scrim {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--m-4) var(--ease-out);
+}
+html[data-motion="tidal"] .drawer-scrim.is-shown { opacity: 1; pointer-events: auto; }
+
+/* 入场：一次 600ms 的叙事，之后面板安静下来。 */
+html[data-motion="tidal"] .intro .panel {
+  animation: td-panel-in var(--m-7) var(--ease-out) both;
+  will-change: transform, filter, opacity;
+}
+html[data-motion="tidal"] .intro .side-head { animation: td-rise-in var(--m-5) var(--ease-out) calc(40ms * var(--td-speed)) both; }
+html[data-motion="tidal"] .intro .hero      { animation: td-rise-in var(--m-5) var(--ease-out) calc(80ms * var(--td-speed)) both; }
+html[data-motion="tidal"] .intro .controls  { animation: td-rise-in var(--m-5) var(--ease-out) calc(140ms * var(--td-speed)) both; }
+html[data-motion="tidal"] .intro .row       { animation: td-rise-in var(--m-5) var(--ease-out) both; }
+html[data-motion="tidal"] .intro .row:nth-child(1) { animation-delay: calc(120ms * var(--td-speed)); }
+html[data-motion="tidal"] .intro .row:nth-child(2) { animation-delay: calc(160ms * var(--td-speed)); }
+html[data-motion="tidal"] .intro .row:nth-child(3) { animation-delay: calc(200ms * var(--td-speed)); }
+html[data-motion="tidal"] .intro .row:nth-child(4) { animation-delay: calc(240ms * var(--td-speed)); }
+html[data-motion="tidal"] .intro .row:nth-child(5) { animation-delay: calc(280ms * var(--td-speed)); }
+html[data-motion="tidal"] .intro .side-foot { animation: td-rise-in var(--m-5) var(--ease-out) calc(280ms * var(--td-speed)) both; }
+
+/* 用户刚操作过：环境让位 900ms，注意力回到内容上（由 app.js 加 .is-attending）。
+   振幅切换不做补间（动画正在跑，transition 会被 animation 覆盖），
+   靠呼吸本身的慢相位把这次变化稀释掉。 */
+html[data-motion="tidal"] body.is-attending .stage::before {
+  --td-lo: 0.16;
+  --td-hi: 0.4;
+}
+
+/* ============================================================
+   降低动效：保留「发生了什么」，去掉「怎么飞过来」
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion="tidal"] .stage::before,
+  html[data-motion="tidal"] .ring-lg .shine,
+  html[data-motion="tidal"] .ring .current,
+  html[data-motion="tidal"] .ring-lg.is-alerting,
+  html[data-motion="tidal"] .ring.state-empty .slide,
+  html[data-motion="tidal"] .live i {
+    animation: none !important;
+  }
+  html[data-motion="tidal"] .stage::before { opacity: 0.42 !important; }
+  html[data-motion="tidal"] .ring-lg .glow { opacity: 0.12 !important; }
+  html[data-motion="tidal"] .ring-lg .breath-charge { opacity: 0 !important; }
+  html[data-motion="tidal"] .ring-lg.is-alerting { animation: none !important; }
+  html[data-motion="tidal"] .ring .current { opacity: 0.42 !important; }
+
+  html[data-motion="tidal"] *,
+  html[data-motion="tidal"] *::before,
+  html[data-motion="tidal"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: calc(120ms * var(--td-speed)) !important;
+    transition-property: opacity, color, background-color, border-color !important;
+  }
+  html[data-motion="tidal"] .intro .panel { filter: none !important; }
+}
+
+html[data-motion="tidal"][data-reduced-motion="true"] .stage::before,
+html[data-motion="tidal"][data-reduced-motion="true"] .ring-lg .shine,
+html[data-motion="tidal"][data-reduced-motion="true"] .ring .current,
+html[data-motion="tidal"][data-reduced-motion="true"] .ring-lg.is-alerting,
+html[data-motion="tidal"][data-reduced-motion="true"] .ring.state-empty .slide,
+html[data-motion="tidal"][data-reduced-motion="true"] .live i {
+  animation: none !important;
+}
+html[data-motion="tidal"][data-reduced-motion="true"] .stage::before { opacity: 0.42 !important; }
+html[data-motion="tidal"][data-reduced-motion="true"] .ring-lg .glow { opacity: 0.12 !important; }
+html[data-motion="tidal"][data-reduced-motion="true"] .ring-lg .breath-charge { opacity: 0 !important; }
+html[data-motion="tidal"][data-reduced-motion="true"] .ring .current { opacity: 0.42 !important; }
+
+html[data-motion="tidal"][data-reduced-motion="true"] *,
+html[data-motion="tidal"][data-reduced-motion="true"] *::before,
+html[data-motion="tidal"][data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: calc(120ms * var(--td-speed)) !important;
+  transition-property: opacity, color, background-color, border-color !important;
+}
+html[data-motion="tidal"][data-reduced-motion="true"] .intro .panel { filter: none !important; }

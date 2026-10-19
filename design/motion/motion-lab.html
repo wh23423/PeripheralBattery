@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-motion="tidal" data-effects="css">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>潮息 · 动效语言提案 — 外设电量面板</title>
+<!-- 真实面板样式（只读复用，不修改 ui/） -->
+<link rel="stylesheet" href="../../ui/styles.css" />
+<!-- 动效语言：可启用层，删除即回到 v0.1.2 -->
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="lab.css" />
+<!-- 评审用强制播放：系统开启「减少动态效果」时，本页仍可看到动效（仅本页生效） -->
+<link rel="stylesheet" href="force-motion.css" />
+</head>
+<body class="lab">
+
+<div class="lab-atmos" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+
+<header class="lab-top">
+  <div class="lab-brand"><span class="lab-pip" aria-hidden="true"></span>潮息 <span class="lab-en">Tidal Breath</span></div>
+  <div class="lab-top-meta"><span>外设电量面板</span><span class="lab-sep">/</span><span>动效语言 v1</span><span class="lab-sep">/</span><span>2026-10</span></div>
+</header>
+
+<main class="lab-main">
+
+  <section class="lab-intro">
+    <h1 class="lab-title">让这块玻璃<br />学会呼吸。</h1>
+    <div class="lab-intro-row">
+      <p class="lab-lede">材质已经足够好，缺的是时间。现状里所有运动都在证明「这是玻璃」——指针柔光、镜面边、噪点——却没有一层在讲述「东西变了」。潮息把变化收进一条 1.8 秒基准脉冲的潮汐：环境层慢、反馈层快、叙事层只发生一次，之后面板安静下来，把注意力还给电量本身。</p>
+      <dl class="lab-facts">
+        <div><dt>呼吸时钟</dt><dd>7.2s<i>×4 脉冲</i></dd></div>
+        <div><dt>时长级数</dt><dd>8 级<i>0 → 720ms</i></dd></div>
+        <div><dt>缓动</dt><dd>5 条<i>一进一出一呼吸</i></dd></div>
+        <div><dt>新增依赖</dt><dd>0<i>只动 transform / opacity</i></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="motion-alert" id="motion-alert" hidden role="status">
+    <span class="motion-alert-dot" aria-hidden="true"></span>
+    <p id="motion-alert-body"><b>系统正在「减少动态效果」。</b>潮息作为可访问性降级被压成了静帧——这是系统偏好，不是方案本身。本页提供强制播放，仅用于评审。<span class="motion-alert-sub">（检查 Windows：设置 → 辅助功能 → 视觉效果 → 动画效果）</span></p>
+    <button type="button" class="motion-alert-btn" id="btn-force-motion">强制播放动效</button>
+  </div>
+
+  <section class="workbench" id="workbench">
+    <nav class="rail" id="rail" aria-label="演示场景">
+      <button type="button" class="rail-tour" id="btn-tour" aria-pressed="true">
+        <span class="rail-tour-ico" aria-hidden="true">❚❚</span>
+        <span class="rail-tour-txt">暂停巡演</span>
+      </button>
+    </nav>
+
+    <div class="desk-col">
+      <div class="desk-frame">
+        <div class="desk">
+          <div class="stage" id="stage">
+            <div class="glow-layer" id="glow-layer" aria-hidden="true"><span class="specular" id="specular"></span></div>
+
+            <div class="panel" id="panel">
+              <div class="low-tint" aria-hidden="true"></div>
+
+              <div class="controls" role="toolbar" aria-label="面板操作">
+                <button type="button" class="ctrl" id="btn-refresh" title="立即刷新" aria-label="刷新">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>
+                </button>
+                <button type="button" class="ctrl" id="btn-pin" title="固定面板" aria-label="固定" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 5 4 4v1H6v-1l4-4-1-5Z"/><path d="M12 13v8"/></svg>
+                </button>
+                <button type="button" class="ctrl" id="btn-settings" title="设置" aria-label="设置" aria-expanded="false" aria-controls="drawer">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.4a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8Z"/><path d="M19.1 14.6a1.5 1.5 0 0 0 .3 1.65l.05.05a1.8 1.8 0 1 1-2.55 2.55l-.05-.05a1.5 1.5 0 0 0-1.65-.3 1.5 1.5 0 0 0-.9 1.4v.1a1.8 1.8 0 1 1-3.6 0v-.1a1.5 1.5 0 0 0-1-1.4 1.5 1.5 0 0 0-1.65.3l-.05.05a1.8 1.8 0 1 1-2.55-2.55l.05-.05a1.5 1.5 0 0 0 .3-1.65 1.5 1.5 0 0 0-1.4-.9H4.2a1.8 1.8 0 1 1 0-3.6h.1a1.5 1.5 0 0 0 1.4-1 1.5 1.5 0 0 0-.3-1.65l-.05-.05A1.8 1.8 0 1 1 8 4.85l.05.05a1.5 1.5 0 0 0 1.65.3h.1a1.5 1.5 0 0 0 .9-1.4V3.6a1.8 1.8 0 1 1 3.6 0v.1a1.5 1.5 0 0 0 .9 1.4 1.5 1.5 0 0 0 1.65-.3l.05-.05a1.8 1.8 0 1 1 2.55 2.55l-.05.05a1.5 1.5 0 0 0-.3 1.65v.1a1.5 1.5 0 0 0 1.4.9h.1a1.8 1.8 0 1 1 0 3.6h-.1a1.5 1.5 0 0 0-1.4.9Z"/></svg>
+                </button>
+                <span class="ctrl-sep" aria-hidden="true"></span>
+                <button type="button" class="ctrl" id="btn-min" title="最小化" aria-label="最小化">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg>
+                </button>
+                <button type="button" class="ctrl" id="btn-close" title="关闭" aria-label="关闭">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>
+                </button>
+              </div>
+
+              <section class="hero" id="hero" aria-label="主设备">
+                <div class="hero-card">
+                  <div class="ring ring-lg" id="hero-ring">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="track" cx="50" cy="50" r="45"/>
+                      <circle class="slide" cx="50" cy="50" r="45"/>
+                      <g class="breath-normal"><circle class="glow" cx="50" cy="50" r="45"/></g>
+                      <g class="breath-charge"><circle class="glow" cx="50" cy="50" r="45"/></g>
+                      <circle class="fill" cx="50" cy="50" r="45"/>
+                      <circle class="shine" cx="50" cy="50" r="45"/>
+                      <circle class="current" cx="50" cy="50" r="45"/>
+                      <circle class="meniscus" cx="50" cy="50" r="45" id="hero-meniscus"/>
+                    </svg>
+                    <div class="ring-center">
+                      <div class="ring-level" id="hero-level"><span class="num" id="hero-num">--</span><span class="pct" id="hero-pct">%</span></div>
+                      <div class="ring-caption" id="hero-caption">等待设备</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="hero-meta">
+                  <div class="hero-title">
+                    <span class="hero-icon" id="hero-icon" aria-hidden="true"></span>
+                    <span class="hero-name" id="hero-name">等待设备</span>
+                  </div>
+                  <div class="hero-sub">
+                    <span class="tag" id="hero-transport">—</span>
+                    <span class="alert-tag" id="hero-alert" hidden>建议充电</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="side" aria-label="设备列表">
+                <header class="side-head">
+                  <div class="title-row">
+                    <h1>外设电量</h1>
+                    <span class="live" id="live"><i aria-hidden="true"></i><span id="live-text">在线</span></span>
+                  </div>
+                  <p class="subtitle" id="subtitle">等待设备…</p>
+                </header>
+
+                <div class="banner" id="banner" aria-hidden="true">
+                  <div class="banner-inner">
+                    <span class="banner-text" id="banner-text">采集器不可用，电量可能不是最新</span>
+                    <button type="button" class="banner-btn" id="btn-restart">重启采集器</button>
+                  </div>
+                </div>
+
+                <div class="list" id="list" role="group" aria-label="设备列表"></div>
+                <div class="empty" id="empty" aria-hidden="true">未发现设备 · 等待采集器上报</div>
+
+                <footer class="side-foot">
+                  <span class="hint">点击设备可设为主卡片</span>
+                  <button type="button" class="all-btn" id="btn-all" aria-pressed="false" aria-label="展开全部设备">全部设备
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </footer>
+              </section>
+
+              <div class="ripple-layer" id="ripple-layer" aria-hidden="true"></div>
+              <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+              <div class="drawer-scrim" id="drawer-scrim"></div>
+              <aside class="drawer" id="drawer" aria-label="设置" aria-hidden="true">
+                <header class="drawer-head">
+                  <h2>设置</h2>
+                  <button type="button" class="ctrl drawer-close" id="btn-drawer-close" title="关闭设置" aria-label="关闭设置">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>
+                  </button>
+                </header>
+                <div class="drawer-body">
+                  <label class="field" for="set-threshold">
+                    <span class="field-label">低电阈值</span>
+                    <span class="field-row">
+                      <input type="range" id="set-threshold" min="5" max="50" step="1" value="15" />
+                      <output class="field-value" id="set-threshold-out" for="set-threshold">15%</output>
+                    </span>
+                  </label>
+                  <label class="check">
+                    <input type="checkbox" id="set-reduced" />
+                    <span>降低动效（关闭柔光与涟漪）</span>
+                  </label>
+                  <label class="check">
+                    <input type="checkbox" id="set-pinned" />
+                    <span>固定面板（失焦不隐藏）</span>
+                  </label>
+                  <div class="drawer-sep" aria-hidden="true"></div>
+                  <dl class="about">
+                    <div><dt>采集器构建</dt><dd>3f9c1a2</dd></div>
+                    <div><dt>协议版本</dt><dd>1</dd></div>
+                    <div><dt>应用版本</dt><dd>0.1.2</dd></div>
+                    <div><dt>系统平台</dt><dd>windows</dd></div>
+                    <div><dt>会话</dt><dd>7f2a</dd></div>
+                  </dl>
+                  <p class="drawer-note">设置保存在本机，重启后保留。</p>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="desk-cap"><span>真机尺寸 720 × 380 DIP · 直接用的是 ui/styles.css，未改一行</span><span class="desk-cap-en">acrylic 由窗口提供，此处用评审模式 CSS 模糊代替</span></p>
+    </div>
+
+    <aside class="inspector" aria-label="动效解剖台">
+      <div class="ins-head"><span>解剖台</span><span class="ins-pulse" aria-hidden="true"></span></div>
+      <h2 class="ins-title" id="ins-title">常态呼吸</h2>
+      <p class="ins-note" id="ins-note"></p>
+      <div class="timeline" id="timeline"></div>
+      <div class="ins-tokens" id="ins-tokens"></div>
+      <div class="ins-foot">
+        <div class="wave">
+          <svg viewBox="0 0 260 66" preserveAspectRatio="none" aria-hidden="true">
+            <path class="wave-path" d="M0 52 C 30 52, 40 14, 88.4 14 L 114.4 14 C 150 14, 160 52, 260 52" />
+            <line class="wave-head" x1="0" y1="0" x2="0" y2="66" />
+          </svg>
+          <div class="wave-tags"><span>吸气 34%</span><span>屏息</span><span>呼气 56%</span></div>
+        </div>
+        <div class="switches">
+          <label class="lab-check"><input type="checkbox" id="opt-reduced" /><span>降低动效</span></label>
+          <label class="lab-check"><input type="checkbox" id="opt-force" /><span>强制播放（忽略系统降级）</span></label>
+          <label class="lab-check"><input type="checkbox" id="opt-slow" /><span>0.25× 慢放</span></label>
+          <label class="lab-check"><input type="checkbox" id="opt-pause" /><span>全部暂停</span></label>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="lab-section" id="clock">
+    <header class="sec-head">
+      <h2>时钟：一条 1.8 秒的基准脉冲</h2>
+      <p>四条呼吸周期都落在同一张网格上。它们不抢拍，也不会互相追赶出第三种节奏。</p>
+    </header>
+    <div class="clock" id="clock-grid"></div>
+    <p class="clock-note">刻度对齐的密度就是「谁在呼吸」：低电最密，空态最疏。切换状态时不是换一个动画，而是换一个呼吸频率——所以状态变化读起来像情绪，不像开关。</p>
+  </section>
+
+  <section class="lab-section" id="tokens">
+    <header class="sec-head">
+      <h2>令牌：八级时长，五条曲线</h2>
+      <p>时间只从令牌里取，不写字面量。点每一行右侧的圆点，用那一刻的时长和曲线跑一遍。</p>
+    </header>
+
+    <div class="token-cols">
+      <div class="token-block">
+        <h3 class="token-h">时长</h3>
+        <div class="token-table" id="dur-table"></div>
+      </div>
+      <div class="token-block">
+        <h3 class="token-h">缓动</h3>
+        <div class="token-table" id="ease-table"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab-section" id="rules">
+    <header class="sec-head">
+      <h2>规则与预算</h2>
+      <p>这套语言能落地，靠的不是动画多，而是约束硬。</p>
+    </header>
+    <div class="rules-grid">
+      <ol class="rules">
+        <li><b>一条主线。</b>任意时刻只有一个元素在「主呼吸」——主环。其他周期都是它的分频，不允许第二种波形同时争注意力。</li>
+        <li><b>进出不对称。</b>出现用 --ease-out、消失用 --ease-in；进 600ms 的，退 180ms。退场永远比入场快，界面才不拖泥带水。</li>
+        <li><b>先承接，再宣告。</b>状态变化时先给容器一个过渡（tint、外晕、行底色），再换内容。禁止内容瞬间替换而容器不动。</li>
+        <li><b>位移不超过 10px。</b>抬升 1–2px、入场 8px、面板 10px。玻璃是重的，飘不起来的位移一律不用。</li>
+        <li><b>循环必须可收口。</b>所有无限动画都能被 <code>getAnimations().pause()</code> 暂停；隐藏态暂停动画、停 rAF、清 timer、不写 DOM——沿用 v0.1.2 的四条契约。</li>
+        <li><b>降低动效是衰减，不是删除。</b>120ms 的 opacity 过渡保留「变了什么」，去掉「怎么飞过来」；环境层停在静帧，不归零。</li>
+      </ol>
+      <div class="budget">
+        <h3 class="token-h">预算</h3>
+        <table class="budget-table">
+          <tbody>
+            <tr><th>常驻循环动画</th><td>3 个合成层<i>外晕 / 主环 / 在线点</i></td><td class="ok">不超过 3</td></tr>
+            <tr><th>每帧 JS</th><td>0 帧<i>只复用现有 specular / spotlight rAF</i></td><td class="ok">不新增</td></tr>
+            <tr><th>新增依赖</th><td>0</td><td class="ok">0</td></tr>
+            <tr><th>动到的属性</th><td>transform / opacity / stroke-dashoffset / color</td><td class="ok">无 filter（入场一次除外）</td></tr>
+            <tr><th>隐藏态</th><td>全部动画 paused、rAF 停、timer 清</td><td class="ok">CPU 目标不变</td></tr>
+            <tr><th>协议 / 采集器</th><td>0 改动</td><td class="ok">只动 UI 层</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="lab-section" id="ship">
+    <header class="sec-head">
+      <h2>落地路径</h2>
+      <p>这不是改版，是一层可启用的覆盖。开关是 <code>html[data-motion="tidal"]</code>，删掉就回到 v0.1.2。</p>
+    </header>
+    <div class="ship">
+      <ol class="ship-steps">
+        <li><span class="ship-n">文件</span><div><code>design/motion/tokens.css</code> 放在 <code>ui/styles.css</code> 之后引入；<code>index.html</code> 根节点加一个属性。</div></li>
+        <li><span class="ship-n">结构</span><div>主环 SVG 加三圈：<code>.shine</code> 潮痕、<code>.slide</code> 扫描、<code>.meniscus</code> 液面；呼吸拆成 <code>.breath-normal</code> / <code>.breath-charge</code> 双层；面板内加一层 <code>.low-tint</code>。</div></li>
+        <li><span class="ship-n">脚本</span><div>主卡交接改成「旧内容下沉 + 新内容升起」；行增删用 FLIP；toast 增加 <code>.is-leaving</code> 退场；抽屉遮罩改 class 过渡；交互后加 <code>body.is-attending</code> 900ms。</div></li>
+        <li><span class="ship-n">降级</span><div>重写 <code>prefers-reduced-motion</code> 段：120ms opacity 过渡 + 环境静帧，不再把动画压成 0.001ms。</div></li>
+      </ol>
+      <div class="ship-note">
+        <p><b>先不应用。</b>本方案交付五个文件：<code>tokens.css</code>（可启用层）、<code>MOTION.md</code>（规格）、<code>motion-lab.html</code> + <code>lab.css</code> + <code>lab.js</code>（本页）。<code>ui/</code> 没有任何改动。</p>
+        <p class="ship-ref">相关文档：<code>TECH_PLAN.md §11</code> 视觉宇宙 · <code>protocol.md §83</code> 未知电量 · <code>BUILD_PLAN §2</code> 性能约束</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="lab-foot">
+    <div>潮息 · Tidal Breath<i>动效语言 v1 · 2026-10</i></div>
+    <div class="lab-foot-r">先不应用 · 一切以 <code>tokens.css</code> 为准</div>
+  </footer>
+</main>
+
+<script src="lab.js"></script>
+</body>
+</html>

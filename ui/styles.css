@@ -137,15 +137,24 @@ body.demo {
   isolation: isolate;
   contain: layout paint;
 
+  /* F-02：深蓝底色层的三档 alpha 走 CSS 变量（默认值 = v0.1.2 观感 = 不透明度 60）。
+     变量只作用于这一个渐变；白色高光 / 噪点 / 边框不动。
+     JS 未执行时也等价于观感基线（§7.4）。 */
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.13'/%3E%3C/svg%3E") repeat,
     linear-gradient(150deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.015) 42%, rgba(255, 255, 255, 0.05) 100%),
-    linear-gradient(155deg, rgba(14, 34, 74, 0.6) 0%, rgba(7, 16, 38, 0.52) 55%, rgba(10, 24, 52, 0.62) 100%);
+    linear-gradient(155deg,
+      rgba(14, 34, 74, var(--panel-a1, 0.60)) 0%,
+      rgba(7, 16, 38, var(--panel-a2, 0.52)) 55%,
+      rgba(10, 24, 52, var(--panel-a3, 0.62)) 100%);
   background-size: 200px 200px, auto, auto;
   background-repeat: repeat, no-repeat, no-repeat;
   background-blend-mode: soft-light, normal, normal;
 
   border: 1px solid rgba(255, 255, 255, 0.18);
+  /* F-02 / §21.2-⑥：低电时只过渡边框颜色（250ms，与 .low-veil 的 opacity 同步）；
+     box-shadow 不在任何 transition 里。 */
+  transition: border-color 0.25s var(--ease);
   /* 最后两条外阴影在真实窗口（窗口=面板）里会被窗口矩形裁掉；
      保留它们只用于 780×440 浏览器预览/评审的层次感，
      生产深度由上面的内阴影 + 边框表达。 */
@@ -194,6 +203,26 @@ body.demo {
 }
 
 .panel > * { position: relative; z-index: 1; }
+
+/* F-02 + §21.2-⑥：低电卡片高光层。
+   红色光晕/内阴影静态预烘焙在本层（box-shadow 不在 transition 里），
+   运行时只做 opacity 0→1（250ms）；面板边框颜色由 .panel 的 transition 同步。 */
+.panel > .low-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+  background:
+    radial-gradient(120% 95% at 50% 112%, rgba(255, 92, 108, 0.22), rgba(255, 92, 108, 0) 72%),
+    radial-gradient(80% 70% at 16% 6%, rgba(255, 92, 108, 0.10), rgba(255, 92, 108, 0) 62%);
+  box-shadow: inset 0 0 90px rgba(255, 92, 108, 0.22);
+}
+
+.panel.is-low .low-veil { opacity: 1; }
+.panel.is-low { border-color: rgba(255, 92, 108, 0.45); }
 
 /* ----------------------------------------------------------
    开发/评审模式：?effects=css 才恢复 4 处 CSS 模糊。
@@ -1032,10 +1061,8 @@ h1 {
   stroke-linejoin: round;
 }
 
-/* 低电量时整块玻璃泛红 */
-.panel.is-low::before {
-  box-shadow: inset 0 0 80px rgba(255, 92, 108, 0.16);
-}
+/* 低电量时整块玻璃泛红：由 #low-veil 预烘焙高光层 + .panel 边框颜色过渡实现
+   （§21.2-⑥；box-shadow 不进 transition，见 .low-veil 定义）。 */
 
 /* ---------------------------------------------------------- 告警 toast
    贴在面板底部（footer 区域），不遮挡列表行右侧电量数值；最多同时 2 条。 */
@@ -1071,6 +1098,8 @@ h1 {
 .toast.is-low { border-color: rgba(255, 92, 108, 0.5); }
 .toast.is-full { border-color: rgba(61, 220, 151, 0.5); }
 .toast.is-offline { border-color: rgba(255, 194, 75, 0.5); }
+/* 设置保存失败等需要用户注意但不属于设备告警的提示（§21.2：只动 color/background-color） */
+.toast.is-warn { border-color: rgba(255, 194, 75, 0.45); }
 
 .toast-dot {
   flex: none;
@@ -1084,6 +1113,7 @@ h1 {
 .toast.is-low .toast-dot { background: var(--red); }
 .toast.is-full .toast-dot { background: var(--green); }
 .toast.is-offline .toast-dot { background: var(--amber); }
+.toast.is-warn .toast-dot { background: var(--amber); }
 
 .toast-text { flex: 1; min-width: 0; }
 
@@ -1093,6 +1123,8 @@ h1 {
 }
 
 /* ---------------------------------------------------------- 设置抽屉 */
+/* §21.2-②：遮罩 200ms opacity 淡入淡出（JS 移除 hidden 后下一帧加 .is-visible；
+   关闭时先去类，200ms 后再 hidden）。淡出期间不接收点击。 */
 .drawer-scrim {
   position: absolute;
   inset: 0;
@@ -1100,6 +1132,14 @@ h1 {
   border-radius: inherit;
   background: rgba(4, 10, 24, 0.42);
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease);
+}
+
+.drawer-scrim.is-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .drawer {
@@ -1180,6 +1220,44 @@ h1 {
   min-width: 0;
   accent-color: var(--glow);
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  background: transparent;
+}
+
+/* §21.2-④：轨道无过渡（拖动跟手）；只有 thumb 在按下时 140ms scale(1.15) */
+.field-row input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.field-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  transition: transform 0.14s var(--ease);
+}
+
+.field-row input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.field-row input[type="range"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.field-row input[type="range"]:focus-visible {
+  outline: 2px solid rgba(169, 204, 255, 0.9);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 .field-value {
@@ -1206,6 +1284,131 @@ h1 {
   accent-color: var(--glow);
   cursor: pointer;
 }
+
+/* ---------------------------------------------------------- S-01 抽屉分组
+   fieldset/legend 提供原生分组语义（读屏可播报「启动」组等），
+   视觉上只保留小标题、去掉浏览器默认边框与内边距。 */
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.group > legend {
+  padding: 0;
+  margin: 0 0 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+}
+
+.group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+}
+
+/* §21.2-③：自定义 switch 视觉，底层仍是原生 <input type=checkbox>。
+   160ms cubic-bezier(.2,.8,.2,1) 过渡 transform（thumb）+ background-color。 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.switch-row input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 28px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition:
+    background-color 0.16s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.switch-row input[type="checkbox"]:checked + .switch {
+  background: rgba(61, 220, 151, 0.55);
+  border-color: rgba(61, 220, 151, 0.7);
+}
+
+.switch-row input[type="checkbox"]:checked + .switch::after {
+  transform: translate3d(12px, 0, 0);
+}
+
+.switch-row input[type="checkbox"]:focus-visible + .switch {
+  outline: 2px solid rgba(169, 204, 255, 0.9);
+  outline-offset: 2px;
+}
+
+.switch-label { min-width: 0; }
+
+.switch-row:has(input[type="checkbox"]:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* 自启三态文案：已启用 / 未启用 / 被系统启动项管理禁用（⚠ 提示） */
+.status-line {
+  margin: 0;
+  font-size: 11px;
+  color: var(--t3);
+  padding-left: 37px;
+}
+
+.status-line[data-state="on"] { color: var(--green); }
+.status-line[data-state="os-disabled"] { color: var(--amber); }
+
+.status-note {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--amber);
+  padding-left: 37px;
+}
+
+.field-note {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--t3);
+}
+
+.group-body .field { margin: 0; }
 
 .drawer-sep {
   height: 1px;

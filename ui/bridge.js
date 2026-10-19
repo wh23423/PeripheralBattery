@@ -54,6 +54,17 @@
     pinned: false,
     collectorState: null,
     events: [],
+    /* S-01 / F-02 / F-04：浏览器 mock 的设置事实源（app-state.settings 从这里取值） */
+    settings: { opacity: 60, autostart: false, notifyLow: true, notifyFull: true, reducedMotion: false },
+    /* S-01：独立运行时状态（镜像 Rust 对注册表的探测结果），不等于 app.json 里的 intent。
+       enabled = Run 值存在且路径匹配；osDisabled = 任务管理器启动项被禁用。 */
+    autostartStatus: { enabled: false, osDisabled: false, path: null },
+    autostartLaunch: false,
+    collectorLow: 20,
+    /* 测试开关：模拟 update_settings 失败（Rust 写入失败回滚路径） */
+    failUpdateSettings: false,
+    /* 浏览器预览默认按「Win11 玻璃可用」模拟；降级路径由测试显式 emit app-state 触发 */
+    acrylic: true,
     params: {
       mock: forceMock, demo: forceDemo, freeze: freeze,
       effects: effects, hide: params.has('hide')
@@ -99,6 +110,10 @@
         var line = typeof args.line === 'string' ? args.line : '';
         var cmdObj = null;
         try { cmdObj = JSON.parse(line); } catch (e) { cmdObj = null; }
+        if (cmdObj && cmdObj.t === 'set' && cmdObj.field === 'low') {
+          var lowV = Math.round(Number(cmdObj.value));
+          if (isFinite(lowV)) debug.collectorLow = Math.min(100, Math.max(0, lowV));
+        }
         if (cmdObj && cmdObj.t === 'refresh' && scenario === 'mock') {
           mockSeq += 1;
           emitCollector({ t: 'tick', session: mockSession, seq: mockSeq, devices: mockSnapshot() });
@@ -112,6 +127,35 @@
         debug.pinned = !!args.pinned;
         setTimeout(function () { emit('app-state', appStatePayload()); }, 0);
         return Promise.resolve(true);
+      /* S-01 / F-02：设置持久化。更新 mock 事实源后 setTimeout(0) 广播 app-state，
+         返回 {ok, settings, autostart} 与 Rust 契约一致。 */
+      case 'update_settings': {
+        if (debug.failUpdateSettings) {
+          return Promise.resolve({ ok: false, error: '模拟失败：设置未保存' });
+        }
+        var patch = (args && args.patch && typeof args.patch === 'object') ? args.patch : {};
+        var s = debug.settings;
+        if (patch.opacity != null) {
+          var ov = Math.round(Number(patch.opacity));
+          if (isFinite(ov)) s.opacity = Math.min(100, Math.max(50, ov));
+        }
+        if (typeof patch.autostart === 'boolean') {
+          s.autostart = patch.autostart;
+          /* 镜像 Rust apply_with：显式开启清掉 StartupApproved 禁用标记并写 Run；
+             显式关闭则 Run 删除、禁用标记一并清掉。 */
+          if (patch.autostart) {
+            debug.autostartStatus = { enabled: true, osDisabled: false, path: (debug.autostartStatus && debug.autostartStatus.path) || null };
+          } else {
+            debug.autostartStatus = { enabled: false, osDisabled: false, path: null };
+          }
+        }
+        if (typeof patch.notifyLow === 'boolean') s.notifyLow = patch.notifyLow;
+        if (typeof patch.notifyFull === 'boolean') s.notifyFull = patch.notifyFull;
+        setTimeout(function () { emit('app-state', appStatePayload()); }, 0);
+        return Promise.resolve({ ok: true, settings: Object.assign({}, s), autostart: Object.assign({}, debug.autostartStatus) });
+      }
+      case 'get_settings':
+        return Promise.resolve({ settings: Object.assign({}, debug.settings), autostart: Object.assign({}, debug.autostartStatus) });
       case 'set_tray_state':
         debug.lastTray = { level: args.level == null ? null : args.level, charging: !!args.charging, online: !!args.online, kind: args.kind || '' };
         return Promise.resolve();
@@ -126,12 +170,25 @@
   }
 
   function appStatePayload() {
-    return {
+    var st = debug.settings;
+    var auto = debug.autostartStatus || { enabled: false, osDisabled: false };
+    var payload = {
       pinned: !!debug.pinned,
+      acrylic: !!debug.acrylic,
+      settings: {
+        opacity: st.opacity,
+        autostart: st.autostart,
+        notifyLow: st.notifyLow,
+        notifyFull: st.notifyFull
+      },
+      autostart: { enabled: !!auto.enabled, osDisabled: !!auto.osDisabled },
+      autostartLaunch: !!debug.autostartLaunch,
       platform: { windows11: root.dataset.windows11 !== 'false', build: 22631 },
       build: debug.build || 'mock',
-      version: '0.1.0'
+      version: '0.2.0'
     };
+    if (typeof auto.path === 'string' && auto.path) payload.autostart.path = auto.path;
+    return payload;
   }
 
   /* ---------------------------------------------------------- 确定性数据 */
@@ -267,7 +324,7 @@
         emitCollector({
           t: 'hello', protocol: 1, session: mockSession, build: 'mock', capabilities: ['approx', 'left_s', 'via', 'transport', 'replaces'],
           devices: mockSnapshot(),
-          settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer', 'keychron'] }
+          settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer', 'keychron'], low: 20, full_alert: true, tick_interval: 30 }
         });
       }, 120);
     }, 60);
@@ -279,7 +336,7 @@
       emitCollector({
         t: 'hello', protocol: 1, session: 'demo-session-1', build: 'demo', capabilities: ['approx', 'left_s', 'via', 'transport', 'replaces'],
         devices: DEMO_DEVICES.map(function (d) { return dev(d); }),
-        settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer'] }
+        settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer'], low: 20, full_alert: true, tick_interval: 30 }
       });
       return;
     }
@@ -291,7 +348,7 @@
       emitCollector({
         t: 'hello', protocol: 1, session: mockSession, build: 'mock', capabilities: ['approx', 'left_s', 'via', 'transport', 'replaces'],
         devices: mockSnapshot(),
-        settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer', 'keychron'] }
+        settings: { poll: { mouse: 5, keyboard: 15, headset: 15, gamepad: 10, steam: 30 }, providers: ['logitech', 'razer', 'keychron'], low: 20, full_alert: true, tick_interval: 30 }
       });
       if (!params.has('empty')) startMockTimeline();
     }
@@ -378,7 +435,7 @@
         resetMockDevices(devices);
         debug.collectorState = { state: 'ready', pid: 4242, protocol: opts.protocol == null ? 1 : opts.protocol, session: mockSession };
         emit('collector-state', debug.collectorState);
-        emitCollector({ t: 'hello', protocol: opts.protocol == null ? 1 : opts.protocol, session: mockSession, build: opts.build || 'mock', capabilities: ['approx', 'left_s', 'via', 'transport', 'replaces'], devices: devices, settings: opts.settings || {} });
+        emitCollector({ t: 'hello', protocol: opts.protocol == null ? 1 : opts.protocol, session: mockSession, build: opts.build || 'mock', capabilities: ['approx', 'left_s', 'via', 'transport', 'replaces'], devices: devices, settings: Object.assign({ low: 20, full_alert: true, tick_interval: 30 }, opts.settings || {}) });
       },
       device: function (device, replaces) { return mockDevice(device, replaces); },
       gone: function (key) {
@@ -429,6 +486,18 @@
       sessionReset: function (session) { this.hello({ session: session || ('mock-session-' + Date.now()) }); },
       devices: function () { return mockSnapshot(); },
       setPinnedLocal: function (pinned) { debug.pinned = !!pinned; emit('app-state', appStatePayload()); },
+      /* S-01 运行时状态注入：模拟外部变化（如任务管理器禁用、Run 项被外部删除） */
+      setAutostartStatus: function (status) {
+        status = status || {};
+        debug.autostartStatus = {
+          enabled: !!status.enabled,
+          osDisabled: !!status.osDisabled,
+          path: typeof status.path === 'string' && status.path ? status.path : null
+        };
+        emit('app-state', appStatePayload());
+      },
+      /* 失败注入：之后 update_settings 一律返回 ok:false（验证 UI 回滚 + toast） */
+      failUpdateSettings: function (fail) { debug.failUpdateSettings = !!fail; },
       cancelTimers: function () {
         demoTimerIds.forEach(function (id) { clearTimeout(id); });
         demoTimerIds = [];

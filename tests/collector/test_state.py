@@ -6,6 +6,7 @@ import threading
 import time
 
 from conftest import Harness, make_status
+from collector.protocol import Protocol
 
 _KEYS = {"logitech:046d:c547:u1", "razer:1532:0554:1a2b3c4d"}
 
@@ -227,6 +228,71 @@ def test_full_alert_only_after_charging_below_100(harness):
     harness.report("logitech", [_mouse(100, charging=True)])
     harness.report("razer", [_headset()])
     assert len(harness.sink.by_type("alert")) == count    # once per charge
+
+
+# ---------------------------------------- F-04 settings payload / alert copy
+class _ListWriter:
+    """Minimal stdio writer so Protocol can be exercised without a real pipe."""
+
+    def __init__(self):
+        self.messages = []
+
+    def send(self, message):
+        self.messages.append(message)
+        return True
+
+
+def test_hello_settings_carry_low_full_alert_and_tick_interval(harness):
+    """hello.settings is the UI's only source for the thresholds (F-04)."""
+    harness.settings.set("low", 25)
+    harness.settings.set("full_alert", False)
+    harness.settings.set("tick_interval", 45.0)
+    writer = _ListWriter()
+    Protocol(writer, session="s", build="test").hello(
+        [], harness.state.settings_payload())
+    hello = writer.messages[-1]
+    assert hello["t"] == "hello"
+    assert hello["protocol"] == 1           # only fields were added, no version bump
+    assert hello["settings"]["low"] == 25
+    assert hello["settings"]["full_alert"] is False
+    assert hello["settings"]["tick_interval"] == 45.0
+    assert isinstance(hello["settings"]["low"], int)
+    assert isinstance(hello["settings"]["full_alert"], bool)
+    assert isinstance(hello["settings"]["tick_interval"], float)
+    assert {"poll", "providers"} <= set(hello["settings"])   # old fields kept
+
+
+def test_settings_payload_follows_config_json(harness):
+    payload = harness.state.settings_payload()
+    assert (payload["low"], payload["full_alert"], payload["tick_interval"]) \
+        == (20, True, 30.0)
+    harness.settings.set("low", 0)
+    harness.settings.set("full_alert", False)
+    harness.settings.set("tick_interval", 45.0)
+    payload = harness.state.settings_payload()
+    assert (payload["low"], payload["full_alert"], payload["tick_interval"]) \
+        == (0, False, 45.0)
+
+
+def test_alert_copy_matches_the_feature_plan(harness):
+    harness.settings.set("low", 20)
+    harness.begin("logitech", "razer")
+    harness.report("logitech", [_mouse(12)])
+    harness.report("razer", [_headset()])
+    low = harness.sink.by_type("alert")
+    assert [a["kind"] for a in low] == ["low"]
+    assert low[0]["text"] == "G502 X PLUS 电量仅剩 12%，建议充电"
+
+    harness.sink.clear()
+    harness.begin("logitech", "razer")
+    harness.report("logitech", [_mouse(80, charging=True)])
+    harness.report("razer", [_headset()])
+    harness.begin("logitech", "razer")
+    harness.report("logitech", [_mouse(100, charging=True)])
+    harness.report("razer", [_headset()])
+    full = harness.sink.by_type("alert")
+    assert [a["kind"] for a in full] == ["full"]
+    assert full[0]["text"] == "G502 X PLUS 已充满"
 
 
 # ---------------------------------------------------------------- replaces

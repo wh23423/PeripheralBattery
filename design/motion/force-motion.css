@@ -1,0 +1,243 @@
+/* 由 tools/build_force_motion.py 从 tokens.css 生成，请勿手改。
+   仅在 <html data-force-motion> 时生效：把潮息的 animation / transition
+   以 !important 重新声明，压过 ui/styles.css 的 prefers-reduced-motion 降级。 */
+
+html[data-force-motion] .stage::before {
+  animation: td-breathe var(--m-breath) var(--ease-breath) infinite !important;
+}
+
+html[data-force-motion] .ring-lg .glow {
+  animation: none !important;
+}
+
+html[data-force-motion] .ring-lg .breath-normal .glow {
+  animation: td-breathe var(--m-breath) var(--ease-breath) calc(-1 * var(--m-phase-card)) infinite !important;
+}
+
+html[data-force-motion] .ring-lg .breath-charge .glow {
+  animation: td-breathe var(--m-breath-charge) var(--ease-breath) calc(-1 * var(--m-phase-card)) infinite !important;
+  animation-play-state: paused !important;
+}
+
+html[data-force-motion] .ring.state-charging .breath-charge .glow {
+  animation-play-state: running !important;
+}
+
+html[data-force-motion] .ring-lg .breath-charge {
+  transition: opacity var(--m-7) var(--ease-breath) !important;
+}
+
+html[data-force-motion] .ring-lg .shine {
+  animation: td-sweep var(--m-breath) linear infinite !important;
+}
+
+html[data-force-motion] .live i {
+  animation: td-breathe calc(var(--m-breath) / 2) var(--ease-breath) calc(-1 * var(--m-phase-ambient)) infinite !important;
+}
+
+html[data-force-motion] .ring .current {
+  transition: opacity var(--m-7) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ring.state-charging .current {
+  animation: td-current var(--m-breath-charge) linear infinite !important;
+}
+
+html[data-force-motion] .ring.state-low .breath-normal .glow {
+  animation-duration: var(--m-breath-low) !important;
+}
+
+html[data-force-motion] .ring-lg.is-alerting {
+  animation: td-beat var(--m-pulse) var(--ease-in-out) 3 both !important;
+}
+
+html[data-force-motion] .ring.state-offline .glow, html[data-force-motion] .ring.state-unknown .glow {
+  animation: none !important;
+}
+
+html[data-force-motion] .ring.state-offline .shine, html[data-force-motion] .ring.state-unknown .shine {
+  animation: none !important;
+}
+
+html[data-force-motion] .ring.state-empty .slide {
+  animation: td-current var(--m-breath-wait) linear infinite !important;
+}
+
+html[data-force-motion] .ring.state-empty .breath-normal .glow {
+  animation-duration: var(--m-breath-wait) !important;
+}
+
+html[data-force-motion] .ring-sm.state-charging .glow {
+  animation: td-breathe var(--m-breath-charge) var(--ease-breath) infinite !important;
+}
+
+html[data-force-motion] .ctrl {
+  transition: color var(--m-2) var(--ease-out),
+              background-color var(--m-2) var(--ease-out),
+              transform var(--m-1) var(--ease-press) !important;
+}
+
+html[data-force-motion] .ctrl::before {
+  transition: opacity var(--m-2) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ctrl svg {
+  transition: transform var(--m-3) var(--ease-out) !important;
+}
+
+html[data-force-motion] .hero-card {
+  transition: transform var(--m-3) var(--ease-out),
+              border-color var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ring-lg {
+  transition: transform var(--m-3) var(--ease-out) !important;
+}
+
+html[data-force-motion] .hero-card::before {
+  transition: opacity var(--m-2) var(--ease-out) !important;
+}
+
+html[data-force-motion] .row {
+  transition: transform var(--m-3) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              border-color var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .row::before {
+  transition: opacity var(--m-2) var(--ease-out) !important;
+}
+
+html[data-force-motion] .row::after {
+  transition: opacity var(--m-3) var(--ease-out) !important;
+}
+
+html[data-force-motion] .row .caret {
+  transition: opacity var(--m-3) var(--ease-out),
+              transform var(--m-3) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ring-sm svg {
+  transition: transform var(--m-3) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ring .fill {
+  transition: stroke-dashoffset var(--m-8) var(--ease-out),
+              stroke var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .ring .meniscus {
+  transition: transform var(--m-8) var(--ease-out), opacity var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .alert-tag {
+  transition: opacity var(--m-4) var(--ease-out),
+              transform var(--m-4) var(--ease-out),
+              color var(--m-4) var(--ease-out),
+              background-color var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .tag {
+  transition: color var(--m-4) var(--ease-out),
+              background-color var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .low-tint {
+  transition: opacity var(--m-7) var(--ease-breath) !important;
+}
+
+html[data-force-motion] .banner {
+  transition: grid-template-rows var(--m-6) var(--ease-out),
+              margin-top var(--m-6) var(--ease-out),
+              padding var(--m-6) var(--ease-out),
+              border-color var(--m-4) var(--ease-out),
+              opacity var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .empty {
+  animation: td-rise-in var(--m-5) var(--ease-out) both !important;
+}
+
+html[data-force-motion] .toast {
+  animation: td-toast-in calc(260ms * var(--td-speed)) var(--ease-out) both !important;
+}
+
+html[data-force-motion] .toast.is-leaving {
+  animation: td-toast-out var(--m-3) var(--ease-in) both !important;
+}
+
+html[data-force-motion] .drawer {
+  transition: transform var(--m-5) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              visibility 0s linear var(--m-5) !important;
+}
+
+html[data-force-motion] .drawer.is-open {
+  transition: transform var(--m-5) var(--ease-out),
+              opacity var(--m-4) var(--ease-out),
+              visibility 0s !important;
+}
+
+html[data-force-motion] .drawer-scrim {
+  transition: opacity var(--m-4) var(--ease-out) !important;
+}
+
+html[data-force-motion] .intro .panel {
+  animation: td-panel-in var(--m-7) var(--ease-out) both !important;
+}
+
+html[data-force-motion] .intro .side-head {
+  animation: td-rise-in var(--m-5) var(--ease-out) calc(40ms * var(--td-speed)) both !important;
+}
+
+html[data-force-motion] .intro .hero {
+  animation: td-rise-in var(--m-5) var(--ease-out) calc(80ms * var(--td-speed)) both !important;
+}
+
+html[data-force-motion] .intro .controls {
+  animation: td-rise-in var(--m-5) var(--ease-out) calc(140ms * var(--td-speed)) both !important;
+}
+
+html[data-force-motion] .intro .row {
+  animation: td-rise-in var(--m-5) var(--ease-out) both !important;
+}
+
+html[data-force-motion] .intro .row:nth-child(1) {
+  animation-delay: calc(120ms * var(--td-speed)) !important;
+}
+
+html[data-force-motion] .intro .row:nth-child(2) {
+  animation-delay: calc(160ms * var(--td-speed)) !important;
+}
+
+html[data-force-motion] .intro .row:nth-child(3) {
+  animation-delay: calc(200ms * var(--td-speed)) !important;
+}
+
+html[data-force-motion] .intro .row:nth-child(4) {
+  animation-delay: calc(240ms * var(--td-speed)) !important;
+}
+
+html[data-force-motion] .intro .row:nth-child(5) {
+  animation-delay: calc(280ms * var(--td-speed)) !important;
+}
+
+html[data-force-motion] .intro .side-foot {
+  animation: td-rise-in var(--m-5) var(--ease-out) calc(280ms * var(--td-speed)) both !important;
+}
+
+html[data-force-motion][data-reduced-motion="true"] .stage::before, html[data-force-motion][data-reduced-motion="true"] .ring-lg .shine, html[data-force-motion][data-reduced-motion="true"] .ring .current, html[data-force-motion][data-reduced-motion="true"] .ring-lg.is-alerting, html[data-force-motion][data-reduced-motion="true"] .ring.state-empty .slide, html[data-force-motion][data-reduced-motion="true"] .live i {
+  animation: none !important !important;
+}
+
+html[data-force-motion][data-reduced-motion="true"] *, html[data-force-motion][data-reduced-motion="true"] *::before, html[data-force-motion][data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important !important;
+  animation-iteration-count: 1 !important !important;
+  transition-duration: calc(120ms * var(--td-speed)) !important !important;
+  transition-property: opacity, color, background-color, border-color !important !important;
+}
+
+/* styles.css 中未被 tokens.css 接管的基底动画（在线点脉冲） */
+html[data-force-motion] .live i::after {
+  animation: pulse-ring 2.4s ease-out infinite !important;
+}

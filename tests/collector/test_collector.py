@@ -6,6 +6,7 @@ spawn PowerShell.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import threading
@@ -14,6 +15,7 @@ import time
 import pytest
 
 from collector.collector import Collector
+from collector.settings import Settings
 from conftest import Harness, make_status
 
 
@@ -395,3 +397,100 @@ def test_job_object_kills_children_when_the_collector_dies():
         if proc.poll() is None:
             proc.kill()
             proc.wait(timeout=5)
+
+
+# ---------------------------------------------------------------- F-04 settings
+def test_apply_set_low_accepts_0_and_100_and_persists(tmp_path):
+    settings = Settings(str(tmp_path / "data"))
+    assert settings.apply_set("", "low", 0) is True
+    assert settings.low == 0
+    assert settings.apply_set("", "low", 100) is True
+    assert settings.low == 100
+    assert settings.apply_set("", "low", 25) is True
+    assert settings.low == 25
+    # save() ran: a fresh Settings --- and thus the next collector start --- sees it
+    reloaded = Settings(str(tmp_path / "data"))
+    assert reloaded.low == 25
+
+
+def test_apply_set_low_rejects_out_of_range_and_non_int(tmp_path):
+    settings = Settings(str(tmp_path / "data"))
+    assert settings.apply_set("", "low", 30) is True
+    for bad in (-1, 101, "", "25", "abc", None, 25.0, True):
+        assert settings.apply_set("", "low", bad) is False, bad
+        assert settings.low == 30
+    # rejected values never reached config.json
+    assert Settings(str(tmp_path / "data")).low == 30
+
+
+def test_apply_set_full_alert_accepts_only_bool(tmp_path):
+    settings = Settings(str(tmp_path / "data"))
+    assert settings.get("full_alert") is True
+    assert settings.apply_set("", "full_alert", False) is True
+    assert settings.get("full_alert") is False
+    assert settings.apply_set("", "full_alert", True) is True
+    for bad in (0, 1, "true", None):
+        assert settings.apply_set("", "full_alert", bad) is False, bad
+        assert settings.get("full_alert") is True
+    assert Settings(str(tmp_path / "data")).get("full_alert") is True
+
+
+def test_apply_set_rejects_unknown_fields_without_writing(tmp_path):
+    settings = Settings(str(tmp_path / "data"))
+    # tick_interval is reported in hello.settings but is not writable this way
+    for field in ("bogus", "tick_interval", "providers", "poll"):
+        assert settings.apply_set("", field, 60.0) is False, field
+    assert not os.path.exists(settings.path)    # nothing was persisted
+
+
+def test_collector_set_command_accepts_global_fields_without_key(tmp_path):
+    h, collector, old_pool = _collector(tmp_path)
+    try:
+        assert collector.handle_command(
+            {"t": "set", "field": "low", "value": 25}) is True
+        assert h.settings.low == 25
+        assert h.sink.by_type("tick")          # refresh + on_tick still runs
+        assert Settings(h.settings.data_dir).low == 25
+
+        h.sink.clear()
+        assert collector.handle_command(
+            {"t": "set", "field": "full_alert", "value": False}) is True
+        assert h.settings.get("full_alert") is False
+        assert h.sink.by_type("tick")
+
+        h.sink.clear()
+        assert collector.handle_command(
+            {"t": "set", "key": "", "field": "low", "value": 15}) is True
+        assert h.settings.low == 15
+        assert h.sink.by_type("tick")
+
+        h.sink.clear()                         # invalid values are ignored
+        assert collector.handle_command(
+            {"t": "set", "field": "low", "value": 101}) is True
+        assert collector.handle_command(
+            {"t": "set", "field": "low", "value": "abc"}) is True
+        assert collector.handle_command(
+            {"t": "set", "field": "bogus", "value": 1}) is True
+        assert h.settings.low == 15
+        assert h.sink.by_type("tick") == []
+        assert Settings(h.settings.data_dir).low == 15
+    finally:
+        _close(h, collector, old_pool)
+
+
+def test_collector_set_command_keeps_the_device_key_requirement(tmp_path):
+    h, collector, old_pool = _collector(tmp_path)
+    key = "logitech:046d:c547:u1"
+    try:
+        # name/hidden still need a real device key: a key-less command is ignored
+        assert collector.handle_command(
+            {"t": "set", "field": "name", "value": "客厅鼠标"}) is True
+        assert h.settings.name_for(key) == ""
+        assert collector.handle_command(
+            {"t": "set", "key": key, "field": "name", "value": "客厅鼠标"}) is True
+        assert h.settings.name_for(key) == "客厅鼠标"
+        assert collector.handle_command(
+            {"t": "set", "key": key, "field": "hidden", "value": True}) is True
+        assert key in h.settings.hidden_keys()
+    finally:
+        _close(h, collector, old_pool)

@@ -50,6 +50,8 @@ node -v
 |---|---|
 | [BUILD_PLAN.md](BUILD_PLAN.md) | **主文档**。架构、性能预算、后台低占用、打包、验收指标、里程碑、18 条审查处置 |
 | [TECH_PLAN.md](TECH_PLAN.md) | 架构决策（D1–D6）、协议稿、视觉规范、动效清单 |
+| [FEATURE_PLAN.md](FEATURE_PLAN.md) | **项目总计划书 v1.3**（S-01/F-01…F-12 + 动效整合 + 透明度落地 + 低电提示两项）；排期/顺序/验收以它为准 |
+| `design/motion/` | 「潮息」动效语言（MOTION.md + 可启用 tokens.css）与真机实验室 motion-lab |
 | `ui/` | 已完成的静态前端（HTML/CSS/JS，无框架）。玻璃材质、动效、交互都在里面 |
 | `tools/shot.js` | Playwright 截图（`?demo` 预览模式、支持悬停态） |
 | `tools/record.js` | 操作演示录制 |
@@ -95,3 +97,39 @@ M0 的验收标准：**24 小时内不出现非物理原因的 key 变化，不�
 - 托盘图标矩形获取（`tray-icon` 的 `rect()` 是否够用）。
 - 集显上的合成开销（当前只有 RTX 5070 Ti 的 headless 数据：16.7ms 满帧，但不能替代真机）。
 - PyInstaller onedir 的实际体积与杀软误报率。
+
+---
+
+## 6. v0.2.0 更新（2026-10-20）
+
+> 已并入 FEATURE_PLAN v1.3 的 v0.2.0 范围（设置抽屉 / 开机静默启动 / 面板不透明度 / 系统通知 / 低电阈值统一）。
+> 契约见 [TECH_PLAN.md](TECH_PLAN.md) §14，发布说明见 [docs/release-notes-v0.2.0.md](docs/release-notes-v0.2.0.md)。
+
+### 6.1 环境（2026-10-20 复测）
+
+| 依赖 | 状态 / 版本 |
+|---|---|
+| Rust / cargo | 1.99.1（stable-x86_64-pc-windows-msvc） |
+| Tauri CLI | 2.12.3（npx） |
+| Visual Studio 2022 | `E:\VisualStudio\2022\Community`（MSVC 14.44 + Windows SDK 10.0.26100） |
+| WebView2 Runtime | 155.0.4283.62（应用最低要求 118+） |
+| Node / npm | 24.20.0 / 11.19.0 |
+| Git | 2.56.0 |
+| Python | 项目 `.venv`（系统级未安装）；pytest / PyInstaller 走 `.venv` |
+| PowerShell | 7.6.7（`tools/verify_autostart.ps1`、`tools/verify_install_uninstall.ps1` 需 pwsh 7） |
+
+### 6.2 从 v0.1.2 升级 / 验收入口
+
+- 构建：`pwsh -File scripts/build.ps1 -NoSign`（签名配置见 README §4）。
+- 设置 / 启动验收：`pwsh -File tools/verify_autostart.ps1`、`pwsh -File tools/verify_install_uninstall.ps1`；
+  两个脚本都会快照并恢复 HKCU 启动项，不弹 UAC。
+- 数据迁移：`app.json` schema 1→2 自动补默认值；旧 `localStorage.lowThreshold` 首次启动迁移到 collector 后删除。
+- 回滚：旧版忽略 `app.json` 新字段；若已开启开机自启，需先卸载 v0.2.0（或手动删除 `Run` 与
+  `StartupApproved\Run\PeripheralBattery`）再装 v0.1.2。
+
+### 6.3 后续 v0.2.1 候选
+
+- 通知点击打开面板；记住面板窗口位置。
+- FEATURE_PLAN 余项：F-05 设备分组（详情 / 重命名 / 隐藏）等。
+- Win10 / 无 acrylic 环境的透明度策略复验；RDP / 快速用户切换下的单实例与开机启动未实测。
+- 自动更新（updater）接线；整链签名（`bundle.windows.signCommand`）。

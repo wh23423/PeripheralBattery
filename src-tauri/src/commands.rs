@@ -15,15 +15,35 @@ pub fn ui_ready(app: AppHandle, state: State<'_, AppState>) -> Value {
     let collector_state = state.sidecar.state();
     let _ = app.emit("collector-state", &collector_state);
 
-    // 默认启动只驻留托盘（不弹窗）；PB_SHOW_ON_START=1 强制显示（截图/帧率用），
-    // 托盘在 ui_ready 之前被点开时也保持显示。
-    let show = state.pb_show_on_start || state.window_visible();
+    // 默认启动只驻留托盘（不弹窗）；PB_SHOW_ON_START=1 强制显示（截图/帧率用）。
+    // F-01：开机自启（--autostart / --hidden）静默启动时不主动显示面板，优先级高于
+    // PB_SHOW_ON_START；但若 ui_ready 之前用户已通过托盘/第二实例把窗口打开
+    // （window_visible），必须保持显示，不能反手 mark_startup_hidden 把它收起来
+    // （reviewer P2-1）。宁可不隐藏，也不吞用户操作。
+    let show = state.window_visible() || (!state.silent_launch && state.pb_show_on_start);
     if show {
         crate::panel::show_panel(&app, "ui-ready");
     } else {
         crate::panel::mark_startup_hidden(&app);
     }
     json!({ "show": show })
+}
+
+/// S-01：更新 app.json 持久化设置（白名单 + clamp + 自启动注册表 + 广播 app-state）。
+#[tauri::command]
+pub fn update_settings(patch: Value, app: AppHandle, state: State<'_, AppState>) -> Value {
+    crate::log_info!("command update_settings patch={patch}");
+    state.update_settings(&app, &patch)
+}
+
+/// S-01：读取当前设置 + 自启动运行时状态。
+///
+/// 主流程不依赖它（ui_ready 时 Rust 会 emit app-state，且 update_settings 的返回体里
+/// 也带 settings/autostart）；保留该命令供浏览器 mock（ui/bridge.js）与外部集成/诊断使用。
+#[tauri::command]
+pub fn get_settings(state: State<'_, AppState>) -> Value {
+    crate::log_debug!("command get_settings");
+    state.settings_payload()
 }
 
 /// 写一行命令给 collector（协议 §2）。
