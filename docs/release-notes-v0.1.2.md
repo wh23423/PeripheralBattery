@@ -9,6 +9,10 @@ Windows 托盘常驻的外设电量面板：鼠标 / 键盘 / 耳机 / 手柄，
 ## 安装包与校验
 
 - `PeripheralBattery_0.1.2_x64-setup.exe`（NSIS，当前用户安装，**无需管理员权限**；内置 WebView2 引导程序）
+  - 大小 **11,166,020 B（10.65 MiB）**，SHA-256 `0633094a151b66a2199b84a41cf03112b8163f27edc71872157f7e736f8ae384`
+  - 同包 app `peripheral-battery.exe` SHA-256 `0a8000e71daff88d7b4115570cf2bc34bc714e9840372fa1b01daaf38f70d19a`（11,001,856 B）；
+    collector `collector.exe` SHA-256 `a66933f2ba26a7585fa01243b49f091b694378c5ceead9c4be1bf9201a728e04`（2,140,226 B）
+  - 构建来源：干净提交 `7c4c858274525dc2e5bc0904ab13284b6b2617e9`（`build-info.json` 中 `git_dirty=false`、`signed=false`）
 - 随包发布 `SHA256SUMS.txt` 与 `build-info.json`（版本 / git commit / 构建时间 / 每个产物的 SHA-256）
   - 校验：`certutil -hashfile PeripheralBattery_0.1.2_x64-setup.exe SHA256`，与 `SHA256SUMS.txt` 对比
 - **代码签名状态说明**：构建脚本支持 Authenticode（signtool）签名，但**本仓库不包含证书**；

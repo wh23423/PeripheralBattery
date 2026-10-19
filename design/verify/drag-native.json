@@ -1,7 +1,7 @@
 {
   "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe",
-  "generated_at": "2026-10-19T23:07:10+08:00",
-  "elapsed_s": 15.5,
+  "generated_at": "2026-10-19T23:14:04+08:00",
+  "elapsed_s": 15.8,
   "drag_css": {
     "dx": -90.0,
     "dy": 0.0
@@ -44,7 +44,7 @@
     {
       "check": "drag: 面板已显示",
       "ok": true,
-      "detail": "t=true\n2026-10-19 23:06:55.187 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"f798e59\",\"pinned\":false,\"platform\":{\"b"
+      "detail": "t=true\n2026-10-19 23:13:49.215 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"7c4c858\",\"pinned\":false,\"platform\":{\"b"
     },
     {
       "check": "drag: mock collector ready",
@@ -94,7 +94,7 @@
     {
       "check": "drag-show: 第二实例唤出面板",
       "ok": true,
-      "detail": "t=true\n2026-10-19 23:07:06.892 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"f798e59\",\"pinned\":false,\"platform\":{\"b"
+      "detail": "t=true\n2026-10-19 23:14:01.083 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"7c4c858\",\"pinned\":false,\"platform\":{\"b"
     },
     {
       "check": "drag-show: 刚唤出后 header 空白立即可拖",

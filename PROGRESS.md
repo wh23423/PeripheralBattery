@@ -250,9 +250,11 @@ FlyDigi BS2PRO 为 USB-C 供电散热器（Scythe 产品页），`powered=True` 
 
 ### 9.3 产物
 
-- 全量构建 `pwsh -File scripts/build.ps1 -NoSign`（日志 `design/verify/v012-build.log`）：PyInstaller collector + Tauri release + NSIS 全部成功。
-- 安装包 `src-tauri/target/release/bundle/nsis/PeripheralBattery_0.1.2_x64-setup.exe`（约 10.65 MiB），
-  哈希与构建信息见同目录 `SHA256SUMS.txt` / `build-info.json`（最终包在干净 commit 上重建后回填）。
+- 全量构建 `pwsh -File scripts/build.ps1 -NoSign`（日志 `design/verify/v012-build-final.log`）：PyInstaller collector + Tauri release + NSIS 全部成功。
+- 安装包 `src-tauri/target/release/bundle/nsis/PeripheralBattery_0.1.2_x64-setup.exe`：**11,166,020 B / 10.65 MiB**，
+  SHA-256 `0633094a151b66a2199b84a41cf03112b8163f27edc71872157f7e736f8ae384`；构建来源干净提交
+  `7c4c858`（`build-info.json`：version 0.1.2、`git_dirty=false`、NotSigned）；同包 app
+  `0a8000e7…`（11,001,856 B）、collector `a66933f2…`（2,140,226 B）。最终包上复跑拖拽 **13/13**、安装/卸载验收 **24/24 PASS**。
 - 代码/文档改动：collector（base/lunafury/state/device_specs/protocol/__main__）、protocol.md、UI（index/app/bridge/styles）、
   tools（ui_smoke/verify_drag/verify_v012_ui/verify_install_v012/collector_ndjson_check）、README §6.1/§7、版本号 0.1.2。
 

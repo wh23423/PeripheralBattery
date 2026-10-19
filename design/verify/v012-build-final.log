@@ -1,0 +1,94 @@
+27 DEPRECATION: Running PyInstaller as admin is not necessary nor sensible. Run PyInstaller from a non-administrator terminal. PyInstaller 7.0 will block this.
+82 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.8
+82 INFO: Python: 3.12.9
+98 INFO: Platform: Windows-11-10.0.26300-SP0
+98 INFO: Python environment: D:\desktop\������ʾ���\.venv
+99 INFO: wrote D:\desktop\������ʾ���\build\pyinstaller\collector.spec
+101 INFO: Removing temporary files and cleaning cache in C:\Users\28482\AppData\Local\pyinstaller
+289 INFO: Module search paths (PYTHONPATH):
+['D:\\desktop\\������ʾ���',
+ 'C:\\Users\\28482\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
+ 'C:\\Users\\28482\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
+ 'C:\\Users\\28482\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+ 'C:\\Users\\28482\\AppData\\Local\\Programs\\Python\\Python312',
+ 'D:\\desktop\\������ʾ���\\.venv',
+ 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages',
+ 'D:\\desktop\\������ʾ���']
+476 INFO: checking Analysis
+476 INFO: Building Analysis because Analysis-00.toc is non existent
+476 INFO: Looking for Python shared library...
+476 INFO: Using Python shared library: C:\Users\28482\AppData\Local\Programs\Python\Python312\python312.dll
+476 INFO: Running Analysis Analysis-00.toc
+476 INFO: Target bytecode optimization level: 0
+476 INFO: Initializing module dependency graph...
+477 INFO: Initializing module graph hook caches...
+487 INFO: Analyzing modules for base_library.zip ...
+1160 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+1525 INFO: Processing standard module hook 'hook-math.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+2100 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+2621 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+2880 INFO: Caching module dependency graph...
+2900 INFO: Analyzing D:\desktop\������ʾ���\collector_entry.py
+2952 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+3201 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks'
+3258 INFO: Processing module hooks (post-graph stage)...
+3261 INFO: Performing binary vs. data reclassification (1 entries)
+3261 INFO: Looking for ctypes DLLs
+3273 INFO: Analyzing run-time hooks ...
+3275 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\desktop\\������ʾ���\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+3278 INFO: Creating base_library.zip...
+3291 INFO: Looking for dynamic libraries
+3406 INFO: Extra DLL search directories (AddDllDirectory): []
+3406 INFO: Extra DLL search directories (PATH): []
+3598 INFO: Warnings written to D:\desktop\������ʾ���\build\pyinstaller\collector\warn-collector.txt
+3613 INFO: Graph cross-reference written to D:\desktop\������ʾ���\build\pyinstaller\collector\xref-collector.html
+3624 INFO: checking PYZ
+3624 INFO: Building PYZ because PYZ-00.toc is non existent
+3625 INFO: Building PYZ (ZlibArchive) D:\desktop\������ʾ���\build\pyinstaller\collector\PYZ-00.pyz
+3748 INFO: Building PYZ (ZlibArchive) D:\desktop\������ʾ���\build\pyinstaller\collector\PYZ-00.pyz completed successfully.
+3750 INFO: checking PKG
+3750 INFO: Building PKG because PKG-00.toc is non existent
+3750 INFO: Building PKG (CArchive) collector.pkg
+3759 INFO: Building PKG (CArchive) collector.pkg completed successfully.
+3760 INFO: Bootloader D:\desktop\������ʾ���\.venv\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\run.exe
+3760 INFO: checking EXE
+3760 INFO: Building EXE because EXE-00.toc is non existent
+3760 INFO: Building EXE from EXE-00.toc
+3760 INFO: Copying bootloader EXE to D:\desktop\������ʾ���\build\pyinstaller\collector\collector.exe
+3765 INFO: Copying icon to EXE
+3767 INFO: Copying 0 resources to EXE
+3767 INFO: Embedding manifest in EXE
+3768 INFO: Appending PKG archive to EXE
+3770 INFO: Fixing EXE headers
+3808 INFO: Building EXE from EXE-00.toc completed successfully.
+3809 INFO: checking COLLECT
+3809 INFO: Building COLLECT because COLLECT-00.toc is non existent
+3809 INFO: Building COLLECT COLLECT-00.toc
+3870 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+3871 INFO: Build complete! The results are available in: D:\desktop\������ʾ���\dist
+collector built: D:\desktop\电量显示插件\dist\collector\collector.exe（19.4 MB）
+npx tauri build
+        Info Looking up installed tauri packages to check mismatched versions...
+        Warn The bundle identifier "com.peripheralbattery.app" set in `"tauri.conf.json" identifier` ends with `.app`. This is not recommended because it conflicts with the application bundle extension on macOS.
+   Compiling peripheral-battery v0.1.2 (D:\desktop\电量显示插件\src-tauri)
+    Finished `release` profile [optimized] target(s) in 19.25s
+       Built application at: D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+        Info Patching D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe with bundle type information: nsis
+        Info Target: x64
+     Running makensis to produce D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\PeripheralBattery_0.1.2_x64-setup.exe
+    Finished 1 bundle at:
+        D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\PeripheralBattery_0.1.2_x64-setup.exe (10.65 MiB)
+
+构建完成：D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+安装包: D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\PeripheralBattery_0.1.2_x64-setup.exe
+指定 -NoSign：跳过签名。
+
+== 发布产物 ==
+  D:\desktop\电量显示插件\src-tauri\target\release\peripheral-battery.exe
+    sha256 0a8000e71daff88d7b4115570cf2bc34bc714e9840372fa1b01daaf38f70d19a  (11001856 bytes)
+  D:\desktop\电量显示插件\dist\collector\collector.exe
+    sha256 a66933f2ba26a7585fa01243b49f091b694378c5ceead9c4be1bf9201a728e04  (2140226 bytes)
+  D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\PeripheralBattery_0.1.2_x64-setup.exe
+    sha256 0633094a151b66a2199b84a41cf03112b8163f27edc71872157f7e736f8ae384  (11166020 bytes)
+SHA256SUMS : D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\SHA256SUMS.txt
+build-info : D:\desktop\电量显示插件\src-tauri\target\release\bundle\nsis\build-info.json
