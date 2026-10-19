@@ -1,5 +1,7 @@
 # 外设电量显示器（Peripheral Battery）
 
+**[下载安装包](https://github.com/wh23423/PeripheralBattery/releases/latest)** · MIT License
+
 Windows 托盘常驻的外设电量面板：鼠标 / 键盘 / 耳机 / 手柄，覆盖 2.4G 接收器、USB、蓝牙三条链路。
 外观为液态玻璃浮动面板（780×440 DIP 窗口 / 720×380 面板 / 28px 圆角）。
 
