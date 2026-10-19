@@ -1,0 +1,363 @@
+[
+  {
+    "variant": "default",
+    "extra": {},
+    "rect": [
+      1604,
+      849,
+      2579,
+      1399
+    ],
+    "scale": 1.25,
+    "region": [
+      38,
+      38,
+      937,
+      512
+    ],
+    "backdrop": 3,
+    "pixels": {
+      "band_tl_10": {
+        "before": [
+          61,
+          51,
+          31
+        ],
+        "after": [
+          84,
+          84,
+          84
+        ]
+      },
+      "band_top_mid": {
+        "before": [
+          69,
+          56,
+          37
+        ],
+        "after": [
+          84,
+          84,
+          84
+        ]
+      },
+      "band_left_mid": {
+        "before": [
+          43,
+          40,
+          39
+        ],
+        "after": [
+          84,
+          84,
+          84
+        ]
+      },
+      "band_corner_2": {
+        "before": [
+          57,
+          48,
+          31
+        ],
+        "after": [
+          51,
+          43,
+          27
+        ]
+      },
+      "panel_inside_bg": {
+        "before": [
+          29,
+          23,
+          17
+        ],
+        "after": [
+          84,
+          97,
+          121
+        ]
+      }
+    },
+    "log": [
+      "2026-10-19 21:08:30.817 [INFO] acrylic enabled build=26300 transparency=Some(true) remote=false",
+      "2026-10-19 21:08:30.817 [INFO] panel region set (created) hwnd=0xcc09ec rect=(38,38,938,513) corner=70 outer=975x550 scale=1.250",
+      "2026-10-19 21:08:30.981 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}",
+      "2026-10-19 21:08:32.134 [INFO] panel position origin=(1604,849) size=975x550 scale=1.250 panel=(1642,887 900x475) work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)",
+      "2026-10-19 21:08:32.155 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}"
+    ]
+  },
+  {
+    "variant": "no-region",
+    "extra": {
+      "PB_DISABLE_PANEL_REGION": "1"
+    },
+    "rect": [
+      1567,
+      812,
+      2542,
+      1362
+    ],
+    "scale": 1.25,
+    "region": null,
+    "backdrop": 3,
+    "pixels": {
+      "band_tl_10": {
+        "before": [
+          59,
+          49,
+          31
+        ],
+        "after": [
+          81,
+          72,
+          59
+        ]
+      },
+      "band_top_mid": {
+        "before": [
+          67,
+          55,
+          36
+        ],
+        "after": [
+          81,
+          70,
+          52
+        ]
+      },
+      "band_left_mid": {
+        "before": [
+          23,
+          19,
+          14
+        ],
+        "after": [
+          56,
+          54,
+          54
+        ]
+      },
+      "band_corner_2": {
+        "before": [
+          70,
+          59,
+          39
+        ],
+        "after": [
+          58,
+          49,
+          33
+        ]
+      },
+      "panel_inside_bg": {
+        "before": [
+          64,
+          52,
+          36
+        ],
+        "after": [
+          82,
+          93,
+          114
+        ]
+      }
+    },
+    "log": [
+      "2026-10-19 21:08:34.871 [INFO] acrylic enabled build=26300 transparency=Some(true) remote=false",
+      "2026-10-19 21:08:34.871 [INFO] panel region (created): disabled by PB_DISABLE_PANEL_REGION=1",
+      "2026-10-19 21:08:34.957 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}",
+      "2026-10-19 21:08:36.199 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 panel=(1567,812 975x550) work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)",
+      "2026-10-19 21:08:36.224 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}"
+    ]
+  },
+  {
+    "variant": "no-acrylic",
+    "extra": {
+      "PB_DISABLE_ACRYLIC": "1"
+    },
+    "rect": [
+      1604,
+      849,
+      2579,
+      1399
+    ],
+    "scale": 1.25,
+    "region": [
+      38,
+      38,
+      937,
+      512
+    ],
+    "backdrop": 1,
+    "pixels": {
+      "band_tl_10": {
+        "before": [
+          61,
+          51,
+          31
+        ],
+        "after": [
+          61,
+          51,
+          31
+        ]
+      },
+      "band_top_mid": {
+        "before": [
+          69,
+          56,
+          37
+        ],
+        "after": [
+          69,
+          56,
+          37
+        ]
+      },
+      "band_left_mid": {
+        "before": [
+          43,
+          40,
+          39
+        ],
+        "after": [
+          43,
+          40,
+          39
+        ]
+      },
+      "band_corner_2": {
+        "before": [
+          57,
+          48,
+          31
+        ],
+        "after": [
+          51,
+          43,
+          27
+        ]
+      },
+      "panel_inside_bg": {
+        "before": [
+          29,
+          23,
+          17
+        ],
+        "after": [
+          55,
+          71,
+          102
+        ]
+      }
+    },
+    "log": [
+      "2026-10-19 21:08:38.698 [INFO] single-instance: mutex acquired name=Local\\PBVerify-probe-no-acrylic-158fe97477 pid=28356 session=unknown user=29736\\iloveyouparadise elevated=true",
+      "2026-10-19 21:08:38.698 [INFO] single-instance: mutex acquired name=Local\\PBVerify-probe-no-acrylic-158fe97477 pid=28356",
+      "2026-10-19 21:08:38.698 [INFO] platform windows_build=26300 windows11=true data_dir=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-acrylic-yu0gnsds\\Roaming\\PeripheralBattery",
+      "2026-10-19 21:08:38.703 [INFO] app config: app.json 与 config.json 均不存在，创建默认 app.json; created C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-acrylic-yu0gnsds\\Roaming\\PeripheralBattery\\app.json",
+      "2026-10-19 21:08:38.703 [INFO] app.json loaded pinned=false path=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-acrylic-yu0gnsds\\Roaming\\PeripheralBattery\\app.json",
+      "2026-10-19 21:08:38.911 [INFO] acrylic disabled: PB_DISABLE_ACRYLIC=1",
+      "2026-10-19 21:08:38.911 [INFO] panel region set (created) hwnd=0x560a26 rect=(38,38,938,513) corner=70 outer=975x550 scale=1.250",
+      "2026-10-19 21:08:38.916 [INFO] sidecar start requested instance=6ec4-18dff03c65ad70e8-8e030f3f50 attempt=0 restart_max=5 data_dir=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-acrylic-yu0gnsds\\Roaming\\PeripheralBattery",
+      "2026-10-19 21:08:38.997 [DEBUG] app-state emitted {\"acrylic\":false,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}",
+      "2026-10-19 21:08:40.231 [INFO] single-instance: already running name=Local\\PBVerify-probe-no-acrylic-158fe97477 session=unknown user=29736\\iloveyouparadise elevated=true existing_window_pid=Some(28356)",
+      "2026-10-19 21:08:40.231 [INFO] single-instance: existing pid=Some(28356) name=Local\\PBVerify-probe-no-acrylic-158fe97477 signaled=true window_activated=false exit",
+      "2026-10-19 21:08:40.235 [INFO] panel position origin=(1604,849) size=975x550 scale=1.250 panel=(1642,887 900x475) work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)",
+      "2026-10-19 21:08:40.253 [DEBUG] app-state emitted {\"acrylic\":false,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}"
+    ]
+  },
+  {
+    "variant": "no-region-no-acrylic",
+    "extra": {
+      "PB_DISABLE_PANEL_REGION": "1",
+      "PB_DISABLE_ACRYLIC": "1"
+    },
+    "rect": [
+      1567,
+      812,
+      2542,
+      1362
+    ],
+    "scale": 1.25,
+    "region": null,
+    "backdrop": 1,
+    "pixels": {
+      "band_tl_10": {
+        "before": [
+          59,
+          49,
+          31
+        ],
+        "after": [
+          59,
+          49,
+          31
+        ]
+      },
+      "band_top_mid": {
+        "before": [
+          67,
+          55,
+          36
+        ],
+        "after": [
+          65,
+          53,
+          36
+        ]
+      },
+      "band_left_mid": {
+        "before": [
+          24,
+          19,
+          14
+        ],
+        "after": [
+          18,
+          15,
+          15
+        ]
+      },
+      "band_corner_2": {
+        "before": [
+          70,
+          59,
+          39
+        ],
+        "after": [
+          58,
+          49,
+          33
+        ]
+      },
+      "panel_inside_bg": {
+        "before": [
+          64,
+          52,
+          36
+        ],
+        "after": [
+          55,
+          71,
+          102
+        ]
+      }
+    },
+    "log": [
+      "2026-10-19 21:08:42.746 [INFO] single-instance: mutex acquired name=Local\\PBVerify-probe-no-region-no-acrylic-38b981bee4 pid=38800 session=unknown user=29736\\iloveyouparadise elevated=true",
+      "2026-10-19 21:08:42.746 [INFO] single-instance: mutex acquired name=Local\\PBVerify-probe-no-region-no-acrylic-38b981bee4 pid=38800",
+      "2026-10-19 21:08:42.746 [INFO] platform windows_build=26300 windows11=true data_dir=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-region-no-acrylic-v_b4n1ty\\Roaming\\PeripheralBattery",
+      "2026-10-19 21:08:42.748 [INFO] app config: app.json 与 config.json 均不存在，创建默认 app.json; created C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-region-no-acrylic-v_b4n1ty\\Roaming\\PeripheralBattery\\app.json",
+      "2026-10-19 21:08:42.748 [INFO] app.json loaded pinned=false path=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-region-no-acrylic-v_b4n1ty\\Roaming\\PeripheralBattery\\app.json",
+      "2026-10-19 21:08:42.958 [INFO] acrylic disabled: PB_DISABLE_ACRYLIC=1",
+      "2026-10-19 21:08:42.958 [INFO] panel region (created): disabled by PB_DISABLE_PANEL_REGION=1",
+      "2026-10-19 21:08:42.963 [INFO] sidecar start requested instance=9790-18dff03d56ea13bc-22a8393f80 attempt=0 restart_max=5 data_dir=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-probe-no-region-no-acrylic-v_b4n1ty\\Roaming\\PeripheralBattery",
+      "2026-10-19 21:08:43.046 [DEBUG] app-state emitted {\"acrylic\":false,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}",
+      "2026-10-19 21:08:44.283 [INFO] single-instance: already running name=Local\\PBVerify-probe-no-region-no-acrylic-38b981bee4 session=unknown user=29736\\iloveyouparadise elevated=true existing_window_pid=Some(38800)",
+      "2026-10-19 21:08:44.283 [INFO] single-instance: existing pid=Some(38800) name=Local\\PBVerify-probe-no-region-no-acrylic-38b981bee4 signaled=true window_activated=false exit",
+      "2026-10-19 21:08:44.288 [INFO] panel position origin=(1567,812) size=975x550 scale=1.250 panel=(1567,812 975x550) work=(0,0,2560,1380) anchor_src=tray-rect anchor=(2164,1380,40x60)",
+      "2026-10-19 21:08:44.307 [DEBUG] app-state emitted {\"acrylic\":false,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"build\":26300,\"windows11\":true},\"version\":\"0.1.1\"}"
+    ]
+  }
+]

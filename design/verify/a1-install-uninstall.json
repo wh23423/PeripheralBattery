@@ -1,0 +1,21 @@
+{
+  "note": "由 Lead 在默认路径手工执行（PowerShell），结论已整理；原始逐步输出见 review/FIX-VERIFICATION.md §4.1。本文件为最终成功验收结果（早期一次失败尝试的 JSON 已被替换）。",
+  "date": "2026-10-19T21:45:00+08:00",
+  "setup": "src-tauri/target/release/bundle/nsis/PeripheralBattery_0.1.1_x64-setup.exe",
+  "setup_sha256": "7E1832B95AA0DBC17F292DB5AE1B0BF2D86561D631E11A9614442A9E6F4FEDED",
+  "environment": "Windows 11 build 26300 / 125% / 本机真实 0.1.0 残留数据（%LOCALAPPDATA%\\PeripheralBattery，1.7MB）",
+  "checks": [
+    {"check": "静默安装 /S", "ok": true, "detail": "exit=0；INSTDIR=默认路径；app/collector/licenses 就位；旧数据文件原样保留"},
+    {"check": "安装注册项", "ok": true, "detail": "DisplayName=PeripheralBattery DisplayVersion=0.1.1 Publisher=peripheralbattery InstallLocation=默认路径"},
+    {"check": "安装器内 collector 版本", "ok": true, "detail": "sha256=3fda3333...c49b9004（与 dist 新 collector 一致，含 A10/A11）"},
+    {"check": "许可证随包", "ok": true, "detail": "licenses\\LICENSE 与 licenses\\THIRD_PARTY_NOTICES.md 存在"},
+    {"check": "首次启动迁移", "ok": true, "detail": "app exit=0；legacy=...\\Local\\PeripheralBattery -> ...\\Roaming\\PeripheralBattery copied=6 skipped_existing=0 errors=0 marker=written"},
+    {"check": "新数据目录内容", "ok": true, "detail": "%APPDATA%\\PeripheralBattery 下 config.json/app.json/aliases.json/history.json/logs/diagnostics + migration-v0.1.1.json"},
+    {"check": "静默卸载 /S（保留数据）", "ok": true, "detail": "exit=0；INSTDIR 递归删除；卸载项/MANUPRODUCTKEY/WebView2 profile 删除；%APPDATA%\\PeripheralBattery 保留"},
+    {"check": "重装 + 卸载 /S /DELETEAPPDATA", "ok": true, "detail": "exit=0；用户数据目录、INSTDIR、注册表全部清除（/DELETEAPPDATA 无值开关解析有效）"},
+    {"check": "恢复原始环境", "ok": true, "detail": "从备份还原 local data + HKCU 键；清理测试 APPDATA 数据；无 app 进程"}
+  ],
+  "passed": 9,
+  "failed": 0,
+  "boundary": "若注册表存在异常 MANUPRODUCTKEY InstallLocation（历史 /D= 测试残留），NSIS 会在钩子前用它决定 INSTDIR；preinstall 钩子无法纠正。正常 0.1.0 升级键值即默认路径，不受影响。"
+}

@@ -61,6 +61,7 @@ PROVIDER_CATEGORY = {
     "lofree": "keyboard",
     "logitech": "mouse",
     "logitech_centurion": "headset",
+    "lunafury": "mouse",
     "mchose": "mouse",
     "nintendo": "gamepad",
     "nzxt": "mouse",
@@ -80,7 +81,8 @@ PROVIDER_ORDER = (
     "razer", "audeze", "wlmouse", "mchose", "hyperx_alpha2", "hyperx_cloud3",
     "hyperx", "keychron", "pulsar", "jbl", "logitech", "steelseries", "xinput",
     "playstation", "8bitdo", "barracuda", "nintendo", "asus", "gwolves",
-    "lofree", "astro", "corsair", "lamzu", "am_infinity", "steelseries_elite",
+    "lofree", "astro", "corsair", "lamzu", "lunafury", "am_infinity",
+    "steelseries_elite",
     "logitech_centurion", "hyperx_cloud3s", "nzxt", "steam", "bluetooth",
 )
 

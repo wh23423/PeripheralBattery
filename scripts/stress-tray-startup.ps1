@@ -35,7 +35,14 @@ if (-not (Test-Path $py)) { throw "python 不存在: $py" }
 Get-Process peripheral-battery -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 500
 
-$log = Join-Path $env:LOCALAPPDATA "PeripheralBattery\logs\app.log"
+# v0.1.1: 数据目录已迁到 %APPDATA%\PeripheralBattery；压测使用独立临时目录，
+# 不触碰真实用户数据（LOCALAPPDATA/APPDATA 都 swap 到临时根）。
+$stressRoot = Join-Path $env:TEMP ("pb-stress-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
+New-Item -ItemType Directory -Force -Path (Join-Path $stressRoot "Local"), (Join-Path $stressRoot "Roaming") | Out-Null
+$env:LOCALAPPDATA = Join-Path $stressRoot "Local"
+$env:APPDATA = Join-Path $stressRoot "Roaming"
+
+$log = Join-Path $env:APPDATA "PeripheralBattery\logs\app.log"
 $env:PB_LOG_LEVEL = "info"
 $env:PB_MOCK_MUTATE_MS = "400"
 $env:PB_COLLECTOR = "$py $mock"
@@ -133,6 +140,7 @@ $result = [ordered]@{
 }
 $json = $result | ConvertTo-Json -Depth 6
 $json | Set-Content -Encoding utf8 $OutJson
+Remove-Item -Recurse -Force -LiteralPath $stressRoot -ErrorAction SilentlyContinue
 Write-Output "===== SUMMARY ====="
 Write-Output ("visible: {0}/{1} ok" -f $result.visible_ok, $result.visible_total)
 Write-Output ("hidden : {0}/{1} ok" -f $result.hidden_ok, $result.hidden_total)

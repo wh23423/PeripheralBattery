@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "PeripheralBattery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.peripheralbattery.app",
   "build": {
     "frontendDist": "../ui"
@@ -12,8 +12,8 @@
       {
         "label": "main",
         "title": "外设电量",
-        "width": 780,
-        "height": 440,
+        "width": 720,
+        "height": 380,
         "resizable": false,
         "maximizable": false,
         "minimizable": true,
@@ -37,6 +37,14 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "publisher": "peripheralbattery",
+    "copyright": "Copyright (c) 2026 wh23423",
+    "license": "MIT",
+    "licenseFile": "../LICENSE",
+    "homepage": "https://github.com/wh23423/PeripheralBattery",
+    "category": "Utility",
+    "shortDescription": "Windows 托盘常驻的外设电量面板（鼠标/键盘/耳机/手柄）",
+    "longDescription": "PeripheralBattery 是 Windows 托盘常驻的外设电量面板，覆盖 2.4G 接收器、USB 与蓝牙三条链路。安装后常驻托盘，点击托盘图标显示液态玻璃浮动面板，失焦自动隐藏。用户数据保存在 %APPDATA%\\PeripheralBattery，卸载时可选择一并删除。",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -45,11 +53,20 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "../dist/collector/": "collector/"
+      "../dist/collector/": "collector/",
+      "../LICENSE": "licenses/LICENSE",
+      "../THIRD_PARTY_NOTICES.md": "licenses/THIRD_PARTY_NOTICES.md"
     },
     "windows": {
+      "webviewInstallMode": {
+        "type": "embedBootstrapper",
+        "silent": true
+      },
+      "minimumWebview2Version": "118.0.0.0",
       "nsis": {
-        "installMode": "currentUser"
+        "installMode": "currentUser",
+        "installerHooks": "nsis/installer-hooks.nsh",
+        "languages": ["English", "SimpChinese"]
       }
     }
   }

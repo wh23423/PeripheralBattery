@@ -1,6 +1,6 @@
 //! 外设电量显示器 — Tauri 2 外壳入口。
 //!
-//! 职责：窗口（acrylic / DWM 圆角 / 780×440）、托盘、失焦隐藏、隐藏四步
+//! 职责：窗口（acrylic / DWM 圆角 / 720×380 = 面板尺寸，备选 B）、托盘、失焦隐藏、隐藏四步
 //! （含 WebView2 `put_IsVisible`）、collector sidecar（stdio NDJSON + Job Object）、
 //! 以及协议 §4 的命令/事件转发。
 
@@ -18,6 +18,7 @@ mod single_instance;
 mod state;
 mod tray;
 mod tray_mirror;
+mod webview2_check;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -58,6 +59,22 @@ fn main() {
             );
             return;
         }
+        single_instance::AcquireResult::AccessDenied { pid: Some(pid) } => {
+            // P1-05：同名互斥体存在但当前权限打不开，且找到了本程序窗口 → 已有另一权限
+            // 级别的实例在运行。必须给出可见提示后退出，不能静默起第二个实例/第二个 collector。
+            crate::log_warn!(
+                "single-instance: permission conflict name={instance_name} existing_pid={pid} → show dialog and exit（不启动第二实例）"
+            );
+            single_instance::show_permission_conflict_message(Some(pid));
+            crate::log_info!("single-instance: permission conflict dialog dismissed, exit");
+            return;
+        }
+        single_instance::AcquireResult::AccessDenied { pid: None } => {
+            // 权限被拒但枚举不到本程序窗口：无法确认已有实例，只能 WARN 后继续（不能凭空阻止启动）。
+            crate::log_warn!(
+                "single-instance: access denied name={instance_name} but no existing window found; continuing without single-instance protection"
+            );
+        }
         single_instance::AcquireResult::Acquired(guard) => {
             crate::log_info!(
                 "single-instance: mutex acquired name={} pid={}",
@@ -69,6 +86,11 @@ fn main() {
         }
         single_instance::AcquireResult::Disabled(msg) => crate::log_warn!("{msg}"),
     }
+
+    // WebView2 运行期预检（review P1-02，由 packaging/webview2_check.rs 提供）：
+    // 必须在 tauri::Builder::default() 之前、logging::init 之后；缺失/过旧时中文提示后
+    // 以退出码 2/3 退出，避免用户看到“双击没反应”。PB_SKIP_WEBVIEW2_CHECK=1 可跳过。
+    webview2_check::ensure_available_or_exit();
 
     let windows_build = platform::windows_build();
     // 取不到 build 号时不要误判成 Win10：按 Win11 处理（DWM 调用失败会被忽略），

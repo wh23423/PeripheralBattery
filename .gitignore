@@ -28,3 +28,7 @@ __pycache__/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# --- 评审证据截图（大文件不入库；报告/JSON/脚本入库）---
+/review/**/*.png
+/review/**/*.webp

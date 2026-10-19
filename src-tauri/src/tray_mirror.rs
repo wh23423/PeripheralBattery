@@ -209,6 +209,33 @@ pub fn apply_message(app: &AppHandle, value: &Value) {
     }
 }
 
+/// 采集器异常退出 / 启动失败时立即把托盘切成离线（review P1-13）：
+/// 托盘是隐藏态唯一环境指示器，不能停留在崩溃前的旧电量；这里不依赖 WebView。
+///
+/// 同时清空镜像状态（含 last_payload 去重缓存），保证下一次 hello/device 一定重新
+/// 发布在线状态——否则重启后同样的电量 payload 会被去重逻辑吞掉，托盘永远停在离线。
+pub fn publish_collector_offline(app: &AppHandle, reason: &str) {
+    let Some(state) = app.try_state::<AppState>() else {
+        return;
+    };
+    {
+        let mut mirror = state.tray_mirror.lock().unwrap();
+        mirror.reset();
+        mirror.last_payload = None;
+    }
+    crate::log_warn!("collector offline: tray-state source=rust online=false reason={reason}");
+    state.update_tray_from_devices(
+        app,
+        TrayState {
+            level: None,
+            charging: false,
+            online: false,
+            kind: String::new(),
+        },
+        "rust",
+    );
+}
+
 #[cfg(test)]
 mod tests {
     use super::TrayMirror;

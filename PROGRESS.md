@@ -4,8 +4,12 @@
 > 完成情况：全量重建 collector + Tauri release + NSIS（8.92 MiB，13:12）；pytest **94** / ui_smoke **15** / cargo test **10** 全绿；
 > P2 **0.318%**（<0.5%）、P3 0.297%（<0.8%）、P4 稳态 **247.7MB**、P1 250fps/p99 4.2ms；
 > P0 可见启动死锁已修复（40/40 + 20/20 压测 0 hang）；F1 主卡、F3 首出数 1.3–1.7s、F4 无误判、F7 stat 摘要、新包安装/运行/卸载全部 PASS。
-> 最终指标与剩余风险见 [README.md](README.md) §5–§6 与 `design/verify/lead-acceptance.json`；本文件保留为暂停/续作历史记录，§7 为续作记录。
+> 最终指标与剩余风险见 [README.md](README.md) §5–§7 与 `design/verify/lead-acceptance.json`；本文件保留为暂停/续作历史记录，§7 为续作记录。
 > 原暂停点说明（历史）：所有 teammate 已停止，无 app/collector 进程、无后台 jobs/构建任务；NSIS 安装包当时仍是 01:14 旧包。
+>
+> **v0.1.1（2026-10-19 晚）**：按 `review/REVIEW-REPORT.md` 修复 A1–A14（数据目录/卸载、WebView2、发布安全、
+> 窗口/生命周期/采集器/前端）。v0.1.1 施工记录与 packaging 验收项见 **§8**；Release Notes 见
+> [docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md)。
 
 ---
 
@@ -152,3 +156,62 @@ $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
 6. 回归：pytest **94**、ui_smoke **15**、cargo test **10** 全绿；最终 NSIS 包安装 → packaged collector 启动 + hello → 退出 Job=0 → 卸载目录/进程全清。
 7. 证据：`design/verify/lead-hidden-final5.json`、`lead-hero-fps.png`、`stress-visible.json`、`tray-stress-result.json`、`lead-acceptance.json`、`release-build-final4.log`；独立报告 `design/audit/final-runtime-audit.md`。
 8. 剩余风险（未解决）：P7 24h 内存增长（5 分钟 +21MB）、P4 启动峰值、P9 24h、真实 HID 真机、P6 first-paint、Win10/多屏/DPI 矩阵、PowerShell watcher（CfgMgr32/WGI helper 未做，30s 连接检测折衷）、updater 未接线、`build` 仍 unknown。
+
+---
+
+## 8. v0.1.1 修复记录（2026-10-19 20:30 起，评审 A1–A14）
+
+目标：按 `review/REVIEW-REPORT.md` 修复 14 项 P1 + 高价值 P2，发布 v0.1.1（`tauri.conf.json` / `Cargo.toml` / `package.json` 版本 0.1.1）。
+并行分工：Lead + 5 名 teammate（packaging / rust-window / rust-lifecycle / collector / frontend），
+Release Notes：[docs/release-notes-v0.1.1.md](docs/release-notes-v0.1.1.md)。
+
+### 8.1 packaging（A1/A2/A3 + 发布文档）——已完成，待 Lead 最终验收
+
+| 项 | 实现 | 验证 |
+|---|---|---|
+| A1 数据目录 | `src-tauri/src/paths.rs`：数据目录迁 `%APPDATA%\PeripheralBattery`；`PB_DATA_DIR` 覆盖并 `set_var` 回写供 collector sidecar 继承；首启迁移 0.1.0 旧目录（config/app/aliases/history/logs/diagnostics，只补缺失、写 `migration-v0.1.1.json`、失败不阻塞并写 app.log） | 新增 5 个单测（迁移/不覆盖/marker 幂等/缺失/同目录）；当时全仓 48 passed，最终全仓 **55 passed**（Lead 复核） |
+| A1 卸载 | `src-tauri/nsis/installer-hooks.nsh`（tauri.conf `bundle.windows.nsis.installerHooks`）：`NSIS_HOOK_POSTUNINSTALL` 无条件删 HKCU `Software\peripheralbattery\PeripheralBattery`（publisher 与 0.1.0 相同，键不变；若未来 publisher 变化条件编译再清旧 vendor 键）、清 WebView2 profile `%LOCALAPPDATA%\com.peripheralbattery.app`、守卫式 `RMDir /r "$INSTDIR"`；`$DeleteAppDataCheckboxState=1` 或 `/DELETEAPPDATA` 才删 `%APPDATA%\PeripheralBattery`；`/UPDATE` 路径不清理；未勾选删除时把 0.1.0 的 4 个配置文件先复制到新数据目录（保证“先卸载再装”不丢数据） | `makensis -INPUTCHARSET UTF8` 静态编译 hooks 通过（peripheralbattery/wh23423 两种 publisher 变体均 0 error/unknown 变量）；默认路径安装→卸载待 Lead 用 `scripts/verify-uninstall.ps1` 复验 |
+| A1 验收脚本 | `scripts/verify-uninstall.ps1`：静默安装到 `%TEMP%` 自定义目录→写 0.1.0 风格数据→静默卸载→断言 INSTDIR/HKCU/WebView2 profile/数据目录；默认不删真实数据，`-DeleteAppData -ConfirmDeleteAppData` 才测删除；有已有安装/进程时拒绝执行（`-Force` 才继续） | PowerShell Parser 解析通过；真实运行由 Lead 执行 |
+| A2 WebView2 | `tauri.conf.json`：`bundle.windows.webviewInstallMode={type:"embedBootstrapper",silent:true}`、`minimumWebview2Version="118.0.0.0"`；新增 `src-tauri/src/webview2_check.rs`（`GetAvailableCoreWebView2BrowserVersionString` + 版本比较 + MessageBoxW 中文提示 + 退出码 2/3，`PB_SKIP_WEBVIEW2_CHECK=1` 逃生口）；main.rs 由 rust-lifecycle 集成 `mod webview2_check;` + `ensure_available_or_exit()`（logging 之后、Builder 之前） | `npx tauri build --no-bundle` 通过；5 个单测；NSIS 构建实测成功（bootstrapper 已从 go.microsoft.com 下载并内嵌，setup 10.64 MiB），断网/旧版场景待在干净环境复验 |
+| A3 元数据 | tauri.conf：publisher `peripheralbattery`（与 0.1.0 注册表键一致，避免升级时 MANUPRODUCTKEY 变化）、copyright `Copyright (c) 2026 wh23423`、MIT license + `licenseFile=../LICENSE`、short/long description、homepage、category；NSIS 语言 English+SimpChinese；`LICENSE`/`THIRD_PARTY_NOTICES.md` 随包映射到安装目录 `licenses\`；窗口 720×380（A14 备选 B） | release exe 版本信息实测：FileVersion/ProductVersion 0.1.1、company/copyright/filedescription 元数据；NSIS 生成物 defines 已确认（publisher/embedBootstrapper/minWebView2/languages/license 页） |
+| A3 build 号 | `src-tauri/build.rs`：监听 `.git/HEAD`、`.git/refs/heads`、`.git/packed-refs`（worktree 兼容）+ `PB_BUILD_SHA`/`PB_BUILD` 注入，输出 `APP_BUILD`/`PB_BUILD` | release exe 内实测 `build=5d096f5`（不再 unknown） |
+| A3 校验和/签名 | `scripts/build.ps1`：构建后调用 `scripts/sign.ps1`（`PB_SIGN_THUMBPRINT` 或 `PB_SIGN_CERT_PATH+PASSWORD`，signtool `/fd sha256 /tr` 签 setup+app+collector，失败即终止；无证书打印跳过并记 signed:false），再生成 `SHA256SUMS.txt` 与 `build-info.json`（版本/git sha/时间/每个文件哈希/signed）；`-NoSign` 可跳过 | 三个脚本 PowerShell Parser 通过；`sign.ps1` 无证书跳过路径实测 exit 0 + status JSON；签名 Valid 需证书复验 |
+| 版本/文档 | package.json 0.1.1；新增 `docs/release-notes-v0.1.1.md`；README 增加系统要求、发布/签名/部署参数、卸载行为表、v0.1.1 A1–A14 汇总、配置路径更新；THIRD_PARTY_NOTICES 补 GPL 来源声明与随包许可说明 | 静态检查 |
+
+### 8.2 并行 teammate 状态（最终）
+
+- **collector**（A10/A11）：完成，pytest **117 passed**。
+- **frontend**（A8/A9/A12/A14 前端）：完成，ui_smoke **21 passed**。
+- **rust-window**（A4/A7/A14 窗口层）：完成（A14 按 Lead 实验结论改走备选 B：窗口 720×380、无安全边；弃用 SetWindowRgn）。
+- **rust-lifecycle**（A5/A6/A12/A13/main.rs）：完成，已集成 `webview2_check`，A13 重试预算修复合入。
+- **Lead**：运行验收 A14/A4/A5/A6/A12/A13/A2 通过（A7 最后复跑）；回归 **cargo test 55 passed**、collector 117、ui_smoke 21；运行验收清单由 Lead 写在 `review/FIX-VERIFICATION.md`。
+- **发布**：最终 NSIS 重建后由 Lead 做默认路径安装/卸载验收；GitHub Release 待用户确认后执行。
+
+### 8.3 packaging 未验证 / 风险（交 Lead 验收）
+
+1. **NSIS 真实构建与默认路径安装/卸载**：hooks 只做了 makensis 静态语法编译；`RMDir /r "$INSTDIR"`、
+   `/DELETEAPPDATA`、复选框变量 `$DeleteAppDataCheckboxState` 的实际行为需在安装包上复验（重点：默认路径
+   `%LOCALAPPDATA%\PeripheralBattery` 安装→产生数据→卸载后 INSTDIR/HKCU/profile 无残留；`/DELETEAPPDATA`
+   删 `%APPDATA%\PeripheralBattery`；不勾选时数据保留）。
+2. **WebView2 embedBootstrapper**：最终构建需联网下载 bootstrapper（go.microsoft.com）；断网安装、
+   旧版 WebView2 升级/提示、完全缺失时的中文 MessageBoxW 需干净环境复验。
+3. **签名**：无证书，发布包默认 NotSigned；`signtool` 实际签名/时间戳/Valid 未验证（需 PFX 或证书指纹）；
+   且为构建后签名，安装包内 app/collector 副本仍未签名。
+4. **0.1.0 升级路径未实机验证**：publisher 保持 `peripheralbattery`、注册表键与安装目录不变（custom `/D=` 也沿用），
+   数据迁移已有单测与 NSIS 复制兜底；但“真实 0.1.0 → 0.1.1 静默覆盖 / 交互式先卸载”两条路径需 Lead 在干净环境实测。
+5. `paths.rs` 迁移在真实 `%LOCALAPPDATA%\PeripheralBattery`（含 1.6MB app.log）上的耗时/权限未实测；
+   单测覆盖了逻辑与幂等性。
+
+### 8.4 A14 设计变更（Lead 实机实验结论）
+
+- Lead 实拍 4 组变体：**region+acrylic = 灰边**、no-region+acrylic = 磨砂玻璃、
+  region+no-acrylic = 透桌面、no-region+no-acrylic = 透桌面。结论：`SetWindowRgn` + acrylic 会被
+  DWM 降级成纯灰 `#545454`，评审报告 §10 的“方案 A（区域裁剪）”前提不成立。
+- 改用报告 **备选 B**：窗口尺寸 = 面板尺寸 **720×380**，去掉 780×440 外框的 30px 安全边，
+  acrylic 只铺满面板内部；前端相应调整 padding/定位/阴影（frontend/rust-window 负责）。
+- packaging 配合：`tauri.conf.json` 的 `app.windows[0].width/height` 改 720/380，其余
+  transparent/decorations/shadow/alwaysOnTop/windowEffects 不变；README / Release Notes 的
+  A14 描述与验收口径同步更新。
+- 灰边验收口径：三背景（亮/暗/彩色）下**面板外无灰色矩形**、可见外轮廓 = 面板 12px 圆角；
+  透明效果 0/1、完全重启、远程/虚拟显示一致；125% DPI / 托盘定位不回归。
+

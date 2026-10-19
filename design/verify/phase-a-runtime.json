@@ -1,0 +1,265 @@
+{
+  "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\debug\\peripheral-battery.exe",
+  "results": [
+    {
+      "check": "region: app 启动 + collector ready",
+      "ok": true,
+      "detail": " message=None\n2026-10-19 21:38:59.529 [INFO] sidecar spawned pid=34752 instance=2718-18dff1e449f466b4-2263af4220 attempt"
+    },
+    {
+      "check": "region: 第二实例激活显示",
+      "ok": true,
+      "detail": "t=true\n2026-10-19 21:39:01.153 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"b"
+    },
+    {
+      "check": "region: 找到主窗口",
+      "ok": true,
+      "detail": "hwnd=0x3440112 visible=True"
+    },
+    {
+      "check": "A14(B): 窗口尺寸 = 面板 720×380 DIP",
+      "ok": true,
+      "detail": "size=900x475 scale=1.250"
+    },
+    {
+      "check": "A14(B): 不使用 SetWindowRgn（避免 acrylic 降级灰）",
+      "ok": true,
+      "detail": "None"
+    },
+    {
+      "check": "A14(B): DWM 圆角生效（Win11）",
+      "ok": true,
+      "detail": "backdrop=3"
+    },
+    {
+      "check": "A14(B): 窗口外只有随距离衰减的柔和阴影（无 30px 灰色/磨砂边框）",
+      "ok": true,
+      "detail": "outer_changed=22.3% near=30 far=22"
+    },
+    {
+      "check": "A14(B): 面板内部确实绘制（阳性对照）",
+      "ok": true,
+      "detail": "inner_changed=98.9% (264 pts)"
+    },
+    {
+      "check": "A14(B): 面板边缘无成片 acrylic 灰",
+      "ok": true,
+      "detail": "gray_like=0"
+    },
+    {
+      "check": "A14: acrylic 状态可判定",
+      "ok": true,
+      "detail": "backdrop=3 transparency=True log=acrylic enabled build=26300 transparency=Some(true) remote=false"
+    },
+    {
+      "check": "A14: 透明效果开启时保持 acrylic",
+      "ok": true,
+      "detail": "backdrop=3"
+    },
+    {
+      "check": "A14: 面板位置=按工作区 clamp 后的期望值（未被裁出工作区）",
+      "ok": true,
+      "detail": "window_x=1642 expected=1642 desired=1734 work=(0,0,2560,1380)"
+    },
+    {
+      "check": "A14: 可见面板位于托盘上方且在工作区内",
+      "ok": true,
+      "detail": "panel_bottom=1362 tray_top=1380 origin=(1642,887)"
+    },
+    {
+      "check": "A14-off: 透明效果关闭/降级时 acrylic 已禁用",
+      "ok": true,
+      "detail": "backdrop=1"
+    },
+    {
+      "check": "A14-off: 降级模式窗口仍是 720×380",
+      "ok": true,
+      "detail": "size=900x475"
+    },
+    {
+      "check": "A14-off: 日志记录 acrylic 禁用原因",
+      "ok": true,
+      "detail": "found"
+    },
+    {
+      "check": "A4: 面板显示",
+      "ok": true,
+      "detail": "t=true\n2026-10-19 21:39:06.493 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"b"
+    },
+    {
+      "check": "A4: collector ready",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "A4: 系统最小化被识别为隐藏",
+      "ok": true,
+      "detail": "2026-10-19 21:39:07.445 [DEBUG] collector stat raw: {\"t\":\"stat\",\"session\":\"7aca2a0b-858f-4457-8ef0-74874c136f98\",\"providers\":{\"mock\":{\"polls\":1,\"avg_ms\":12.3,\"l"
+    },
+    {
+      "check": "A4: 最小化后窗口不可见",
+      "ok": true,
+      "detail": "visible=False iconic=False"
+    },
+    {
+      "check": "A4: 隐藏四步 IsVisible(false) 执行",
+      "ok": true,
+      "detail": "found"
+    },
+    {
+      "check": "A4: 隐藏后一次激活即显示",
+      "ok": true,
+      "detail": "t=true\n2026-10-19 21:39:08.121 [DEBUG] app-state emitted {\"acrylic\":true,\"build\":\"5d096f5\",\"pinned\":false,\"platform\":{\"b"
+    },
+    {
+      "check": "A4: 显示后窗口可见且非最小化",
+      "ok": true,
+      "detail": "visible=True iconic=False"
+    },
+    {
+      "check": "A4: 显示位置正常（非 -32000 垃圾坐标）",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362)"
+    },
+    {
+      "check": "A4: 最小化恢复后窗口尺寸正确（720×380 DIP，非 199×34 占位）",
+      "ok": true,
+      "detail": "size=900x475 scale=1.250"
+    },
+    {
+      "check": "A12: 隐藏态托盘 pin 在 Rust 侧立即生效",
+      "ok": true,
+      "detail": "},\"xinput\":{\"polls\":2,\"avg_ms\":31.0,\"last_ms\":28.0}},\"timers_per_s\":0.99,\"key_migrations\":0,\"seq\":7}\n2026-10-19 21:39:12.447 [INFO] [debug-o"
+    },
+    {
+      "check": "A12: app.json 持久化 pinned=true",
+      "ok": true,
+      "detail": "C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-pin-byt4hiqy\\Roaming\\PeripheralBattery\\app.json -> {'pinned': True}"
+    },
+    {
+      "check": "A12: 隐藏态只发生一次 pin（无前端迟到大全）",
+      "ok": true,
+      "detail": "saved_count=1"
+    },
+    {
+      "check": "A12: 显示后 pinned 保持 true（无迟到 toggle）",
+      "ok": true,
+      "detail": "pinned=True saved_count=1"
+    },
+    {
+      "check": "A13: 崩溃后托盘 <2s 立即离线",
+      "ok": true,
+      "detail": "] webview TrySuspend completed suspended=true\n2026-10-19 21:39:16.129 [INFO] collector stdout EOF\n2026-10-19 21:39:16.129 [INFO] collector stderr EOF\n2026-10-19"
+    },
+    {
+      "check": "A13: 指数退避 1s/3s/10s 且次数递增",
+      "ok": true,
+      "detail": "attempts=[(1, 1000), (2, 3000), (3, 10000)]"
+    },
+    {
+      "check": "A13: 3 次崩溃后第 4 次 spawn 恢复（计数=4）",
+      "ok": true,
+      "detail": "spawn_count=4"
+    },
+    {
+      "check": "A13: 恢复后 collector 重新 ready",
+      "ok": true,
+      "detail": "ready_count=4"
+    },
+    {
+      "check": "A13: hello 不再无条件清零重启预算",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "check": "A13: 退避序列可追溯（delays=1000,3000,10000）",
+      "ok": true,
+      "detail": "[1000, 3000, 10000]"
+    },
+    {
+      "check": "A13: 单实例运行中",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "A9: WebView2 层已关闭默认右键菜单/浏览器加速键",
+      "ok": true,
+      "detail": "2026-10-19 21:39:33.562 [INFO] webview2 hardening: context_menus=disabled; accelerator_keys=disabled"
+    },
+    {
+      "check": "A2: WebView2 运行期预检已执行",
+      "ok": true,
+      "detail": "2026-10-19 21:39:33.348 [INFO] webview2 runtime version=155.0.4283.62 minimum=118.0.0.0"
+    },
+    {
+      "check": "A9: F5 不触发整页重载",
+      "ok": true,
+      "detail": "2026-10-19 21:39:35.581 [DEBUG] ui_ready received; fallback thread exits (window_visible=true)"
+    },
+    {
+      "check": "A9: F5 不重置窗口位置",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1642, 887, 2542, 1362)"
+    },
+    {
+      "check": "A9: 右键无浏览器菜单",
+      "ok": true,
+      "detail": "popup_menus=0"
+    },
+    {
+      "check": "A8: 标题区可拖动窗口",
+      "ok": true,
+      "detail": "(1642, 887, 2542, 1362) -> (1552, 887, 2452, 1362)"
+    },
+    {
+      "check": "A5: 同会话第二实例快速退出（不产生双托盘/双 collector）",
+      "ok": true,
+      "detail": "exit_code=0"
+    },
+    {
+      "check": "A5: 第二实例激活已有面板",
+      "ok": true,
+      "detail": "found single-instance show"
+    },
+    {
+      "check": "A5: 只剩一个 app 进程",
+      "ok": true,
+      "detail": "count=1"
+    },
+    {
+      "check": "A5: 不同实例名/数据目录可并行运行（测试隔离前提）",
+      "ok": true,
+      "detail": "a_alive=True b_alive=True"
+    },
+    {
+      "check": "A6: 残留记录指向非 collector 进程时不误杀",
+      "ok": true,
+      "detail": "fake_pid=38012 alive=True"
+    },
+    {
+      "check": "A6: 只删 pid 文件并记录原因（exe mismatch）",
+      "ok": true,
+      "detail": "2026-10-19 21:39:53.274 [INFO] cleanup residual: 仅删除 pid 文件 reason=exe mismatch (foreign install) path=C:\\Users\\28482\\AppData\\Local\\Temp\\pb-verify-res"
+    },
+    {
+      "check": "A6: 另一活实例的 collector 不被误杀",
+      "ok": true,
+      "detail": "fake_pid=29620 alive=True"
+    },
+    {
+      "check": "A6: LeaveAlone 有日志可追溯",
+      "ok": true,
+      "detail": "found skip-kill log"
+    },
+    {
+      "check": "A2: 启动时记录 WebView2 运行期版本",
+      "ok": true,
+      "detail": "ession=unknown user=29736\\iloveyouparadise elevated=true\n2026-10-19 21:39:56.823 [INFO] single-instance: mutex acquired name=Local\\PBVerify-"
+    },
+    {
+      "check": "A2: WebView2 版本 >= 118（最低要求）",
+      "ok": true,
+      "detail": "version=155.0.4283.62"
+    }
+  ]
+}

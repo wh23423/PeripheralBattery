@@ -2,7 +2,8 @@
    用法：node tools/ui_shots.js
    输出：design/verify/ui-prod-*.png（生产模式，无 backdrop-filter）
         design/verify/ui-dev-*.png（?effects=css，保留 CSS 毛玻璃用于评审）
-   视口固定 780×440 DIP（面板 720×380 + 四周 30px 安全边）。 */
+   视口 780×440 DIP 仅用于浏览器预览（.stage 720×380 居中、留出外阴影空间）；
+   生产窗口 = 面板 720×380，无安全边（REVIEW-REPORT §10.3 备选 B）。 */
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');

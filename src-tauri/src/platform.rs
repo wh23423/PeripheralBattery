@@ -1,5 +1,6 @@
-//! Windows 平台能力：版本检测、DWM 圆角、工作区/光标、进程与 Job Object、
-//! WebView2 的 `put_IsVisible`（经 `ICoreWebView2Controller::SetIsVisible`）。
+//! Windows 平台能力：版本检测、DWM 圆角、面板/窗口几何（A14 备选B）、透明效果/远程会话检测、
+//! 工作区/光标、进程与 Job Object、虚拟桌面（A7）、WebView2 的 `put_IsVisible`
+//! （经 `ICoreWebView2Controller::SetIsVisible`）、隐藏态内存优化与浏览器特性加固（A9）。
 
 use std::ffi::c_void;
 use std::mem::{size_of, zeroed};
@@ -27,7 +28,8 @@ use windows_sys::Win32::System::JobObjects::{
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
 };
 use windows_sys::Win32::System::Registry::{
-    RegCloseKey, RegOpenKeyExW, RegQueryValueExW, HKEY_LOCAL_MACHINE, KEY_READ,
+    RegCloseKey, RegOpenKeyExW, RegQueryValueExW, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ,
+    REG_DWORD,
 };
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::System::SystemInformation::{GetVersionExW, OSVERSIONINFOW};
@@ -36,8 +38,9 @@ use windows_sys::Win32::System::Threading::{
     WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION, PROCESS_TERMINATE,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetAncestor, GetClassNameW, GetCursorPos, GetForegroundWindow, GetWindowTextW,
-    GetWindowThreadProcessId, SetForegroundWindow, ShowWindow, GA_ROOT, SW_SHOWNORMAL,
+    EnumWindows, GetAncestor, GetClassNameW, GetCursorPos, GetForegroundWindow, GetSystemMetrics,
+    GetWindowTextW, GetWindowThreadProcessId, IsIconic, IsWindowVisible, SetForegroundWindow,
+    ShowWindow, GA_ROOT, SM_REMOTESESSION, SW_SHOWNORMAL,
 };
 use windows_sys::Wdk::System::SystemServices::RtlGetVersion;
 
@@ -141,6 +144,109 @@ pub fn set_dwm_round_corner(hwnd: HWND) -> i32 {
 
 pub fn raw_hwnd(h: isize) -> HWND {
     h as HWND
+}
+
+// ---------------------------------------------------------------------------
+// 面板/窗口几何（A14 备选B：可见窗口 = 面板 720×380，四周无安全边）
+//
+// 实机像素验收证明 SetWindowRgn + acrylic 会让 DWM 把 acrylic 降级成纯灰
+// （方案 A 前提不成立）：改为窗口直接等于面板尺寸，acrylic 只铺面板，
+// 30px 安全边/窗口区域裁剪整体移除；圆角由 CSS + DWM 负责。
+// ---------------------------------------------------------------------------
+
+/// 窗口外框逻辑宽度（DIP，与 tauri.conf.json 的 width 一致；备选B = 面板宽）。
+pub const WINDOW_OUTER_WIDTH_DIP: f64 = 720.0;
+/// 窗口外框逻辑高度（DIP，与 tauri.conf.json 的 height 一致；备选B = 面板高）。
+pub const WINDOW_OUTER_HEIGHT_DIP: f64 = 380.0;
+/// 可见面板逻辑宽度（DIP，ui/index.html 的 .panel；备选B 填满窗口）。
+pub const PANEL_WIDTH_DIP: f64 = 720.0;
+/// 可见面板逻辑高度（DIP；备选B 填满窗口）。
+pub const PANEL_HEIGHT_DIP: f64 = 380.0;
+/// 安全边（DIP）：备选B 下为 0（保留常量表达布局语义）。
+pub const PANEL_SAFE_MARGIN_DIP: f64 = 0.0;
+/// 面板相对托盘/工作区的垂直间距（DIP）。
+pub const PANEL_ANCHOR_GAP_DIP: f64 = 14.0;
+
+/// 窗口/面板几何的物理像素度量（纯函数结果，可单测）。
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PanelGeometry {
+    /// 可见面板相对窗口外框的偏移（物理像素；备选B 恒为 0）。
+    pub inset: i32,
+    /// 可见面板宽度（物理像素）。
+    pub width: i32,
+    /// 可见面板高度（物理像素）。
+    pub height: i32,
+    /// 窗口外框宽度（物理像素）。
+    pub outer_width: i32,
+    /// 窗口外框高度（物理像素）。
+    pub outer_height: i32,
+}
+
+/// 按 DPI scale 计算窗口/面板几何的物理像素度量。
+/// 非法 scale（NaN/0/负数）按 100% 处理，保证不 panic。
+pub fn panel_geometry(scale: f64) -> PanelGeometry {
+    let scale = if scale.is_finite() && scale > 0.0 {
+        scale
+    } else {
+        1.0
+    };
+    PanelGeometry {
+        inset: (PANEL_SAFE_MARGIN_DIP * scale).round() as i32,
+        width: (PANEL_WIDTH_DIP * scale).round() as i32,
+        height: (PANEL_HEIGHT_DIP * scale).round() as i32,
+        outer_width: (WINDOW_OUTER_WIDTH_DIP * scale).round() as i32,
+        outer_height: (WINDOW_OUTER_HEIGHT_DIP * scale).round() as i32,
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 原生窗口状态 / 系统设置（A4 状态校准、A14 acrylic 降级）
+// ---------------------------------------------------------------------------
+
+/// 原生 `IsIconic`：判断窗口是否被系统最小化（Win+↓/Win+D）。
+pub fn is_window_minimized(hwnd: isize) -> bool {
+    unsafe { IsIconic(hwnd as HWND) != 0 }
+}
+
+/// 原生 `IsWindowVisible`：判断窗口当前是否可见（不要求在前台）。
+pub fn is_window_visible(hwnd: isize) -> bool {
+    unsafe { IsWindowVisible(hwnd as HWND) != 0 }
+}
+
+/// `GetSystemMetrics(SM_REMOTESESSION)`：当前会话是否为远程桌面/串流会话。
+pub fn is_remote_session() -> bool {
+    unsafe { GetSystemMetrics(SM_REMOTESESSION) != 0 }
+}
+
+/// 读取 HKCU\...\Themes\Personalize\EnableTransparency。
+/// - `Some(true)`：系统“透明效果”开启；
+/// - `Some(false)`：关闭（Win11 会把 acrylic 降级成纯灰，必须关掉窗口效果）；
+/// - `None`：键不存在/查询失败（旧系统或精简系统），调用方自行决定。
+pub fn transparency_enabled() -> Option<bool> {
+    unsafe {
+        let sub = wide("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
+        let mut hkey: windows_sys::Win32::System::Registry::HKEY = std::ptr::null_mut();
+        if RegOpenKeyExW(HKEY_CURRENT_USER, sub.as_ptr(), 0, KEY_READ, &mut hkey) != 0 {
+            return None;
+        }
+        let name = wide("EnableTransparency");
+        let mut data: u32 = 0;
+        let mut size = size_of::<u32>() as u32;
+        let mut ty: u32 = 0;
+        let rc = RegQueryValueExW(
+            hkey,
+            name.as_ptr(),
+            std::ptr::null(),
+            &mut ty,
+            &mut data as *mut u32 as *mut u8,
+            &mut size,
+        );
+        let _ = RegCloseKey(hkey);
+        if rc != 0 || ty != REG_DWORD || size < size_of::<u32>() as u32 {
+            return None;
+        }
+        Some(data != 0)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -418,6 +524,180 @@ impl Drop for JobHandle {
 }
 
 // ---------------------------------------------------------------------------
+// 虚拟桌面（A7 / P1-07，尽力而为）：IVirtualDesktopManager
+//
+// 实机验证事实（Win11 26300，独立 COM 探针）：
+// 1. `IsWindowOnCurrentVirtualDesktop` 在后台进程里是「进程相对语义」：用户切到别的
+//    虚拟桌面后仍可能返回 TRUE —— 不能作为跳过迁移的依据，只保留作日志参考。
+// 2. `GetWindowDesktopId(普通窗口)`（记事本/Chrome）返回真实桌面 GUID；本 Tauri 窗口
+//    可能 hr=S_OK 但 GUID 全 0（未知），任务栏/Progman/WorkerW 则直接失败。
+// 3. 必须由 app 自己调 `MoveWindowToDesktop`（其它进程调用返回 E_ACCESSDENIED）。
+// 4. 可行启发式：前台窗口（用户刚置前的记事本等）所在桌面 = 当前桌面。
+//
+// 因此逻辑改为：用「前台窗口的 GetWindowDesktopId」确定 target，不再用
+// IsWindowOnCurrentVirtualDesktop 早退；ours 有效且等于 target 才跳过，否则迁移；
+// 取不到 target（tray 点击时前台可能是任务栏/桌面窗口）→ skipped，只 WARN 不阻塞显示。
+// COM 初始化失败 / RPC_E_CHANGED_MODE / 任何 HRESULT 错误都只 WARN；
+// `PB_DISABLE_VD=1` 完全关闭该逻辑。
+// ---------------------------------------------------------------------------
+
+use windows::Win32::Foundation::HWND as ComHwnd;
+use windows::Win32::System::Com::{
+    CoCreateInstance, CoInitializeEx, CoUninitialize, CLSCTX_ALL, COINIT_APARTMENTTHREADED,
+    COINIT_DISABLE_OLE1DDE,
+};
+use windows::Win32::UI::Shell::{IVirtualDesktopManager, VirtualDesktopManager};
+
+/// COM 初始化兜底：返回 `(是否需要 CoUninitialize, 描述)`。
+/// RPC_E_CHANGED_MODE 表示线程已被其它组件以其它套间模式初始化，此时仍可正常 CoCreateInstance。
+fn com_init() -> Result<(bool, String), String> {
+    unsafe {
+        let hr = CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+        if hr.is_ok() {
+            // S_OK / S_FALSE：每次成功调用都必须配对一次 CoUninitialize。
+            Ok((true, format!("CoInitializeEx hr=0x{:08x}", hr.0 as u32)))
+        } else if hr == windows::Win32::Foundation::RPC_E_CHANGED_MODE {
+            Ok((
+                false,
+                "CoInitializeEx=RPC_E_CHANGED_MODE（沿用线程现有套间）".to_string(),
+            ))
+        } else {
+            Err(format!("CoInitializeEx 失败 hr=0x{:08x}", hr.0 as u32))
+        }
+    }
+}
+
+fn vd_manager() -> Result<IVirtualDesktopManager, String> {
+    unsafe {
+        CoCreateInstance::<_, IVirtualDesktopManager>(
+            &VirtualDesktopManager,
+            None::<&windows_core::IUnknown>,
+            CLSCTX_ALL,
+        )
+        .map_err(|e| format!("CoCreateInstance(IVirtualDesktopManager) 失败: {e}"))
+    }
+}
+
+fn com_hwnd(hwnd: isize) -> ComHwnd {
+    ComHwnd(hwnd as *mut c_void)
+}
+
+/// 全 0 GUID = 未知桌面 id（Tauri 窗口实测会返回这种值），不能当作有效桌面比较。
+fn is_null_desktop_id(id: &windows_core::GUID) -> bool {
+    *id == windows_core::GUID::zeroed()
+}
+
+/// 纯函数决策：ours 有效且等于 target → 已在当前桌面；否则（未知/不同）迁移到 target。
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum VdAction {
+    AlreadyOnCurrent,
+    MoveTo(windows_core::GUID),
+}
+
+fn decide_vd_action(ours: Option<windows_core::GUID>, target: windows_core::GUID) -> VdAction {
+    match ours {
+        Some(id) if !is_null_desktop_id(&id) && id == target => VdAction::AlreadyOnCurrent,
+        _ => VdAction::MoveTo(target),
+    }
+}
+
+fn ensure_on_current_virtual_desktop_inner(
+    hwnd: isize,
+    foreground: Option<isize>,
+) -> Result<String, String> {
+    let manager = vd_manager()?;
+    let our = com_hwnd(hwnd);
+    // 仅作日志参考：后台进程里该接口是「进程相对语义」，不能作为跳过依据。
+    let on_current_hint = match unsafe { manager.IsWindowOnCurrentVirtualDesktop(our) } {
+        Ok(v) => {
+            if v.as_bool() {
+                "true(进程相对语义，仅供参考)".to_string()
+            } else {
+                "false".to_string()
+            }
+        }
+        Err(e) => format!("err({e})"),
+    };
+
+    // 1) 当前桌面启发式 = 前台窗口所在桌面。
+    let Some(fg) = foreground else {
+        return Ok(format!(
+            "skipped: cannot determine current desktop (no foreground window); IsWindowOnCurrentVirtualDesktop={on_current_hint}"
+        ));
+    };
+    let target = match unsafe { manager.GetWindowDesktopId(com_hwnd(fg)) } {
+        Ok(id) if !is_null_desktop_id(&id) => id,
+        Ok(_) => {
+            return Ok(format!(
+                "skipped: cannot determine current desktop (foreground=0x{fg:x} returned null desktop id); IsWindowOnCurrentVirtualDesktop={on_current_hint}"
+            ));
+        }
+        Err(e) => {
+            return Ok(format!(
+                "skipped: cannot determine current desktop (GetWindowDesktopId(foreground=0x{fg:x}) failed: {e}); IsWindowOnCurrentVirtualDesktop={on_current_hint}"
+            ));
+        }
+    };
+
+    // 2) 自己窗口的桌面 id：失败或全 0 GUID 一律视为「未知」（不能当有效 id 比较）。
+    let ours = unsafe { manager.GetWindowDesktopId(our) }
+        .ok()
+        .filter(|id| !is_null_desktop_id(id));
+
+    // 3) 已在当前桌面 / 4) 迁移到 target。
+    match decide_vd_action(ours, target) {
+        VdAction::AlreadyOnCurrent => Ok(format!(
+            "already-on-current desktop_id={target:?} IsWindowOnCurrentVirtualDesktop={on_current_hint}"
+        )),
+        VdAction::MoveTo(target) => {
+            let ours_desc = ours
+                .map(|g| format!("{g:?}"))
+                .unwrap_or_else(|| "unknown".to_string());
+            match unsafe { manager.MoveWindowToDesktop(our, &target) } {
+                Ok(()) => Ok(format!(
+                    "moved-to-current desktop_id={target:?} ours={ours_desc} IsWindowOnCurrentVirtualDesktop={on_current_hint}"
+                )),
+                Err(e) => Err(format!(
+                    "MoveWindowToDesktop(our=0x{hwnd:x} desktop_id={target:?}) 失败: {e}（E_ACCESSDENIED=0x80070005 表示系统拒绝跨桌面移动；继续正常显示）"
+                )),
+            }
+        }
+    }
+}
+
+/// 确保窗口在当前虚拟桌面（A7）。返回一句可日志化的结论；失败仅 WARN，不阻塞显示。
+pub fn ensure_on_current_virtual_desktop(hwnd: isize, foreground: Option<isize>) -> String {
+    if crate::state::env_flag("PB_DISABLE_VD") {
+        return "skipped PB_DISABLE_VD=1".to_string();
+    }
+    let (initialized, init_desc) = match com_init() {
+        Ok(v) => v,
+        Err(e) => {
+            crate::log_warn!("virtual desktop: {e}（继续正常显示）");
+            return format!("skipped: {e}");
+        }
+    };
+    crate::log_debug!("virtual desktop: {init_desc}");
+    let result = ensure_on_current_virtual_desktop_inner(hwnd, foreground);
+    if initialized {
+        unsafe { CoUninitialize() };
+    }
+    match result {
+        Ok(desc) => {
+            // skipped（tray 点击时前台是任务栏/桌面窗口等）也 WARN，但不阻塞显示。
+            if desc.starts_with("skipped") {
+                crate::log_warn!("virtual desktop: {desc}");
+            }
+            desc
+        }
+        Err(e) => {
+            crate::log_warn!("virtual desktop: {e}（继续正常显示）");
+            format!("failed: {e}")
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // WebView2 IsVisible（隐藏四步的第 1/2 步）
 // ---------------------------------------------------------------------------
 
@@ -540,6 +820,85 @@ pub fn set_webview_memory_mode(window: &WebviewWindow, low: bool) -> String {
     webview2_memory_mode(window, low)
 }
 
+// ---------------------------------------------------------------------------
+// WebView2 加固（A9 / P1-09）：关闭默认右键菜单与浏览器加速键（F5/Ctrl+R/Ctrl+P）
+//
+// wry 0.57 默认 browser_accelerator_keys=true / default_context_menus=true，Tauri 2.12.4
+// 未暴露配置。这里在 controller.CoreWebView2().Settings() 上直接关：
+// - ICoreWebView2Settings::SetAreDefaultContextMenusEnabled(FALSE)
+// - ICoreWebView2Settings3::SetAreBrowserAcceleratorKeysEnabled(FALSE)（老运行时无此接口时 WARN）
+// 前端 JS 拦截保留为兜底；`PB_DISABLE_WEBVIEW2_HARDENING=1` 跳过。
+// ---------------------------------------------------------------------------
+
+use webview2_com::Microsoft::Web::WebView2::Win32::{
+    ICoreWebView2Settings, ICoreWebView2Settings3,
+};
+
+fn webview2_harden_settings(window: &WebviewWindow) -> String {
+    let result: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
+    let slot = result.clone();
+    let dispatch = window.with_webview(move |platform_webview| {
+        let controller = platform_webview.controller();
+        let mut parts: Vec<String> = Vec::new();
+        let core = match unsafe { controller.CoreWebView2() } {
+            Ok(c) => c,
+            Err(e) => {
+                *slot.lock().unwrap() = Some(format!("CoreWebView2 ERR {e}"));
+                return;
+            }
+        };
+        let settings: ICoreWebView2Settings = match unsafe { core.Settings() } {
+            Ok(s) => s,
+            Err(e) => {
+                *slot.lock().unwrap() = Some(format!("Settings ERR {e}"));
+                return;
+            }
+        };
+        // 1) 浏览器右键菜单（base settings，所有运行时都有）
+        match unsafe { settings.SetAreDefaultContextMenusEnabled(false) } {
+            Ok(()) => parts.push("context_menus=disabled".to_string()),
+            Err(e) => parts.push(format!("context_menus ERR {e}")),
+        }
+        // 2) 浏览器加速键（Settings3，WebView2 Runtime 88+；老版本 cast 失败只 WARN）
+        match settings.cast::<ICoreWebView2Settings3>() {
+            Ok(s3) => match unsafe { s3.SetAreBrowserAcceleratorKeysEnabled(false) } {
+                Ok(()) => parts.push("accelerator_keys=disabled".to_string()),
+                Err(e) => parts.push(format!("accelerator_keys ERR {e}")),
+            },
+            Err(e) => parts.push(format!("ICoreWebView2Settings3 unavailable({e})")),
+        }
+        *slot.lock().unwrap() = Some(parts.join("; "));
+    });
+    match dispatch {
+        Ok(()) => result
+            .lock()
+            .unwrap()
+            .clone()
+            .unwrap_or_else(|| "NOT_EXECUTED".to_string()),
+        Err(e) => format!("DISPATCH_ERR {e}"),
+    }
+}
+
+/// A9：关闭 WebView2 默认右键菜单与浏览器加速键。失败只 WARN，不阻塞启动。
+pub fn harden_webview2(window: &WebviewWindow) -> String {
+    if crate::state::env_flag("PB_DISABLE_WEBVIEW2_HARDENING") {
+        let msg = "skipped PB_DISABLE_WEBVIEW2_HARDENING=1".to_string();
+        crate::log_info!("webview2 hardening: {msg}");
+        return msg;
+    }
+    let r = webview2_harden_settings(window);
+    let failed = r.starts_with("DISPATCH_ERR")
+        || r == "NOT_EXECUTED"
+        || r.contains("ERR")
+        || r.contains("unavailable");
+    if failed {
+        crate::log_warn!("webview2 hardening: {r}");
+    } else {
+        crate::log_info!("webview2 hardening: {r}");
+    }
+    r
+}
+
 /// 等待进程退出（用于 sidecar 关闭握手），返回是否在超时前退出。
 pub fn wait_process_exit(pid: u32, timeout_ms: u32) -> bool {
     unsafe {
@@ -558,3 +917,83 @@ pub fn wait_process_exit(pid: u32, timeout_ms: u32) -> bool {
         r == WAIT_OBJECT_0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn panel_geometry_100_percent() {
+        // 备选B：窗口=面板 720×380，无安全边
+        let g = panel_geometry(1.0);
+        assert_eq!((g.outer_width, g.outer_height), (720, 380));
+        assert_eq!((g.width, g.height), (720, 380));
+        assert_eq!(g.inset, 0);
+    }
+
+    #[test]
+    fn panel_geometry_125_percent() {
+        let g = panel_geometry(1.25);
+        assert_eq!((g.outer_width, g.outer_height), (900, 475));
+        assert_eq!((g.width, g.height), (900, 475));
+        assert_eq!(g.inset, 0);
+    }
+
+    #[test]
+    fn panel_geometry_150_and_200_percent() {
+        let g150 = panel_geometry(1.5);
+        assert_eq!((g150.outer_width, g150.outer_height), (1080, 570));
+        assert_eq!((g150.width, g150.height), (1080, 570));
+        let g200 = panel_geometry(2.0);
+        assert_eq!((g200.outer_width, g200.outer_height), (1440, 760));
+        assert_eq!((g200.width, g200.height), (1440, 760));
+        assert_eq!(g200.inset, 0);
+    }
+
+    #[test]
+    fn panel_geometry_invalid_scale_falls_back_to_100() {
+        let expected = panel_geometry(1.0);
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            assert_eq!(panel_geometry(bad), expected, "scale={bad}");
+        }
+    }
+
+    fn guid(value: u128) -> windows_core::GUID {
+        windows_core::GUID::from_u128(value)
+    }
+
+    #[test]
+    fn null_desktop_id_detection() {
+        assert!(is_null_desktop_id(&windows_core::GUID::zeroed()));
+        assert!(!is_null_desktop_id(&guid(1)));
+        // 只有部分字节非 0 也不是 null（GUID 按 16 字节整体比较）
+        assert!(!is_null_desktop_id(&windows_core::GUID {
+            data1: 0,
+            data2: 0,
+            data3: 0,
+            data4: [1, 0, 0, 0, 0, 0, 0, 0],
+        }));
+    }
+
+    #[test]
+    fn vd_action_decides_move_or_already() {
+        let target = guid(0x1111_2222_3333_4444_5555_6666_7777_8888);
+        // ours 有效且与 target 相同 → 已在当前桌面
+        assert_eq!(
+            decide_vd_action(Some(target), target),
+            VdAction::AlreadyOnCurrent
+        );
+        // ours 未知（取不到 / 全 0 GUID）→ 必须尝试迁移
+        assert_eq!(decide_vd_action(None, target), VdAction::MoveTo(target));
+        assert_eq!(
+            decide_vd_action(Some(windows_core::GUID::zeroed()), target),
+            VdAction::MoveTo(target)
+        );
+        // ours 是别的桌面 → 迁移到 target
+        assert_eq!(
+            decide_vd_action(Some(guid(2)), target),
+            VdAction::MoveTo(target)
+        );
+    }
+}
+

@@ -1,0 +1,32 @@
+{
+  "interval_ms": 2000,
+  "duration_s": 42.0,
+  "roots": 3,
+  "snapshots": [
+    {
+      "t_rel": 2.02,
+      "roots": 3,
+      "devs": 23
+    },
+    {
+      "t_rel": 6.09,
+      "roots": 3,
+      "devs": 23
+    },
+    {
+      "t_rel": 11.03,
+      "roots": 3,
+      "devs": 23
+    },
+    {
+      "t_rel": 18.08,
+      "roots": 3,
+      "devs": 23
+    },
+    {
+      "t_rel": 33.02,
+      "roots": 3,
+      "devs": 23
+    }
+  ]
+}

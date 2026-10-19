@@ -245,21 +245,25 @@ UI 必须处理 `level === null`：空心环 + `approx || "未知"`，**不能**
 
 ## 5. Tauri 配置（修订）
 
-### 5.1 窗口尺寸：必须给阴影留边
+### 5.1 窗口尺寸：窗口 = 面板（v0.1.1 修订，备选 B）
 
-**v1.0 的 P0**：窗口 720×380 = 面板尺寸，`body` 里 `stage` 756×416 居中后溢出，面板正好贴满窗口，`0 30px 70px` 的阴影全在窗口外被裁掉；圆角外还会露出**方形 acrylic**。
+**v0.1.0 的 P1**：窗口取 780×440（面板 720×380 + 四周 30px 安全边），acrylic 作用于整个窗口矩形，于是 30px 安全边也被 acrylic 填充；当 DWM 把 acrylic 降级（透明效果关闭 / 远程会话 / 虚拟显示驱动）时，四周出现不随桌面变化的固定灰框（#4D4E4F~#545454）。用户实际复现。
 
-修正：
+**v0.1.1 实测结论（决定放弃“区域裁剪”方案）**：`SetWindowRgn` 裁出面板形状后，DWM 会把 acrylic 降级成纯灰 #545454（4 组变体实拍：region+acrylic=灰边；no-region+acrylic=真磨砂；region+no-acrylic=透桌面；no-region+no-acrylic=透桌面）。即“窗口区域裁剪”与“真 acrylic”不可兼得，review §10 备选 B 胜出：
 
 ```jsonc
-"width": 780, "height": 440,           // 面板 720×380 + 30px 安全边
+"width": 720, "height": 380,           // 窗口 = 面板，无安全边
 "transparent": true, "decorations": false, "shadow": false,
 "windowEffects": { "effects": ["acrylic"] }
 ```
 
-- Win11：`DwmSetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE, ROUND)`，圆角与 CSS 28px 对齐。
-- Win10：没有 DWM 圆角，acrylic 会露出方角 → 该平台回退为不透明深色底（或 `SetWindowRgn` 硬圆角，需视觉确认）。
-- 监听 `scaleFactorChanged` 重设窗口尺寸；面板按 DIP 计算，避免 1px 半像素偏移。
+- CSS `body { padding: 0 }`，`.stage/.panel` 填满窗口；面板圆角 12px 贴近 Win11 DWM 圆角（8px），角落 acrylic 外露 ≤4px。
+- acrylic 只覆盖面板内部：结构上不可能再出现“面板外灰框”；DWM 仍在窗口外绘制柔和阴影（实测 ~40–60px 衰减），面板外无任何均匀色块。
+- Win11：保留 `DwmSetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE, ROUND)`。Win10：没有 DWM 圆角，acrylic 会露出方角 → 该平台回退为不透明深色底（`data-windows11=false` / `data-acrylic=off` CSS 实底）。
+- acrylic 降级检测：`EnableTransparency=0` / 远程会话 / `PB_DISABLE_ACRYLIC=1` / Win10 → `set_effects(None)` + `app-state.acrylic=false`，前端 `html[data-acrylic="off"]` 用不透明烟熏底（#0a1830），不存在灰框。
+- 监听 `scaleFactorChanged` 重设窗口尺寸（720×380 DIP）并重定位；面板按 DIP 计算，避免 1px 半像素偏移。
+- 已知取舍：窗口=面板后 P2-19“透明安全边吞点击”只剩 CSS 12px 圆角外的极小角落；外阴影由 DWM 提供、CSS box-shadow 仅浏览器预览可见。
+- 回滚：`PB_DISABLE_ACRYLIC=1` 回到“无 acrylic + CSS 实底”，仍是窗口=面板。
 
 ### 5.2 焦点与弹层
 
@@ -379,7 +383,7 @@ UI 必须处理 `level === null`：空心环 + `approx || "未知"`，**不能**
 
 | # | 级别 | 发现 | 处置 |
 |---|---|---|---|
-| 1 | P0 | 窗口 720×380 恰好裁掉阴影、露出方角 acrylic | 窗口改 780×440；Win11 DWM 圆角；Win10 回退不透明 |
+| 1 | P0 | 窗口 720×380 恰好裁掉阴影、露出方角 acrylic | **v0.1.1 再修订**：780×440+30px 安全边会让 acrylic 整窗填充、在降级环境出现灰框（用户复现 P1）；SetWindowRgn 又与 acrylic 冲突（DWM 降级纯灰，实拍确认）。最终采用备选 B：窗口=面板 720×380、无安全边、acrylic 只铺面板、CSS 圆角 12px，Win10/降级走不透明实底；详见 §5.1 |
 | 2 | P0 | `externalBin` 不带 `_internal` | 改 `bundle.resources`，运行时 resource_dir 启动 |
 | 3 | P0 | 并发破坏合并函数与 gone 语义 | StateStore 完整快照门控 + last_seen |
 | 4 | P0 | 设备 key 不稳定/不唯一 | 重建 key 体系 + 持久化映射 + `replaces` |

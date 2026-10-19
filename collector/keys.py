@@ -62,6 +62,7 @@ PROVIDER_VID = {
     "lofree": "388d",
     "logitech": "046d",
     "logitech_centurion": "046d",
+    "lunafury": "373e",
     "mchose": "5253",
     "nintendo": "057e",
     "nzxt": "1e71",

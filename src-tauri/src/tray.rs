@@ -1,13 +1,41 @@
 //! 托盘：resvg 运行时渲染状态色图标（电量/充电/离线/设备类型），左键切换面板，
 //! 右键菜单（刷新 / 固定 / 设置 / 退出）。位置由 `tray.rect()` 提供（协议 §3.2）。
+//!
+//! review P1-12：托盘“固定面板”必须是 **Rust 侧事实源**——隐藏态 WebView2 已 TrySuspend，
+//! 只 emit 给前端的事件会丢失/延迟到下次显示才触发。因此：
+//! - 菜单项是 CheckMenuItem（勾选 = pinned）；
+//! - 点击由 Rust 直接 `state.set_pinned(!pinned)`（持久化 + emit app-state）并同步勾选；
+//! - 前端点图钉（commands::set_pinned）也调用 `sync_pin_menu` 同步勾选，两端一致。
+
+use std::sync::Mutex;
 
 use serde_json::json;
 use tauri::image::Image;
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager, Wry};
 
 use crate::state::AppState;
+
+/// 托盘“固定面板”勾选项句柄（Rust 侧唯一写入口；首次 create_tray 时填入）。
+static PIN_ITEM: Mutex<Option<CheckMenuItem<Wry>>> = Mutex::new(None);
+
+/// 同步托盘菜单的 pin 勾选状态（可从任意线程调用：tauri 内部会投递主线程）。
+pub fn sync_pin_menu(pinned: bool) {
+    let item = match PIN_ITEM.lock() {
+        Ok(guard) => guard.clone(),
+        Err(poisoned) => poisoned.into_inner().clone(),
+    };
+    match item {
+        Some(item) => match item.set_checked(pinned) {
+            Ok(()) => crate::log_info!("tray pin menu synced checked={pinned}"),
+            Err(e) => crate::log_warn!("tray pin menu set_checked 失败 checked={pinned}: {e}"),
+        },
+        None => {
+            crate::log_debug!("tray pin menu 尚未创建，跳过勾选同步 checked={pinned}")
+        }
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct TrayState {
@@ -177,14 +205,16 @@ fn current_scale(app: &AppHandle) -> f64 {
 // ---------------------------------------------------------------------------
 
 pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
+    let state = app.state::<AppState>();
+    let pinned = state.pinned();
     let refresh = MenuItem::with_id(app, "refresh", "刷新", true, None::<&str>)?;
-    let pin = MenuItem::with_id(app, "pin", "固定面板", true, None::<&str>)?;
+    // P1-12：勾选项 = 当前 pinned，Rust 侧权威状态。
+    let pin = CheckMenuItem::with_id(app, "pin", "固定面板", true, pinned, None::<&str>)?;
     let settings = MenuItem::with_id(app, "settings", "设置", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
     let menu = Menu::with_items(app, &[&refresh, &pin, &settings, &separator, &quit])?;
 
-    let state = app.state::<AppState>();
     let ts = state.tray_state.lock().unwrap().clone();
     let scale = current_scale(app);
     let icon = render_tray_icon(&ts, scale).unwrap_or_else(fallback_icon);
@@ -198,9 +228,14 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
         .on_tray_icon_event(|tray, event| handle_tray_event(tray.app_handle(), event))
         .build(app)?;
 
+    // P1-12：保存勾选项句柄（前后端 pin 变更都通过 sync_pin_menu 更新它）。
+    match PIN_ITEM.lock() {
+        Ok(mut slot) => *slot = Some(pin),
+        Err(poisoned) => *poisoned.into_inner() = Some(pin),
+    }
     *state.tray.lock().unwrap() = Some(tray);
     crate::log_info!(
-        "tray created id=peripheral-battery-tray scale={scale} icon_color={}",
+        "tray created id=peripheral-battery-tray scale={scale} icon_color={} pinned={pinned}",
         main_color(&ts)
     );
     Ok(())
@@ -305,9 +340,16 @@ pub(crate) fn handle_menu(app: &AppHandle, id: &str) {
             let ok = state.sidecar.refresh();
             crate::log_info!("tray action=refresh collector_refresh={ok}");
         }
-        "pin" => {
-            let _ = app.emit("tray-action", json!({ "action": "toggle-pin" }));
-            crate::log_info!("tray action=toggle-pin");
+        // 兼容 PB_TEST_TRAY_ACTION=pin / toggle-pin 两种自动化注入值。
+        "pin" | "toggle-pin" => {
+            // P1-12：pin 必须在 Rust 侧完成——隐藏态 WebView2 已 TrySuspend，只 emit 给
+            // 前端的事件会丢失，并在下次显示时“迟到 toggle”。这里直接翻转持久化状态，
+            // app-state 是前端唯一事实源（state.set_pinned 会 emit app-state）。
+            let state = app.state::<AppState>();
+            let pinned = !state.pinned();
+            state.set_pinned(app, pinned);
+            sync_pin_menu(pinned);
+            crate::log_info!("tray action=toggle-pin pinned={pinned} source=rust");
         }
         "settings" => {
             // 默认启动是隐藏的：必须先走正常四步显示面板，否则抽屉开在隐藏窗口里，

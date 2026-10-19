@@ -1,8 +1,15 @@
 # v0.1.0 复审报告与待修复计划
 
+> **正式版位置：本文已并入 [review/REVIEW-REPORT.md](review/REVIEW-REPORT.md) §10，并在 §7 阶段 A 增加 A14 条目。**
+> 本文件保留为独立摘要，实施时以 `review/REVIEW-REPORT.md` 为准。
 > 版本：PeripheralBattery v0.1.0（commit `a24f2fc`）
 > 日期：2026-10-19
 > 状态：**只记录计划，本轮不修改代码**；等确认后与 §3 的其余问题一起修，发 v0.1.1。
+>
+> **2026-10-19 晚更新（v0.1.1 已实施）**：阶段 A 的 A1–A14 已全部修复并完成自动化/实机验收，见
+> [review/FIX-VERIFICATION.md](review/FIX-VERIFICATION.md)。其中 **§1 灰框方案有变更**：实测
+> `SetWindowRgn`+acrylic 会被 DWM 降级为纯灰 `#545454`，故采用 review 报告的**备选 B**
+> （窗口尺寸=面板 720×380、去掉 30px 安全边、acrylic 只铺面板、CSS 圆角 12px），详见验收记录 §2 A14。
 
 ---
 

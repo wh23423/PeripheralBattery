@@ -23,6 +23,8 @@
   --line-soft: rgba(255, 255, 255, 0.1);
   --glass: rgba(255, 255, 255, 0.07);
   --glass-hi: rgba(255, 255, 255, 0.12);
+  /* 无 acrylic 时的实底深海军蓝（Win10 / 透明效果关闭 / 降低透明度共用） */
+  --panel-solid: #0a1830;
 
   /* 状态色 */
   --accent: #dbe9ff;
@@ -35,7 +37,10 @@
   --glow-soft: rgba(120, 170, 255, 0.45);
   --glow-spread: rgba(120, 170, 255, 0.32);
 
-  --r-panel: 28px;
+  /* 备选 B（REVIEW-REPORT §10.3）：窗口 = 面板 720×380，四周无安全边。
+     圆角取 12px 贴近 Win11 DWM 窗口圆角（约 8px），避免面板圆角外露出过多
+     acrylic/窗口底色而形成灰角；同时保证 720×380 贴边时观感完整。 */
+  --r-panel: 12px;
   --r-card: 20px;
   --r-row: 14px;
 
@@ -58,8 +63,10 @@ html, body {
 }
 
 body {
-  /* 780×440 窗口：720×380 面板 + 四周正好 30px 安全边（见 BUILD_PLAN §5.1） */
-  padding: 30px;
+  /* 备选 B（REVIEW-REPORT §10.3）：窗口 = 面板 720×380 DIP，四周没有 30px 安全边；
+     padding: 0 让 .stage/.panel 正好填满窗口。浏览器预览仍用 780×440 视口把
+     .stage 居中（仅用于截图/评审，留出外阴影的显示空间）。 */
+  padding: 0;
   display: grid;
   place-items: center;
   font-family: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI",
@@ -139,6 +146,9 @@ body.demo {
   background-blend-mode: soft-light, normal, normal;
 
   border: 1px solid rgba(255, 255, 255, 0.18);
+  /* 最后两条外阴影在真实窗口（窗口=面板）里会被窗口矩形裁掉；
+     保留它们只用于 780×440 浏览器预览/评审的层次感，
+     生产深度由上面的内阴影 + 边框表达。 */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.38),
     inset 0 -1px 0 rgba(255, 255, 255, 0.08),
@@ -209,17 +219,37 @@ html[data-effects="css"] .row {
   backdrop-filter: blur(8px) saturate(140%);
 }
 
-/* Win10：没有 DWM 圆角与 acrylic → 面板退回不透明深色底 */
-html[data-windows11="false"] .panel {
-  background-color: #0b1834;
+/* ----------------------------------------------------------
+   无 acrylic 降级（P2-46 / §10.3 A14）——三个来源共用同一实底变量，
+   避免重复字面量、方便统一调色：
+   1) Win10：没有 DWM 圆角与 acrylic；
+   2) Rust 下发 app-state {"acrylic": false}：系统“透明效果”关闭、远程会话、
+      PB_DISABLE_ACRYLIC=1（窗口显示前也会 emit，前端首帧即用正确底）；
+   3) 系统“降低透明度”偏好（生产路径；?effects=css 浏览器评审模式保留玻璃看图）。
+   生产本来 0 个 backdrop-filter，降级只换不透明实底 + 边框/内阴影保证对比度，
+   不新增任何模糊（BUILD_PLAN §3.1）。 */
+html[data-windows11="false"] .panel,
+html[data-acrylic="off"] .panel {
+  background-color: var(--panel-solid);
 }
 
-/* 系统"降低透明度"时：生产路径（无 data-effects）给不透明烟熏底，
-   不依赖 CSS 模糊；?effects=css 是浏览器评审模式，保留玻璃层次用于看图。
-   注意：这里不改 backdrop-filter —— 生产本来就没有它，降透明度靠不透明底实现。 */
+/* acrylic 明确不可用时：更实的深海军蓝底 + 亮边框/内阴影，保证无模糊背景的可读性 */
+html[data-acrylic="off"] .panel {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(150, 190, 255, 0.09),
+    inset 0 0 70px rgba(96, 148, 226, 0.1),
+    0 30px 70px rgba(0, 8, 30, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* 系统“降低透明度”时：生产路径（无 data-effects）给同一不透明实底，
+   不依赖 CSS 模糊；?effects=css 是浏览器评审模式，保留玻璃层次用于看图。 */
 @media (prefers-reduced-transparency: reduce) {
   html:not([data-effects="css"]) .panel {
-    background-color: #0b1834;
+    background-color: var(--panel-solid);
   }
 }
 
@@ -313,6 +343,7 @@ html[data-windows11="false"] .panel {
   position: relative;
   width: 15px;
   height: 15px;
+  transition: transform 0.25s var(--ease);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -326,6 +357,10 @@ html[data-windows11="false"] .panel {
 }
 
 .ctrl:hover::before { opacity: 1; }
+
+#btn-refresh:hover svg { transform: rotate(-38deg); }
+#btn-settings:hover svg { transform: rotate(32deg); }
+#btn-pin:hover svg { transform: translateY(-1px) scale(1.07); }
 
 .ctrl:active {
   transform: scale(0.92);
@@ -386,6 +421,42 @@ html[data-windows11="false"] .panel {
     inset 0 -18px 36px rgba(8, 20, 44, 0.18),
     0 16px 36px -16px rgba(0, 10, 34, 0.6);
 }
+
+.hero-card {
+  transition: transform 0.28s var(--ease), border-color 0.28s var(--ease);
+}
+
+.hero:hover .hero-card {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.ring-lg { transition: transform 0.28s var(--ease); }
+.hero:hover .ring-lg { transform: scale(1.025); }
+
+/* 悬停时跟随指针的柔光（JS 写入 --mx/--my；rAF 合并，只重绘这一张小卡） */
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 68%),
+    radial-gradient(76% 76% at 50% 46%, rgba(169, 204, 255, 0.14), rgba(169, 204, 255, 0) 72%);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-card:hover::before { opacity: 1; }
+
+.hero-name,
+.hero-icon { transition: color 0.2s var(--ease), opacity 0.2s var(--ease); }
+
+.hero:hover .hero-name { color: #fff; }
+.hero:hover .hero-icon { opacity: 0.95; }
 
 .hero-meta { padding-left: 2px; }
 
@@ -728,6 +799,7 @@ h1 {
   cursor: pointer;
   contain: layout paint;
   outline-offset: 2px;
+  transition: transform 0.18s var(--ease), border-color 0.2s var(--ease);
 }
 
 /* 悬停：两个预烘焙伪元素只改 opacity（不 transition box-shadow / 背景渐变） */
@@ -736,7 +808,9 @@ h1 {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 100%);
+  background:
+    radial-gradient(140px circle at var(--mx, 50%) var(--my, 50%), rgba(190, 215, 255, 0.22), rgba(190, 215, 255, 0) 70%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 100%);
   opacity: 0;
   transition: opacity 0.2s var(--ease);
   pointer-events: none;
@@ -760,6 +834,11 @@ h1 {
 
 .row:hover::after,
 .row:focus-visible::after { opacity: 1; }
+
+.row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(169, 204, 255, 0.28);
+}
 
 .row:active { transform: scale(0.988); }
 
@@ -828,6 +907,21 @@ h1 {
 }
 
 .row:hover .caret { opacity: 1; transform: translateX(0); }
+
+/* 悬停：图标环轻微放大、文字提亮、图标更清晰（只动 transform/color/opacity） */
+.ring-sm svg { transition: transform 0.25s var(--ease); }
+
+.row:hover .ring-sm svg,
+.row:focus-visible .ring-sm svg { transform: rotate(-90deg) scale(1.06); }
+
+.row-name,
+.row-right,
+.kind-ico { transition: color 0.2s var(--ease), opacity 0.2s var(--ease); }
+
+.row:hover .row-name,
+.row:hover .row-right { color: #fff; }
+
+.row:hover .kind-ico { opacity: 1; }
 
 .kind-ico {
   width: 14px;
@@ -920,6 +1014,9 @@ h1 {
 
 .all-btn:hover::before { opacity: 1; }
 .all-btn:hover::after { opacity: 0.75; }
+
+.all-btn svg { transition: transform 0.22s var(--ease); }
+.all-btn:hover svg { transform: translateX(2px); }
 
 .all-btn:active {
   transform: translateY(1px) scale(0.98);
@@ -1147,6 +1244,50 @@ h1 {
   color: var(--t3);
   opacity: 0.85;
 }
+
+/* ---------------------------------------------------------- 呼吸灯效
+   三处呼吸灯（全部只动 opacity，不触发布局/重绘大区域）：
+   1) 面板外圈的环境光晕（stage::before，位于玻璃之后）；
+   2) 主卡圆环的柔光（.ring-lg .glow，充电时用更强的 charge-breathe）；
+   3) 在线状态点（.live i）。
+   隐藏态由 JS 暂停全部动画 + body.is-hidden 兜底；降低动效由全局媒体查询关闭。 */
+
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 0.26; }
+  50% { opacity: 0.92; }
+}
+
+@keyframes ring-breathe {
+  0%, 100% { opacity: 0.05; }
+  50% { opacity: 0.18; }
+}
+
+@keyframes dot-breathe {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 1; }
+}
+
+/* 面板外圈环境光晕：备选 B 后窗口=面板，光晕不再向外扩 10px（那部分在生产里
+   本来就会被窗口矩形裁掉，且会让 720×380 视口产生 10px 的滚动溢出）；
+   改为与 .stage 同尺寸，只保留透过玻璃可见的部分，预览/生产观感一致。 */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 38px;
+  background:
+    radial-gradient(58% 46% at 50% 100%, rgba(120, 170, 255, 0.4), rgba(120, 170, 255, 0) 72%),
+    radial-gradient(42% 38% at 12% 0%, rgba(190, 215, 255, 0.18), rgba(190, 215, 255, 0) 70%),
+    radial-gradient(40% 36% at 88% 8%, rgba(150, 190, 255, 0.14), rgba(150, 190, 255, 0) 70%);
+  animation: ambient-breathe 7s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ring-lg .glow { animation: ring-breathe 5.6s ease-in-out infinite; }
+
+.live i { animation: dot-breathe 3.4s ease-in-out infinite; }
+.live.is-connecting i { animation: none; }
 
 /* ---------------------------------------------------------- 入场 */
 @keyframes panel-in {

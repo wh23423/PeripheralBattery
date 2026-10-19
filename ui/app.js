@@ -132,6 +132,12 @@
     heroRowKey: null,
     trayPrimed: false,
     hiddenActionsBlocked: 0,
+    /* P1-09：生产面板的浏览器右键菜单 / 加速键拦截计数（Playwright 断言用） */
+    blockedShortcuts: 0,
+    lastBlockedShortcut: '',
+    blockedContextMenus: 0,
+    /* P2-46 / §10.3：app-state 下发的 acrylic 可用性 → html[data-acrylic] */
+    acrylic: '',
     pendingSettings: false,
     pendingSpin: false,
     deviceKeys: [],
@@ -882,6 +888,7 @@
     D.trayPrimed = trayPrimed;
     D.settings = { lowThreshold: settings.lowThreshold, reducedMotion: settings.reducedMotion, pinned: state.pinned };
     D.effects = root.dataset.effects || 'none';
+    D.acrylic = root.dataset.acrylic || '';
     D.reducedMotion = prefersReducedMotion();
     D.hidden = state.hidden;
     D.introActive = document.body.classList.contains('intro');
@@ -1072,7 +1079,19 @@
 
   function handleAppState(as) {
     if (!as || typeof as !== 'object') return;
-    if (typeof as.pinned === 'boolean') {
+    /* A14 / P2-46 / §10.3：Rust 会在窗口显示前也 emit app-state（此时前端可能仍是
+       隐藏态），acrylic 不可用时先落 html[data-acrylic="off"]，保证窗口第一次可见
+       就是实底降级的正确样式（styles.css 里 .panel 的实底降级规则）。
+       只写一个属性、不触发布局，不违反隐藏态「不写 DOM」的性能约束。 */
+    if (typeof as.acrylic === 'boolean') {
+      root.dataset.acrylic = as.acrylic === false ? 'off' : 'on';
+      D.acrylic = root.dataset.acrylic;
+    }
+    /* A12：Tauri 下托盘「固定面板」由 Rust 直接 set_pinned 并 emit app-state，
+       app-state 是唯一事实源；这里只同步状态/UI，绝不能再 invoke set_pinned
+       （否则与本地 setPinned 形成 set_pinned ↔ app-state 反馈环）。 */
+    const pinnedChanged = typeof as.pinned === 'boolean';
+    if (pinnedChanged) {
       state.pinned = as.pinned;
       settings.pinned = as.pinned;
       saveSettings();
@@ -1086,7 +1105,13 @@
     }
     if (typeof as.build === 'string' && as.build) state.build = as.build;
     if (typeof as.version === 'string' && as.version) state.appVersion = as.version;
-    if (state.hidden) { state.dirty = true; return; }
+    if (state.hidden) {
+      state.dirty = true;
+      /* A12：隐藏态 WebView 可能已暂停；pin 状态先记在 D.pendingPin，
+         恢复显示后由 render()/updatePinUI() 统一回写。 */
+      if (pinnedChanged) D.pendingPin = state.pinned;
+      return;
+    }
     updateInfo();
     updatePinUI();
   }
@@ -1171,6 +1196,7 @@
     clearAllTimers();
     cancelAllRaf();
     el['glow-layer'].classList.remove('is-tracking');
+    clearSpotlight();
     /* 1. 暂停全部 Web Animations */
     pausedAnimations = [];
     try {
@@ -1302,8 +1328,13 @@
       if (bridge.hasTauri) spinRefresh();
       else doRefresh();
     } else if (action === 'settings') openDrawer();
-    else if (action === 'toggle-pin') togglePin();
-    else if (action === 'quit') {
+    else if (action === 'toggle-pin') {
+      /* A12：Tauri 下托盘「固定面板」由 Rust 直接 set_pinned 并 emit app-state
+         （隐藏态 WebView 暂停也不丢事件），前端不再自行 toggle，避免 Rust 已翻转后
+         前端再翻转回去或形成 set_pinned ↔ app-state 反馈环。
+         浏览器 mock/预览没有 Rust 托盘，保留本地 toggle 以覆盖隐藏态守卫。 */
+      if (!bridge.hasTauri) togglePin();
+    } else if (action === 'quit') {
       /* Rust 托盘 quit 已经走退出流程，前端不再重复请求 */
       if (!bridge.hasTauri) windowAction('quit');
     }
@@ -1313,6 +1344,21 @@
 
   let specularPending = null;
   let specularRaf = 0;
+
+  /* 行/主卡悬停柔光：同一时刻只点亮一个元素，rAF 合并，隐藏/降低动效时清除。 */
+  let litTarget = null;
+  let litPending = null;
+  let litRaf = 0;
+
+  function clearSpotlight() {
+    if (litTarget) {
+      litTarget.style.removeProperty('--mx');
+      litTarget.style.removeProperty('--my');
+      litTarget = null;
+    }
+    litPending = null;
+    litRaf = 0;
+  }
 
   function flushSpecular() {
     specularRaf = 0;
@@ -1324,10 +1370,36 @@
     el.specular.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
   }
 
+  function flushSpotlight() {
+    litRaf = 0;
+    if (state.hidden || !litTarget || !litPending) return;
+    const r = litTarget.getBoundingClientRect();
+    litTarget.style.setProperty('--mx', (litPending.x - r.left).toFixed(1) + 'px');
+    litTarget.style.setProperty('--my', (litPending.y - r.top).toFixed(1) + 'px');
+    litPending = null;
+  }
+
+  function updateSpotlight(e) {
+    const target = e.target && e.target.closest
+      ? e.target.closest('.row, .hero-card')
+      : null;
+    if (target !== litTarget) {
+      if (litTarget) {
+        litTarget.style.removeProperty('--mx');
+        litTarget.style.removeProperty('--my');
+      }
+      litTarget = target;
+    }
+    if (!litTarget) return;
+    litPending = { x: e.clientX, y: e.clientY };
+    if (!litRaf) litRaf = raf(flushSpotlight);
+  }
+
   function onPointerMove(e) {
     if (state.hidden || prefersReducedMotion()) return;
     specularPending = { x: e.clientX, y: e.clientY };
     if (!specularRaf) specularRaf = raf(flushSpecular);
+    updateSpotlight(e);
   }
 
   function spawnRipple(target, clientX, clientY, small) {
@@ -1397,12 +1469,43 @@
       root.dataset.reducedMotion = 'true';
       D.reducedMotion = true;
       el['glow-layer'].classList.remove('is-tracking');
+      clearSpotlight();
       cancelHeroTween();
     } else {
       delete root.dataset.reducedMotion;
       D.reducedMotion = false;
     }
     el['set-reduced'].checked = !!settings.reducedMotion;
+  }
+
+  /* ========================================================== 生产面板系统交互拦截 */
+
+  /* P1-09：wry 默认 browser_accelerator_keys/default_context_menus 会让生产面板弹出
+     WebView2 浏览器右键菜单；F5/Ctrl+R 会整页重载（产生第二次 ui_ready/show，把用户
+     拖到别处的窗口重置回托盘锚点，并丢失主卡/抽屉状态），Ctrl+P 打印预览覆盖透明小窗。
+     这里在 document 捕获阶段兜底拦截（wry 层关闭默认菜单后仍有效，浏览器评审也不误触）。
+     只拦截明确列出的浏览器级快捷键，Ctrl+C/V/X/A/Z 等文本编辑键不受影响。 */
+  function isBlockedAccelerator(e) {
+    if (e.altKey) return false;
+    const key = String(e.key || '').toLowerCase();
+    if (key === 'f5') return true;
+    if (!e.ctrlKey) return false;
+    return key === 'r' || key === 'p' || key === 'f' || key === 's' || key === 'u';
+  }
+
+  function onBlockedAccelerator(e) {
+    if (!isBlockedAccelerator(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    D.blockedShortcuts++;
+    D.lastBlockedShortcut = String(e.key || '');
+  }
+
+  function onBlockedContextMenu(e) {
+    /* 生产（Tauri）与浏览器 mock 都生效：面板不出现 WebView2 默认右键菜单 */
+    e.preventDefault();
+    e.stopPropagation();
+    D.blockedContextMenus++;
   }
 
   /* ========================================================== 事件绑定 */
@@ -1453,6 +1556,7 @@
     });
     el.panel.addEventListener('pointerleave', function () {
       el['glow-layer'].classList.remove('is-tracking');
+      clearSpotlight();
     });
 
     /* 点击涟漪：按钮/行一套小涟漪，空白玻璃一套大涟漪 */
@@ -1468,6 +1572,10 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && drawerOpen) { e.preventDefault(); closeDrawer(); }
     });
+
+    /* P1-09：浏览器右键菜单 / 加速键兜底拦截（捕获阶段先于页面其它处理） */
+    document.addEventListener('contextmenu', onBlockedContextMenu, true);
+    document.addEventListener('keydown', onBlockedAccelerator, true);
   }
 
   /* ========================================================== 启动 */

@@ -41,11 +41,13 @@ pub fn collector_restart(state: State<'_, AppState>) -> bool {
     state.sidecar.restart()
 }
 
-/// 固定面板，持久化到 app config。
+/// 固定面板，持久化到 app config，并同步托盘菜单勾选（P1-12：Rust 侧是唯一事实源）。
 #[tauri::command]
 pub fn set_pinned(pinned: bool, app: AppHandle, state: State<'_, AppState>) -> bool {
-    crate::log_info!("command set_pinned pinned={pinned}");
-    state.set_pinned(&app, pinned)
+    crate::log_info!("command set_pinned pinned={pinned} source=frontend");
+    let ok = state.set_pinned(&app, pinned);
+    crate::tray::sync_pin_menu(pinned);
+    ok
 }
 
 /// 托盘状态色：level/charging/online/kind → 图标。

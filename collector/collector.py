@@ -286,10 +286,13 @@ class Collector:
         if self.bluetooth_provider is not None and self.settings.is_enabled("bluetooth"):
             try:
                 # Patch only the in-memory PowerShell text: the upstream
-                # providers/bluetooth.py file stays byte-identical. A 10 s
-                # connection poll instead of 2 s is the accepted P2 trade-off;
-                # battery snapshots on connect (+3/+8/+15 s) and once a minute
-                # are unchanged.
+                # providers/bluetooth.py file stays byte-identical. The connection
+                # state is read every bt_watch_ms (30 s instead of upstream 2 s is
+                # the accepted P2 trade-off); battery snapshots wake at the
+                # earliest due time, so the +0/+3/+8/+15 s re-reads after a
+                # connection change and the +3/+8/+15/+30 s cold-start retries
+                # really fire instead of collapsing into the poll interval
+                # (review P1-11).
                 from . import btconfig
                 self._bt_watch_ms = btconfig.configure(self.settings)
             except Exception:
@@ -756,9 +759,10 @@ def make_providers(jbl_listen_first: float = 0.0) -> List[Any]:
         HyperXAlpha2Provider, HyperXCloud3Provider, HyperXCloud3SProvider,
         HyperXProvider, JblProvider, KeychronProvider, LamzuProvider,
         LofreeProvider, LogitechProvider, LogitechCenturionProvider,
-        MchoseProvider, NintendoProvider, NzxtProvider, PlayStationProvider,
-        PulsarProvider, RazerProvider, SteelSeriesEliteProvider,
-        SteelSeriesProvider, WLmouseProvider, XInputProvider, SteamProvider,
+        LunafuryProvider, MchoseProvider, NintendoProvider, NzxtProvider,
+        PlayStationProvider, PulsarProvider, RazerProvider,
+        SteelSeriesEliteProvider, SteelSeriesProvider, WLmouseProvider,
+        XInputProvider, SteamProvider,
     )
     return [RazerProvider(), AudezeProvider(), WLmouseProvider(), MchoseProvider(),
             HyperXAlpha2Provider(), HyperXCloud3Provider(), HyperXProvider(),
@@ -768,7 +772,7 @@ def make_providers(jbl_listen_first: float = 0.0) -> List[Any]:
             PlayStationProvider(), EightBitDoProvider(), BarracudaProvider(),
             NintendoProvider(), AsusProvider(), GWolvesProvider(), LofreeProvider(),
             AstroProvider(), CorsairProvider(),
-            LamzuProvider(), AmInfinityProvider(),
+            LamzuProvider(), LunafuryProvider(), AmInfinityProvider(),
             SteelSeriesEliteProvider(), LogitechCenturionProvider(),
             HyperXCloud3SProvider(), NzxtProvider(),
             SteamProvider()]

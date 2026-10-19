@@ -1,10 +1,13 @@
 """StateStore: complete-snapshot gating, last_seen gone, semantic diff, alerts."""
 from __future__ import annotations
 
+import logging
 import threading
 import time
 
 from conftest import Harness, make_status
+
+_KEYS = {"logitech:046d:c547:u1", "razer:1532:0554:1a2b3c4d"}
 
 
 def _mouse(level=68, charging=False, name="G502 X PLUS"):
@@ -487,3 +490,86 @@ def test_bluetooth_merge_runs_only_on_complete_snapshot(tmp_path):
     devices = h.state.snapshot_devices()
     assert len(devices) == 1                    # dedupe_controllers kept the BT copy
     assert devices[0]["transport"] == "bluetooth"
+
+
+# --------------------------------------------------- P1-10 sleep/resume clock jumps
+def _keepalive_tick(h: Harness, advance: float = 5.0) -> None:
+    """One normal 5 s heartbeat: providers re-report, then the global tick runs."""
+    h.clock.advance(advance)
+    h.begin("logitech", "razer")
+    h.report("logitech", [_mouse()])
+    h.report("razer", [_headset()])
+    h.state.on_tick()
+
+
+def test_two_minutes_of_normal_ticks_never_emit_gone(two_provider_harness):
+    h = two_provider_harness
+    h.sink.clear()
+    for _ in range(24):                         # 24 * 5 s = 120 s awake
+        _keepalive_tick(h)
+    assert h.sink.by_type("gone") == []
+    assert h.sink.by_type("device") == []       # identical values: no churn
+    assert h.state.stats()["clock_jumps"] == 0
+    assert {d["key"] for d in h.state.snapshot_devices()} == _KEYS
+
+
+def test_resume_clock_jump_suppresses_the_gone_storm(two_provider_harness, caplog):
+    """Windows' monotonic clock counts sleep: the first tick after +1 h must not
+    expire every device (P1-10). Devices stay visible and the UI gets a tick."""
+    h = two_provider_harness
+    h.sink.clear()
+    h.state.on_tick()                           # anchor the previous-tick clock
+    h.sink.clear()
+    caplog.set_level(logging.INFO, logger="halo_battery")
+
+    h.clock.advance(3600.0)                     # laptop slept for an hour
+    h.state.on_tick()                           # first tick after resume
+
+    assert h.sink.by_type("gone") == []
+    assert h.sink.by_type("device") == []
+    assert {d["key"] for d in h.state.snapshot_devices()} == _KEYS
+    assert h.state.stats()["clock_jumps"] == 1
+    assert h.state.clock_jumps == 1
+    records = [r.getMessage() for r in caplog.records
+               if "clock jump detected" in r.getMessage()]
+    assert len(records) == 1
+    assert "resume_s=3600.0" in records[0]
+    ticks = h.sink.by_type("tick")              # resync snapshot, not a device storm
+    assert len(ticks) == 1
+    assert {d["key"] for d in ticks[0]["devices"]} == _KEYS
+
+
+def test_gone_decision_is_back_to_normal_after_the_resume_tick(two_provider_harness):
+    h = two_provider_harness
+    h.sink.clear()
+    h.state.on_tick()                           # anchor
+    h.clock.advance(3600.0)
+    h.state.on_tick()                           # suppressed resume tick
+    h.sink.clear()
+
+    for _ in range(10):                         # normal 1 Hz ticks, no new reports
+        h.clock.advance(1.0)
+        h.state.on_tick()
+    assert h.sink.by_type("gone") == []         # 10 s <= max(2*5, 10)
+    h.clock.advance(1.0)
+    h.state.on_tick()                           # 11 s > the gone deadline
+    assert {m["key"] for m in h.sink.by_type("gone")} == _KEYS
+    assert h.state.stats()["clock_jumps"] == 1  # the 1 Hz ticks are not jumps
+
+
+def test_consecutive_normal_ticks_do_not_trigger_resume_detection(two_provider_harness):
+    h = two_provider_harness
+    h.sink.clear()
+    h.state.on_tick()                           # anchor
+    for _ in range(30):
+        h.clock.advance(1.0)
+        h.state.on_tick()
+    assert h.state.stats()["clock_jumps"] == 0
+    assert h.state.clock_jump_threshold == 5.0  # max(5 s, 3 * 1 Hz scheduler period)
+
+    h.clock.advance(4.9)                        # below the threshold
+    h.state.on_tick()
+    assert h.state.stats()["clock_jumps"] == 0
+    h.clock.advance(5.1)                        # longer than the threshold
+    h.state.on_tick()
+    assert h.state.stats()["clock_jumps"] == 1

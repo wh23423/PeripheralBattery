@@ -97,15 +97,47 @@ let browser = null;
 let baseUrl = '';
 const pageErrors = [];
 
-async function openPage(query) {
+/* 默认用 780×440 浏览器预览视口（.stage 720×380 居中，留出外阴影空间）；
+   传 vpWidth/vpHeight 可模拟其它视口，如 720×380 的生产窗口（窗口=面板，备选 B）。 */
+async function openPage(query, vpWidth, vpHeight) {
   const page = await browser.newPage({
-    viewport: { width: W, height: H },
+    viewport: { width: vpWidth || W, height: vpHeight || H },
     deviceScaleFactor: 2
   });
   const pageName = query;
   page.on('pageerror', err => pageErrors.push({ page: pageName, kind: 'pageerror', text: String(err && err.message || err) }));
   page.on('console', msg => {
     if (msg.type() === 'error') pageErrors.push({ page: pageName, kind: 'console', text: msg.text() });
+  });
+  await page.goto(baseUrl + query, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
+  return page;
+}
+
+/* A12 契约测试：模拟 Tauri 外壳（bridge.hasTauri=true，不启动真实应用）。
+   注入最小的 window.__TAURI__：invoke 只记录调用，event.listen 保存 handler。 */
+async function openTauriLikePage(query) {
+  const page = await browser.newPage({
+    viewport: { width: W, height: H },
+    deviceScaleFactor: 2
+  });
+  await page.addInitScript(() => {
+    window.__tauriCalls = [];
+    window.__TAURI__ = {
+      core: {
+        invoke: async (cmd, args) => {
+          window.__tauriCalls.push({ cmd: cmd, args: args || null });
+          return null;
+        }
+      },
+      event: {
+        listen: async () => () => {}
+      }
+    };
+  });
+  page.on('pageerror', err => pageErrors.push({ page: 'tauri-like:' + query, kind: 'pageerror', text: String(err && err.message || err) }));
+  page.on('console', msg => {
+    if (msg.type() === 'error') pageErrors.push({ page: 'tauri-like:' + query, kind: 'console', text: msg.text() });
   });
   await page.goto(baseUrl + query, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.__pbDebug && window.__pbDebug.renders > 0, null, { timeout: 8000 });
@@ -164,6 +196,7 @@ function rect(page, selector) {
         const list = document.getElementById('list');
         const hero = document.getElementById('hero').getBoundingClientRect();
         const side = document.querySelector('.side').getBoundingClientRect();
+        const bodyCs = getComputedStyle(document.body);
         return {
           vw: window.innerWidth,
           vh: window.innerHeight,
@@ -172,16 +205,23 @@ function rect(page, selector) {
           listClient: list.clientHeight,
           hero: { x: hero.x, y: hero.y, right: hero.right, bottom: hero.bottom },
           side: { x: side.x, y: side.y, right: side.right, bottom: side.bottom },
+          bodyPadding: [bodyCs.paddingTop, bodyCs.paddingRight, bodyCs.paddingBottom, bodyCs.paddingLeft],
+          panelRadius: getComputedStyle(document.getElementById('panel')).borderTopLeftRadius,
           docOverflowX: document.documentElement.scrollWidth > window.innerWidth,
           docOverflowY: document.documentElement.scrollHeight > window.innerHeight
         };
       });
-      /* BUILD_PLAN §5.1：780×440 窗口里 720×380 面板，四周正好 30px 安全边 */
-      ok(Math.abs(layout.panel.x - 30) <= 1, '面板左安全边不是 30px：' + layout.panel.x);
-      ok(Math.abs(layout.panel.y - 30) <= 1, '面板上安全边不是 30px：' + layout.panel.y);
+      /* 备选 B（REVIEW-REPORT §10.3）：生产窗口 = 面板 720×380，四周无安全边。
+         本用例用 780×440 浏览器预览视口：body 是 grid 居中容器，.stage 应正好
+         居中（左右/上下各留 30px 预览余量，只为能看到外阴影）。 */
+      ok(Math.abs(layout.panel.x - (W - 720) / 2) <= 1, '预览视口下面板未水平居中：' + layout.panel.x);
+      ok(Math.abs(layout.panel.y - (H - 380) / 2) <= 1, '预览视口下面板未垂直居中：' + layout.panel.y);
       eq(Math.round(layout.panel.w), 720, '面板宽度');
       eq(Math.round(layout.panel.h), 380, '面板高度');
-      ok(layout.panel.right <= W - 29 && layout.panel.bottom <= H - 29, '面板撑出窗口安全边');
+      ok(layout.panel.right <= W - 29 && layout.panel.bottom <= H - 29, '面板撑出 780×440 预览视口');
+      /* 备选 B：不能再靠 body padding 造安全边；圆角 12px 贴近 DWM 窗口圆角 */
+      eq(layout.bodyPadding.join(','), '0px,0px,0px,0px', 'body 仍有 padding（备选 B 应无安全边）');
+      eq(layout.panelRadius, '12px', '面板圆角应为 12px（贴近 Win11 DWM 窗口圆角）');
       ok(!layout.docOverflowX && !layout.docOverflowY, '文档出现滚动溢出');
       ok(layout.listScroll <= layout.listClient + 1, 'demo 列表出现纵向溢出：' + layout.listScroll + ' > ' + layout.listClient);
       ok(layout.hero.right <= layout.panel.right && layout.hero.bottom <= layout.panel.bottom, '主卡溢出面板');
@@ -719,15 +759,15 @@ function rect(page, selector) {
       ok(!opened.inert, '打开后抽屉仍有 inert');
       eq(opened.focus, 'set-threshold', '打开抽屉后焦点未进入第一个设置项');
 
-      /* 抽屉是覆盖层，不能改变 720×380 面板外框 */
+      /* 抽屉是覆盖层，不能改变 720×380 面板外框/在预览视口中的居中位置 */
       const panelWhileOpen = await page.evaluate(() => {
         const r = document.getElementById('panel').getBoundingClientRect();
         return { x: r.x, y: r.y, w: r.width, h: r.height };
       });
       eq(Math.round(panelWhileOpen.w), 720, '打开设置后面板宽度被改变');
       eq(Math.round(panelWhileOpen.h), 380, '打开设置后面板高度被改变');
-      eq(Math.round(panelWhileOpen.x), 30, '打开设置后安全边改变');
-      eq(Math.round(panelWhileOpen.y), 30, '打开设置后安全边改变');
+      eq(Math.round(panelWhileOpen.x), (W - 720) / 2, '打开设置后面板在预览视口中的位置被改变');
+      eq(Math.round(panelWhileOpen.y), (H - 380) / 2, '打开设置后面板在预览视口中的位置被改变');
 
       /* 调整低电阈值：32 → 55% 的 Arctis 7P 不应再被判低电之外，检查阈值写入生效 */
       await page.evaluate(() => {
@@ -1253,11 +1293,517 @@ function rect(page, selector) {
       ok(info.toastInPanel, 'toast 越出了面板边界');
       eq(Math.round(info.panel.w), 720, 'toast 改变了面板宽度');
       eq(Math.round(info.panel.h), 380, 'toast 改变了面板高度');
-      eq(Math.round(info.panel.x), 30, '面板安全边被改变');
-      eq(Math.round(info.panel.y), 30, '面板安全边被改变');
+      eq(Math.round(info.panel.x), (W - 720) / 2, '面板在预览视口中的位置被改变');
+      eq(Math.round(info.panel.y), (H - 380) / 2, '面板在预览视口中的位置被改变');
       await screenshot(page, 'ui-dev-toast.png');
     } finally {
       await page.close();
+    }
+  });
+
+  /* ============ A4. 拖拽区 deep（P1-08） ============ */
+  await test('A4 drag-region="deep"：标题/副标题/空白 header 可拖，按钮不在拖拽区内', async () => {
+    const html = fs.readFileSync(path.join(UI_DIR, 'index.html'), 'utf8');
+    /* 去掉 HTML 注释再匹配属性（注释里解释了 P1-08，不能算属性出现） */
+    const markup = html.replace(/<!--[\s\S]*?-->/g, '');
+    const dragTags = markup.match(/<[^>]*data-tauri-drag-region[^>]*>/g) || [];
+    eq(dragTags.length, 1, 'data-tauri-drag-region 应只出现一处（.side-head）');
+    includes(dragTags[0], 'class="side-head"', '拖拽区不在 .side-head 上');
+    includes(dragTags[0], 'data-tauri-drag-region="deep"', '拖拽区不是 deep（裸属性只对元素自身生效）');
+
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      const info = await page.evaluate(() => {
+        const head = document.querySelector('.side-head');
+        const headRect = head.getBoundingClientRect();
+        const probe = (x, y) => {
+          const node = document.elementFromPoint(x, y);
+          const region = node && node.closest ? node.closest('[data-tauri-drag-region]') : null;
+          return {
+            tag: node ? node.tagName : '',
+            insideHead: !!(node && head.contains(node)),
+            region: region ? String(region.className || '') : ''
+          };
+        };
+        const titleRect = document.querySelector('.side-head h1').getBoundingClientRect();
+        const subRect = document.getElementById('subtitle').getBoundingClientRect();
+        const btn = document.getElementById('btn-settings').getBoundingClientRect();
+        const btnNode = document.elementFromPoint(btn.left + btn.width / 2, btn.top + btn.height / 2);
+        return {
+          attr: head.getAttribute('data-tauri-drag-region'),
+          headH: headRect.height,
+          title: probe(titleRect.left + 2, titleRect.top + titleRect.height / 2),
+          subtitle: probe(subRect.left + 2, subRect.top + subRect.height / 2),
+          /* 标题行与副标题之间的 6px 空白（P1-08 真机唯一能拖的缝隙） */
+          blank: probe(headRect.left + 2, titleRect.bottom + 3),
+          interactiveInHead: head.querySelectorAll('button, input, textarea, select, a, [contenteditable], [tabindex]:not([tabindex="-1"])').length,
+          controlsInHead: head.contains(document.getElementById('controls')),
+          controlsHit: !!(btnNode && (btnNode.id === 'btn-settings' || btnNode.closest('#btn-settings')))
+        };
+      });
+      eq(info.attr, 'deep', '.side-head 的 drag-region 不是 deep');
+      ok(info.headH > 40, 'header 高度异常：' + info.headH);
+      ['title', 'subtitle', 'blank'].forEach(name => {
+        ok(info[name].insideHead, name + ' 命中点不在 .side-head 内：' + JSON.stringify(info[name]));
+        includes(info[name].region, 'side-head', name + ' 命中点不属于 drag-region 子树');
+      });
+      eq(info.interactiveInHead, 0, '拖拽区内仍有可交互元素（deep 会排除它们，但 header 应只有文本）');
+      ok(!info.controlsInHead, '控制按钮簇落入 drag-region 子树，会影响按钮点击');
+      ok(info.controlsHit, '设置按钮中心命中测试失败（按钮被其它层遮挡）');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ A5. 右键菜单拦截（P1-09） ============ */
+  await test('A5 contextmenu 被 document 级拦截（生产+浏览器 mock），不弹 WebView2 默认菜单', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      /* 合成事件：document 级 handler 调用 preventDefault 后事件对象必须被取消 */
+      const synth = await page.evaluate(() => {
+        const before = window.__pbDebug.blockedContextMenus;
+        const ev = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+        const dispatched = document.querySelector('.hero-card').dispatchEvent(ev);
+        return {
+          before: before,
+          after: window.__pbDebug.blockedContextMenus,
+          prevented: ev.defaultPrevented,
+          dispatched: dispatched
+        };
+      });
+      eq(synth.prevented, true, '合成 contextmenu 未被 preventDefault');
+      eq(synth.dispatched, false, '合成 contextmenu 的 dispatchEvent 未返回 false');
+      eq(synth.after, synth.before + 1, 'contextmenu 拦截计数未递增');
+
+      /* 真实右击：走与生产一致的输入事件路径 */
+      await page.mouse.click(W * 0.5, H * 0.55, { button: 'right' });
+      await sleep(150);
+      const real = await page.evaluate(() => ({
+        blocked: window.__pbDebug.blockedContextMenus,
+        rows: document.querySelectorAll('.row:not([hidden])').length,
+        renders: window.__pbDebug.renders
+      }));
+      ok(real.blocked > synth.after, '真实右击未触发 contextmenu 拦截：' + real.blocked);
+      eq(real.rows, 4, '右击后页面状态异常（行数变化）');
+      ok(real.renders > 0, '右击后页面被重载');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ A6. 浏览器加速键拦截（P1-09） ============ */
+  await test('A6 F5/Ctrl+R/Ctrl+Shift+R/Ctrl+P/Ctrl+F/Ctrl+S/Ctrl+U 被拦截且页面不重载', async () => {
+    const page = await openPage('?mock&freeze&effects=css');
+    try {
+      await waitIntroDone(page);
+      const cases = [
+        { label: 'F5', key: 'F5' },
+        { label: 'Ctrl+R', key: 'r', ctrl: true },
+        { label: 'Ctrl+Shift+R', key: 'R', ctrl: true, shift: true },
+        { label: 'Ctrl+P', key: 'p', ctrl: true },
+        { label: 'Ctrl+F', key: 'f', ctrl: true },
+        { label: 'Ctrl+S', key: 's', ctrl: true },
+        { label: 'Ctrl+U', key: 'u', ctrl: true }
+      ];
+
+      const base = await page.evaluate(() => {
+        window.__accelToken = 'alive-' + Date.now();
+        return {
+          token: window.__accelToken,
+          renders: window.__pbDebug.renders,
+          blocked: window.__pbDebug.blockedShortcuts
+        };
+      });
+
+      /* 1) 合成 keydown：defaultPrevented + dispatchEvent 返回 false */
+      for (const c of cases) {
+        const r = await page.evaluate(c => {
+          const ev = new KeyboardEvent('keydown', {
+            key: c.key, ctrlKey: !!c.ctrl, shiftKey: !!c.shift, bubbles: true, cancelable: true
+          });
+          const dispatched = document.getElementById('panel').dispatchEvent(ev);
+          return { prevented: ev.defaultPrevented, dispatched: dispatched };
+        }, c);
+        ok(r.prevented, c.label + ' 未被 preventDefault（合成 keydown）');
+        eq(r.dispatched, false, c.label + ' 的 dispatchEvent 未被取消（合成 keydown）');
+      }
+
+      /* 2) 真实按键：同样被拦截，且页面不重载（token/渲染计数保持） */
+      for (const c of cases) {
+        const combo = c.ctrl
+          ? (c.shift ? 'Control+Shift+' : 'Control+') + c.key.toUpperCase()
+          : c.key;
+        await page.keyboard.press(combo);
+      }
+      await sleep(200);
+      const after = await page.evaluate(() => ({
+        token: window.__accelToken || '',
+        renders: window.__pbDebug.renders,
+        blocked: window.__pbDebug.blockedShortcuts
+      }));
+      eq(after.token, base.token, '页面被加速键重载（token 丢失）');
+      eq(after.renders, base.renders, '加速键触发了整页重载/重新渲染');
+      ok(after.blocked >= base.blocked + cases.length * 2,
+        '加速键拦截计数不足：' + after.blocked + '（合成+真实应至少 +' + (cases.length * 2) + '）');
+
+      /* 3) 文本编辑快捷键不能被误伤 */
+      const textKeys = await page.evaluate(() => {
+        const out = {};
+        ['c', 'v', 'x', 'a', 'z', 'y'].forEach(key => {
+          const ev = new KeyboardEvent('keydown', { key: key, ctrlKey: true, bubbles: true, cancelable: true });
+          document.getElementById('panel').dispatchEvent(ev);
+          out[key] = ev.defaultPrevented;
+        });
+        return out;
+      });
+      Object.keys(textKeys).forEach(k => {
+        ok(!textKeys[k], 'Ctrl+' + k.toUpperCase() + ' 文本编辑快捷键被误拦截');
+      });
+
+      /* 输入框内同样保留编辑快捷键（焦点在抽屉滑块上时 Ctrl+A 不被拦截） */
+      const inInput = await page.evaluate(() => {
+        document.getElementById('btn-settings').click();
+        const input = document.getElementById('set-threshold');
+        const ev = new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true, cancelable: true });
+        input.dispatchEvent(ev);
+        return {
+          prevented: ev.defaultPrevented,
+          drawerOpen: document.getElementById('drawer').classList.contains('is-open')
+        };
+      });
+      ok(inInput.drawerOpen, '设置抽屉未打开（前置条件失败）');
+      ok(!inInput.prevented, '输入框内 Ctrl+A 被误拦截');
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ A7. 托盘 pin 契约 + acrylic 降级（A12/A14） ============ */
+  await test('A7 app-state 是 pin 事实源（不回调 set_pinned）；acrylic=false 走实底降级', async () => {
+    const appJs = fs.readFileSync(path.join(UI_DIR, 'app.js'), 'utf8');
+    ok(/action\s*===\s*['"]toggle-pin['"][\s\S]{0,360}bridge\.hasTauri/.test(appJs),
+      'toggle-pin 分支缺少 bridge.hasTauri 判断（Tauri 下会与 Rust set_pinned 互相抵消）');
+
+    const page = await openPage('?mock&freeze');
+    try {
+      /* 1) 浏览器 mock 路径：托盘 toggle-pin 仍本地翻转（现有隐藏态守卫依赖它） */
+      const tray = await page.evaluate(() => {
+        const callsBefore = window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length;
+        window.__pbMock.trayAction('toggle-pin');
+        return {
+          callsBefore: callsBefore,
+          callsAfter: window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length,
+          pinOn: document.getElementById('btn-pin').classList.contains('is-on')
+        };
+      });
+      ok(tray.pinOn, 'mock 路径托盘 toggle-pin 未本地翻转');
+      ok(tray.callsAfter > tray.callsBefore, 'mock 路径托盘 toggle-pin 未调用 set_pinned');
+
+      /* 2) app-state 下发 pinned：只同步状态/UI，不得再回调 set_pinned（避免反馈环） */
+      const sync = await page.evaluate(() => {
+        const callsBefore = window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length;
+        window.__pbMock.appState({
+          pinned: true, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: true
+        });
+        return {
+          callsBefore: callsBefore,
+          callsAfter: window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length,
+          pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+          ariaPressed: document.getElementById('btn-pin').getAttribute('aria-pressed'),
+          drawerChecked: document.getElementById('set-pinned').checked,
+          stored: JSON.parse(localStorage.getItem('pb.settings.v1') || '{}').pinned,
+          acrylic: document.documentElement.dataset.acrylic
+        };
+      });
+      eq(sync.callsAfter, sync.callsBefore, 'handleAppState 收到 pinned 后又 invoke set_pinned（反馈环）');
+      ok(sync.pinOn, 'app-state pinned=true 未回写 pin 按钮');
+      eq(sync.ariaPressed, 'true', 'app-state pinned 未更新 aria-pressed');
+      eq(sync.drawerChecked, true, 'app-state pinned 未更新设置抽屉勾选');
+      eq(sync.stored, true, 'app-state pinned 未持久化到 localStorage');
+      eq(sync.acrylic, 'on', 'app-state acrylic=true 未落到 html[data-acrylic="on"]');
+
+      /* 3) acrylic=false：实底/边框/内阴影降级，且不新增 backdrop-filter */
+      const fallback = await page.evaluate(() => {
+        const parseAlpha = color => {
+          const m = String(color).match(/rgba?\(([^)]+)\)/);
+          if (!m) return 1;
+          const parts = m[1].split(',').map(Number);
+          return parts.length === 4 ? parts[3] : 1;
+        };
+        window.__pbMock.appState({
+          pinned: false, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: false
+        });
+        const cs = getComputedStyle(document.getElementById('panel'));
+        return {
+          acrylic: document.documentElement.dataset.acrylic,
+          bg: cs.backgroundColor,
+          bgAlpha: parseAlpha(cs.backgroundColor),
+          solid: getComputedStyle(document.documentElement).getPropertyValue('--panel-solid').trim(),
+          borderAlpha: parseAlpha(cs.borderTopColor),
+          shadow: cs.boxShadow,
+          backdrop: cs.backdropFilter,
+          webkitBackdrop: (cs.getPropertyValue('-webkit-backdrop-filter') || '').trim() || 'none'
+        };
+      });
+      eq(fallback.acrylic, 'off', 'app-state acrylic=false 未落到 html[data-acrylic="off"]');
+      eq(fallback.solid, '#0a1830', '缺少 --panel-solid 实底变量');
+      eq(fallback.bgAlpha, 1, 'acrylic=false 时面板背景仍半透明：' + fallback.bg);
+      eq(fallback.backdrop, 'none', 'acrylic 降级新增了 backdrop-filter（生产约束）');
+      eq(fallback.webkitBackdrop, 'none', 'acrylic 降级新增了 -webkit-backdrop-filter（生产约束）');
+      includes(fallback.shadow, 'inset', 'acrylic=false 面板缺少内阴影');
+      ok(fallback.borderAlpha > 0.18, 'acrylic=false 边框未强化：alpha=' + fallback.borderAlpha);
+
+      /* 4) acrylic=true 恢复玻璃（不作为生产约束，但保证属性可逆） */
+      const restored = await page.evaluate(() => {
+        window.__pbMock.appState({
+          pinned: false, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: true
+        });
+        return {
+          acrylic: document.documentElement.dataset.acrylic,
+          bg: getComputedStyle(document.getElementById('panel')).backgroundColor
+        };
+      });
+      eq(restored.acrylic, 'on', 'acrylic=true 未恢复 html[data-acrylic="on"]');
+      eq(restored.bg, 'rgba(0, 0, 0, 0)', 'acrylic=true 后实底降级未撤销：' + restored.bg);
+    } finally {
+      await page.close();
+    }
+
+    /* 5) 隐藏态（WebView 暂停）：app-state pinned 只记 D.pendingPin，不写 DOM、不回调 invoke */
+    const hidden = await openPage('?mock&freeze&effects=css&hide');
+    try {
+      await hidden.waitForFunction(() => window.__pbDebug.hidden === true, null, { timeout: 5000 });
+      await sleep(120);
+      const before = await hidden.evaluate(() => ({
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        calls: window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length
+      }));
+      await hidden.evaluate(() => {
+        window.__pbMock.appState({
+          pinned: true, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: false
+        });
+      });
+      await sleep(150);
+      const during = await hidden.evaluate(() => ({
+        renders: window.__pbDebug.renders,
+        domWrites: window.__pbDebug.domWritesWhileHidden,
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        pendingPin: window.__pbDebug.pendingPin,
+        calls: window.__pbBridge.calls.filter(c => c.cmd === 'set_pinned').length,
+        stored: JSON.parse(localStorage.getItem('pb.settings.v1') || '{}').pinned,
+        acrylic: document.documentElement.dataset.acrylic
+      }));
+      eq(during.renders, before.renders, '隐藏态 app-state 触发了 DOM 渲染');
+      eq(during.domWrites, 0, '隐藏态 app-state 写入了 DOM');
+      eq(during.calls, before.calls, '隐藏态 app-state 又 invoke set_pinned');
+      eq(during.pinOn, before.pinOn, '隐藏态 app-state 直接改动了 pin 按钮');
+      eq(during.pendingPin, true, '隐藏态 pinned 未记录到 D.pendingPin');
+      eq(during.stored, true, '隐藏态 pinned 未持久化');
+      eq(during.acrylic, 'off', '隐藏态（显示前）acrylic=false 未先落 dataset');
+
+      /* 恢复显示：pin UI 由 render() 统一回写 */
+      await hidden.evaluate(() => window.__pbMock.visibility(false));
+      await hidden.waitForFunction(() => window.__pbDebug.hidden === false, null, { timeout: 3000 });
+      await sleep(120);
+      const resumed = await hidden.evaluate(() => ({
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        renders: window.__pbDebug.renders,
+        acrylic: document.documentElement.dataset.acrylic
+      }));
+      ok(resumed.pinOn, '恢复显示后 pin 按钮未回写');
+      ok(resumed.renders > before.renders, '恢复显示后未渲染');
+      eq(resumed.acrylic, 'off', '恢复显示后 acrylic 降级样式丢失');
+    } finally {
+      await hidden.close();
+    }
+  });
+
+  /* ============ A8. Tauri-like 下的 pin 契约（A12） ============ */
+  await test('A8 模拟 Tauri：tray-action toggle-pin 前端不翻转，app-state 为唯一 pin 事实源', async () => {
+    const page = await openTauriLikePage('?mock&freeze');
+    try {
+      const env = await page.evaluate(() => ({
+        hasTauri: window.PB.bridge.hasTauri,
+        dataTauri: document.documentElement.dataset.tauri
+      }));
+      eq(env.hasTauri, true, '模拟 Tauri 环境未生效（bridge.hasTauri 仍为 false）');
+      eq(env.dataTauri, 'true', 'html[data-tauri] 未标记为 true');
+
+      /* 托盘 pin：Rust 已 set_pinned + emit app-state；前端收到 tray-action 不得再翻转 */
+      const tray = await page.evaluate(() => {
+        const count = () => (window.__tauriCalls || []).filter(c => c.cmd === 'set_pinned').length;
+        const pinBefore = document.getElementById('btn-pin').classList.contains('is-on');
+        const callsBefore = count();
+        window.__pbMock.trayAction('toggle-pin');
+        return {
+          callsBefore: callsBefore,
+          callsAfter: count(),
+          pinBefore: pinBefore,
+          pinAfter: document.getElementById('btn-pin').classList.contains('is-on')
+        };
+      });
+      eq(tray.callsAfter, tray.callsBefore, 'Tauri 下 tray-action toggle-pin 仍 invoke set_pinned（会与 Rust 双翻转）');
+      eq(tray.pinAfter, tray.pinBefore, 'Tauri 下 tray-action toggle-pin 仍自行改 pin UI');
+
+      /* Rust emit app-state(pinned=true)：UI 同步，且不产生 set_pinned invoke（无反馈环） */
+      const sync = await page.evaluate(() => {
+        const count = () => (window.__tauriCalls || []).filter(c => c.cmd === 'set_pinned').length;
+        const callsBefore = count();
+        window.__pbMock.appState({
+          pinned: true, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: false
+        });
+        const m = getComputedStyle(document.getElementById('panel')).backgroundColor.match(/rgba?\(([^)]+)\)/);
+        const parts = m ? m[1].split(',').map(Number) : [];
+        return {
+          callsBefore: callsBefore,
+          callsAfter: count(),
+          pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+          acrylic: document.documentElement.dataset.acrylic,
+          bgAlpha: parts.length === 4 ? parts[3] : 1
+        };
+      });
+      eq(sync.callsAfter, sync.callsBefore, 'Tauri 下 app-state pinned 又 invoke set_pinned（反馈环）');
+      ok(sync.pinOn, 'Tauri 下 app-state pinned=true 未回写 pin UI');
+      eq(sync.acrylic, 'off', 'Tauri 下 app-state acrylic=false 未落 dataset');
+      eq(sync.bgAlpha, 1, 'Tauri 下 acrylic=false 面板未实底降级');
+
+      /* 模拟 Rust emit pinned=false：UI 跟随，仍然不产生 set_pinned invoke */
+      await page.evaluate(() => {
+        window.__pbMock.appState({
+          pinned: false, platform: { windows11: true, build: 22631 },
+          build: 'mock', version: '0.1.0', acrylic: true
+        });
+      });
+      const off = await page.evaluate(() => ({
+        pinOn: document.getElementById('btn-pin').classList.contains('is-on'),
+        calls: (window.__tauriCalls || []).filter(c => c.cmd === 'set_pinned').length
+      }));
+      ok(!off.pinOn, 'Tauri 下 app-state pinned=false 未回写 pin UI');
+      eq(off.calls, tray.callsBefore, 'Tauri 下 pin 同步链路出现额外 set_pinned invoke');
+
+      const tauriErrors = pageErrors.filter(e => e.page === 'tauri-like:?mock&freeze');
+      eq(tauriErrors.length, 0, '模拟 Tauri 页面出现控制台错误：' + JSON.stringify(tauriErrors.slice(0, 3)));
+    } finally {
+      await page.close();
+    }
+  });
+
+  /* ============ A9. 备选 B：生产窗口 = 面板 720×380（§10.3） ============ */
+  await test('A9 720×380 生产视口：body padding=0、stage/panel 填满窗口、内部元素不出界', async () => {
+    /* 生产（无 ?effects=css）：窗口 = 面板，720×380 视口应被 .stage/.panel 正好填满 */
+    const prod = await openPage('?demo', 720, 380);
+    try {
+      await waitIntroDone(prod);
+      const info = await prod.evaluate(() => {
+        const rect = sel => {
+          const node = document.querySelector(sel);
+          if (!node) return null;
+          const r = node.getBoundingClientRect();
+          return { x: r.x, y: r.y, w: r.width, h: r.height, right: r.right, bottom: r.bottom };
+        };
+        const bodyCs = getComputedStyle(document.body);
+        const panelCs = getComputedStyle(document.getElementById('panel'));
+        return {
+          vw: window.innerWidth,
+          vh: window.innerHeight,
+          bodyPadding: [bodyCs.paddingTop, bodyCs.paddingRight, bodyCs.paddingBottom, bodyCs.paddingLeft],
+          docOverflowX: document.documentElement.scrollWidth > window.innerWidth,
+          docOverflowY: document.documentElement.scrollHeight > window.innerHeight,
+          stage: rect('.stage'),
+          panel: rect('#panel'),
+          glow: rect('#glow-layer'),
+          controls: rect('#controls'),
+          hero: rect('#hero'),
+          side: rect('.side'),
+          foot: rect('.side-foot'),
+          list: rect('#list'),
+          panelRadius: panelCs.borderTopLeftRadius,
+          panelBackdrop: panelCs.backdropFilter
+        };
+      });
+      eq(info.vw, 720, '生产视口宽度应为 720');
+      eq(info.vh, 380, '生产视口高度应为 380');
+      eq(info.bodyPadding.join(','), '0px,0px,0px,0px', 'body padding 应为 0（备选 B 无安全边）');
+      ok(!info.docOverflowX && !info.docOverflowY, '720×380 生产视口出现滚动溢出');
+      eq(info.panelBackdrop, 'none', '生产模式 720×380 不应出现 backdrop-filter');
+      const fills = r => !!r && Math.abs(r.x) < 0.5 && Math.abs(r.y) < 0.5 &&
+        Math.abs(r.w - 720) < 0.5 && Math.abs(r.h - 380) < 0.5;
+      ok(fills(info.stage), '.stage 未填满 720×380 窗口：' + JSON.stringify(info.stage));
+      ok(fills(info.panel), '.panel 未填满 720×380 窗口：' + JSON.stringify(info.panel));
+      ok(fills(info.glow), 'glow-layer 未与面板/窗口对齐：' + JSON.stringify(info.glow));
+      eq(info.panelRadius, '12px', '面板圆角应为 12px（窗口=面板时贴近 DWM 圆角）');
+      const inside = (r, label) => {
+        ok(!!r, label + ' 不存在');
+        ok(r.x >= -0.5 && r.y >= -0.5 && r.right <= 720.5 && r.bottom <= 380.5,
+          label + ' 越出 720×380 窗口：' + JSON.stringify(r));
+      };
+      inside(info.controls, '控件簇');
+      inside(info.hero, '主卡');
+      inside(info.side, '列表区');
+      inside(info.foot, '列表 footer');
+      inside(info.list, '列表滚动区');
+      await screenshot(prod, 'ui-prod-720x380.png');
+
+      /* 抽屉 / toast 是绝对定位覆盖层，720×380 下也不能越界。
+         注意用 demo 自己的 session 发 alert，避免 mock 默认 session 触发全量重置。 */
+      await prod.evaluate(() => {
+        document.getElementById('btn-settings').click();
+        window.__pbMock.emit({
+          t: 'alert', session: window.__pbDebug.session, kind: 'low',
+          key: 'headset:arctis-nova-7', level: 12, text: 'Arctis Nova 7 电量低，建议充电'
+        });
+      });
+      await sleep(420);
+      const overlay = await prod.evaluate(() => {
+        const pick = sel => {
+          const node = document.querySelector(sel);
+          if (!node) return null;
+          const r = node.getBoundingClientRect();
+          return { x: r.x, y: r.y, right: r.right, bottom: r.bottom };
+        };
+        return { drawer: pick('#drawer'), toast: pick('.toast') };
+      });
+      const inWindow = r => !!r && r.x >= -0.5 && r.y >= -0.5 && r.right <= 720.5 && r.bottom <= 380.5;
+      ok(inWindow(overlay.drawer), '抽屉越出 720×380 窗口：' + JSON.stringify(overlay.drawer));
+      ok(inWindow(overlay.toast), 'toast 越出 720×380 窗口：' + JSON.stringify(overlay.toast));
+      await screenshot(prod, 'ui-prod-720x380-overlay.png');
+    } finally {
+      await prod.close();
+    }
+
+    /* ?effects=css 浏览器评审模式在 720×380 生产视口下仍能正常看图（4 处模糊） */
+    const dev = await openPage('?demo&effects=css', 720, 380);
+    try {
+      await waitIntroDone(dev);
+      const devInfo = await dev.evaluate(() => {
+        const sel = s => getComputedStyle(document.querySelector(s)).backdropFilter;
+        const panel = document.getElementById('panel').getBoundingClientRect();
+        return {
+          panel: sel('#panel'),
+          controls: sel('#controls'),
+          hero: sel('.hero-card'),
+          row: sel('.row'),
+          bodyPadding: getComputedStyle(document.body).paddingTop,
+          panelRect: { x: panel.x, y: panel.y, w: panel.width, h: panel.height }
+        };
+      });
+      ok(devInfo.panel !== 'none', '720×380 评审模式面板无 backdrop-filter');
+      ok(devInfo.controls !== 'none', '720×380 评审模式控件簇无 backdrop-filter');
+      ok(devInfo.hero !== 'none', '720×380 评审模式主卡无 backdrop-filter');
+      ok(devInfo.row !== 'none', '720×380 评审模式列表行无 backdrop-filter');
+      eq(devInfo.bodyPadding, '0px', '720×380 评审模式 body padding 应仍为 0');
+      eq(Math.round(devInfo.panelRect.w), 720, '720×380 评审模式面板宽度');
+      eq(Math.round(devInfo.panelRect.h), 380, '720×380 评审模式面板高度');
+      await screenshot(dev, 'ui-dev-720x380-effects.png');
+    } finally {
+      await dev.close();
     }
   });
 

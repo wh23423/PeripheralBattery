@@ -1,0 +1,242 @@
+{
+ "forcedButtons": {
+  "ctrl": [
+   {
+    "id": "btn-refresh",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   },
+   {
+    "id": "btn-pin",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   },
+   {
+    "id": "btn-settings",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   },
+   {
+    "id": "btn-min",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   },
+   {
+    "id": "btn-close",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   },
+   {
+    "id": "btn-drawer-close",
+    "color": "rgb(0, 0, 0)",
+    "bg": "rgba(255, 255, 255, 0)",
+    "stroke": "rgb(0, 0, 0)"
+   }
+  ],
+  "h1Color": "rgb(0, 0, 0)",
+  "bodyBg": "rgba(255, 255, 255, 0)",
+  "htmlBg": "rgba(255, 255, 255, 0)",
+  "panelBg": "rgba(255, 255, 255, 0)",
+  "panelBgImage": [
+   "url(\"data:image/svg+xml,%3Csvg xmlns='http://",
+   " linear-gradient(150deg, rgba(255, 255, 255, ",
+   " linear-gradient(155deg, rgba(14, 34, 74, 0.6"
+  ]
+ },
+ "tabOrderClean": [
+  {
+   "id": "btn-refresh",
+   "cls": "ctrl",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "刷新",
+   "visible": true
+  },
+  {
+   "id": "btn-pin",
+   "cls": "ctrl",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "固定",
+   "visible": true
+  },
+  {
+   "id": "btn-settings",
+   "cls": "ctrl",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "设置",
+   "visible": true
+  },
+  {
+   "id": "btn-min",
+   "cls": "ctrl",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "最小化",
+   "visible": true
+  },
+  {
+   "id": "btn-close",
+   "cls": "ctrl",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "关闭",
+   "visible": true
+  },
+  {
+   "id": null,
+   "cls": "row",
+   "tag": "DIV",
+   "inDrawer": false,
+   "label": "Xbox Elite 2，45%，充电中",
+   "visible": true
+  },
+  {
+   "id": null,
+   "cls": "row",
+   "tag": "DIV",
+   "inDrawer": false,
+   "label": "Viper V3 Pro，68%",
+   "visible": true
+  },
+  {
+   "id": null,
+   "cls": "row",
+   "tag": "DIV",
+   "inDrawer": false,
+   "label": "Logi M185，电量未知",
+   "visible": true
+  },
+  {
+   "id": null,
+   "cls": "row",
+   "tag": "DIV",
+   "inDrawer": false,
+   "label": "Arctis 7P，55%",
+   "visible": true
+  },
+  {
+   "id": "btn-all",
+   "cls": "all-btn",
+   "tag": "BUTTON",
+   "inDrawer": false,
+   "label": "",
+   "visible": true
+  },
+  {
+   "id": null,
+   "cls": "demo",
+   "tag": "BODY",
+   "inDrawer": false,
+   "label": "",
+   "visible": true
+  }
+ ],
+ "xssValid": {
+  "scripts": 2,
+  "imgs": 0,
+  "rowNames": [
+   "<img src=x onerror=\"window.__xss=1\"><script>window.__xss=2</script>",
+   "中文 \"><svg onload=window.__xss=3>"
+  ],
+  "rowAria": [
+   "<img src=x onerror=\"window.__xss=1\"><script>window.__xss=2</script>，50%"
+  ],
+  "keys": [
+   "<img src=x onerror=\"window.__xss=1\"><script>window.__xss=2</script>",
+   "\"><svg onload=window.__xss=3>"
+  ],
+  "toast": "<img src=x onerror=\"window.__xss=1\"><script>window.__xss=2</script>",
+  "heroName": "中文 \"><svg onload=window.__xss=3>",
+  "heroLabel": "主设备：中文 \"><svg onload=window.__xss=3>，7%"
+ },
+ "longNames": {
+  "rowNameScroll": 0,
+  "rowNameClient": 0,
+  "rowTextLen": 300,
+  "rowOverflow": false,
+  "heroOverflow": true,
+  "panelOverflow": true,
+  "listScrollW": 462,
+  "listClientW": 462
+ },
+ "versionErrorFresh": {
+  "sub": "采集器版本与协议不匹配",
+  "live": "版本过期",
+  "bannerHidden": false,
+  "bannerText": "采集器版本过期，请重启采集器",
+  "bannerRole": null,
+  "bannerAriaLive": null,
+  "restartVisible": true,
+  "devices": 5,
+  "before": {
+   "sub": "5 台设备 · 17:07 更新"
+  }
+ },
+ "toastOverlap": {
+  "toastRect": {
+   "l": 317.098876953125,
+   "t": 357.8194885253906,
+   "r": 616.901123046875,
+   "b": 395.1854553222656
+  },
+  "coveredRows": [
+   {
+    "key": "d5",
+    "top": 350.6875
+   }
+  ],
+  "hitTag": null,
+  "heroBefore": "d0",
+  "heroAfter": "d0",
+  "toastGone": false
+ },
+ "btnAllEmpty": {
+  "drawerOpen": true,
+  "devices": 0,
+  "live": "等待设备"
+ },
+ "focusRemoval": {
+  "before": true,
+  "afterTag": "BODY",
+  "afterId": "",
+  "afterCls": "demo"
+ },
+ "heroKeyboardFocus": {
+  "activeId": "hero",
+  "activeTag": "SECTION",
+  "focusVisible": true,
+  "outline": "rgba(169, 204, 255, 0.9) solid 2px",
+  "heroKey": "razer:1532:0099:unit-3",
+  "rowKey": "razer:1532:0099:unit-3"
+ },
+ "runtimeMediaChange": {
+  "before": {
+   "reduced": false,
+   "attr": null,
+   "glow": "glow-layer",
+   "transform": "matrix(1, 0, 0, 1, -1000, -1000)"
+  },
+  "after": {
+   "reduced": false,
+   "attr": null,
+   "media": true,
+   "glow": "glow-layer",
+   "transform": "matrix(1, 0, 0, 1, -1000, -1000)",
+   "rafTicks": 0
+  }
+ },
+ "forcedDark": {
+  "bodyBg": "rgb(255, 255, 255)",
+  "bodyImg": "none",
+  "subColor": "rgb(0, 0, 0)",
+  "panelBg": "rgba(255, 255, 255, 0)"
+ },
+ "consoleErrors": []
+}

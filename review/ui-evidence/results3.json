@@ -1,0 +1,279 @@
+{
+ "baseline": {
+  "panelScroll": [
+   1042,
+   718
+  ],
+  "listScroll": [
+   462,
+   462
+  ],
+  "drawerRect": {
+   "l": 767,
+   "r": 1073,
+   "t": 41,
+   "b": 399,
+   "vis": "hidden",
+   "tr": "matrix(1, 0, 0, 1, 334, 0)"
+  },
+  "overflowing": [
+   {
+    "tag": "DIV",
+    "cls": "banner",
+    "id": "banner",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "SPAN",
+    "cls": "banner-text",
+    "id": "banner-text",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "BUTTON",
+    "cls": "banner-btn",
+    "id": "btn-restart",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "DIV",
+    "cls": "row is-hero",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "DIV",
+    "cls": "ring ring-sm state-low",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "svg",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0
+   },
+   {
+    "tag": "DIV",
+    "cls": "ring-center",
+    "id": "",
+    "l": 0,
+    "r": 0
+   }
+  ]
+ },
+ "forcedAlpha": {
+  "bodyBg": "rgba(255, 255, 255, 0)",
+  "htmlBg": "rgba(255, 255, 255, 0)",
+  "panelBg": "rgba(255, 255, 255, 0)",
+  "canvasSupported": true
+ },
+ "longDetail": {
+  "panelScroll": [
+   1042,
+   718
+  ],
+  "over": [
+   {
+    "tag": "DIV",
+    "cls": "banner",
+    "id": "banner",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": "采集器不可用\n          重启采集器"
+   },
+   {
+    "tag": "SPAN",
+    "cls": "banner-text",
+    "id": "banner-text",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": "采集器不可用"
+   },
+   {
+    "tag": "BUTTON",
+    "cls": "banner-btn",
+    "id": "btn-restart",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": "重启采集器"
+   },
+   {
+    "tag": "DIV",
+    "cls": "row is-hero",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+   },
+   {
+    "tag": "DIV",
+    "cls": "ring ring-sm state-low",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "svg",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "circle",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "DIV",
+    "cls": "ring-center",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "SPAN",
+    "cls": "ring-glyph-wrap",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   },
+   {
+    "tag": "svg",
+    "cls": "[object SVGAnimatedString]",
+    "id": "",
+    "l": 0,
+    "r": 0,
+    "sw": 0,
+    "cw": 0,
+    "text": ""
+   }
+  ],
+  "hero": {
+   "sw": 4603,
+   "cw": 171,
+   "ow": "hidden",
+   "ws": "nowrap"
+  },
+  "heroTitle": {
+   "sw": 194,
+   "cw": 194,
+   "ow": "visible"
+  },
+  "rows": [
+   {
+    "hidden": true,
+    "sw": 0,
+    "cw": 0,
+    "nameSw": 0,
+    "nameCw": 0
+   },
+   {
+    "hidden": false,
+    "sw": 460,
+    "cw": 460,
+    "nameSw": 3264,
+    "nameCw": 334
+   },
+   {
+    "hidden": false,
+    "sw": 460,
+    "cw": 460,
+    "nameSw": 334,
+    "nameCw": 334
+   }
+  ],
+  "heroVisible": 171
+ },
+ "toastClick": {
+  "toastRect": {
+   "t": 357.9,
+   "b": 395.3,
+   "l": 317.2,
+   "r": 616.8
+  },
+  "overlappingVisibleRows": [
+   "t5"
+  ],
+  "hitClass": "toast-text",
+  "hitIsToast": true,
+  "heroBefore": "t0",
+  "heroAfter": "t0",
+  "toastCount": 0,
+  "toastGone": true,
+  "pinnedBefore": false
+ }
+}

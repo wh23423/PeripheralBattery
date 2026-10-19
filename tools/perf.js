@@ -1,6 +1,7 @@
 /* 帧时间采样：空闲 vs 指针持续移动 vs 点击交互
    注意：headless Chromium 走软件渲染（SwiftShader），绝对值偏悲观，
-   这里看的是"不同状态之间的相对差异"。 */
+   这里看的是"不同状态之间的相对差异"。
+   780×440 仅浏览器预览视口；生产窗口 = 面板 720×380（备选 B），不影响相对性能口径。 */
 const { chromium } = require('playwright');
 const path = require('path');
 const { pathToFileURL } = require('url');

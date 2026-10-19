@@ -1,0 +1,53 @@
+{
+  "initial": {
+    "current": "8b0222b5-61b6-4a59-bd69-cfc954219028",
+    "count": 1
+  },
+  "results": [
+    {
+      "check": "桌面1：面板在主窗口可见",
+      "ok": true,
+      "detail": "visible=True on_current=True"
+    },
+    {
+      "check": "桌面1：面板可见（DWM cloak=0）",
+      "ok": true,
+      "detail": "visible=True cloaked=0"
+    },
+    {
+      "check": "创建/切换到临时桌面 2",
+      "ok": true,
+      "detail": "{'current': 'dc350144-36d8-4c4d-9459-b7879f49b3df', 'count': 2}"
+    },
+    {
+      "check": "阳性对照：普通窗口在桌面2 被 DWM cloak（证明检测有效）",
+      "ok": true,
+      "detail": "control=根据审查报告完成修复 — DeepSeek Harness cloaked=2"
+    },
+    {
+      "check": "桌面2：面板可见（未 cloak，符合“面板出现在当前桌面”）",
+      "ok": true,
+      "detail": "cloaked=0"
+    },
+    {
+      "check": "桌面2 前台窗口（记事本）的桌面 ID = 当前桌面",
+      "ok": true,
+      "detail": "hwnd=8653072 desktop=dc350144-36d8-4c4d-9459-b7879f49b3df current=dc350144-36d8-4c4d-9459-b7879f49b3df"
+    },
+    {
+      "check": "桌面2 激活后面板仍可见（DWM cloak=0）",
+      "ok": true,
+      "detail": "cloaked=0"
+    },
+    {
+      "check": "app 日志记录 VD 决策且未 failed",
+      "ok": true,
+      "detail": "2026-10-19 21:32:33.691 [INFO] window virtual desktop reason=single-instance result=moved-to-current desktop_id=DC350144-36D8-4C4D-9459-B7879F49B3DF ours=unknown IsWindowOnCurrentV"
+    },
+    {
+      "check": "恢复用户环境（临时桌面已关闭，桌面数/当前桌面恢复）",
+      "ok": true,
+      "detail": "{'current': '8b0222b5-61b6-4a59-bd69-cfc954219028', 'count': 1}"
+    }
+  ]
+}

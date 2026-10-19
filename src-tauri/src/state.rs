@@ -53,6 +53,9 @@ pub struct AppState {
     pub sidecar: Arc<Sidecar>,
     pub windows11: bool,
     pub windows_build: u32,
+    /// 窗口 acrylic 是否真正启用（A14）：透明效果关闭/远程会话/PB_DISABLE_ACRYLIC=1
+    /// 时为 false，前端据此提高面板底色不透明度，保证无模糊时的对比度。
+    acrylic: AtomicBool,
     pub pb_show_on_start: bool,
     pub pb_hide_after_ms: Option<u64>,
     pb_hide_armed: AtomicBool,
@@ -82,6 +85,9 @@ impl AppState {
             sidecar,
             windows11,
             windows_build,
+            // Win10 一律没有 DWM acrylic：初始即为 false，apply_platform 会按
+            // 透明效果/远程会话/PB_DISABLE_ACRYLIC 再校准 Win11 的情况。
+            acrylic: AtomicBool::new(windows11),
             pb_show_on_start: env_flag("PB_SHOW_ON_START"),
             pb_hide_after_ms: env_ms("PB_HIDE_AFTER_MS"),
             pb_hide_armed: AtomicBool::new(false),
@@ -98,6 +104,15 @@ impl AppState {
 
     pub fn set_window_visible(&self, visible: bool) {
         self.window_visible.store(visible, Ordering::SeqCst);
+    }
+
+    /// acrylic 是否启用（A14）。windowEffects 不可用时为 false。
+    pub fn acrylic(&self) -> bool {
+        self.acrylic.load(Ordering::SeqCst)
+    }
+
+    pub fn set_acrylic(&self, enabled: bool) {
+        self.acrylic.store(enabled, Ordering::SeqCst);
     }
 
     pub fn mark_ui_ready(&self) {
@@ -192,6 +207,9 @@ impl AppState {
     pub fn app_state_payload(&self) -> serde_json::Value {
         json!({
             "pinned": self.pinned(),
+            // A14：acrylic 不可用（透明效果关闭/远程会话/PB_DISABLE_ACRYLIC=1）时为 false，
+            // 前端可据此把面板底色调实（html[data-acrylic="off"]）。
+            "acrylic": self.acrylic(),
             "platform": {
                 "windows11": self.windows11,
                 "build": self.windows_build,

@@ -9,6 +9,11 @@ that instant look gone. So:
   merged, diffed or emitted until the last one has reported;
 * ``gone`` is decided only by the global 1 Hz tick, only from
   ``now - last_seen > max(2 * TTL, 10 s)`` - never from a "missing rounds" count;
+* a tick gap far longer than the scheduler period means the machine slept:
+  Windows' ``time.monotonic()`` is ``GetTickCount64`` and includes suspend time,
+  so the first tick after resume would otherwise expire every device at once.
+  That tick suppresses the expiry pass, re-anchors every ``last_seen`` to now
+  and emits no gone/device event (P1-10, resume);
 * the three upstream merge helpers run only on the gated complete snapshot;
 * ``device`` is emitted only on a semantic change (level/charging/online/name/
   approx/left_s/kind/transport/via), plus once more with ``replaces`` when the
@@ -35,6 +40,14 @@ KEYBOARD_WORDS = ("keychron", "lofree", "keyboard")
 
 MIN_GONE_AGE = 10.0          # protocol.md §4.2: max(2 * TTL, 10 s)
 RECENT_GONE_WINDOW = 60.0    # a key gone this recently may still be morphed
+
+# Resume detection (P1-10). The scheduler calls on_tick() at tick_hz (1 Hz by
+# default), so a normal gap is ~1 s. A gap above max(5 s, 3 periods) can only be
+# a suspended monotonic clock (sleep / Modern Standby) - CPython's monotonic is
+# GetTickCount64 on Windows and counts suspend time. Do not use the 30 s full
+# tick cadence for this: it would miss a 60 s sleep.
+MIN_CLOCK_JUMP = 5.0
+CLOCK_JUMP_FACTOR = 3.0
 
 
 def normalize_kind(status: DeviceStatus) -> str:
@@ -153,6 +166,17 @@ class StateStore:
         self._tick_requested = False
         self._last_tick = 0.0
         self._tick_interval = float(getattr(settings, "tick_interval", 30.0) or 30.0)
+        # Expected on_tick() cadence (Collector's scheduler: 1 / tick_hz, default
+        # 1 s) and the gap above which the monotonic clock must have jumped.
+        try:
+            tick_hz = float(getattr(settings, "tick_hz", 1.0) or 1.0)
+        except (TypeError, ValueError):
+            tick_hz = 1.0
+        self._tick_period = 1.0 / max(0.2, tick_hz)
+        self._clock_jump_threshold = max(MIN_CLOCK_JUMP,
+                                         CLOCK_JUMP_FACTOR * self._tick_period)
+        self._last_clock: Optional[float] = None   # monotonic clock of the last tick
+        self._clock_jumps = 0
         self._gone_count = 0
         self._device_events = 0
         self._tick_events = 0
@@ -193,7 +217,20 @@ class StateStore:
         with self._lock:
             return {"device_events": self._device_events,
                     "tick_events": self._tick_events,
-                    "gone": self._gone_count}
+                    "gone": self._gone_count,
+                    "clock_jumps": self._clock_jumps}
+
+    @property
+    def clock_jumps(self) -> int:
+        """How many suspend/resume clock jumps suppressed an expiry pass (P1-10)."""
+        with self._lock:
+            return self._clock_jumps
+
+    @property
+    def clock_jump_threshold(self) -> float:
+        """Gap between two ticks above which a resume is assumed (seconds)."""
+        with self._lock:
+            return self._clock_jump_threshold
 
     def set_in_flight(self, providers: Iterable[str]) -> None:
         """Providers currently polling: their devices cannot be called gone while
@@ -431,6 +468,24 @@ class StateStore:
                 self._emit_tick()
                 return
             now = self._clock()
+            previous = self._last_clock
+            self._last_clock = now
+            if previous is not None and now - previous > self._clock_jump_threshold:
+                # Suspend/resume (P1-10): time.monotonic() includes the sleep on
+                # Windows, so without this branch the first tick after wake sees
+                # every device older than max(2*TTL, 10 s) and emits a gone storm
+                # followed by a re-add storm. Skip this expiry pass and re-anchor
+                # every last_seen marker to now: no gone and no device event is
+                # produced by the resume itself. The next poll round decides.
+                self._clock_jumps += 1
+                log.info("clock jump detected resume_s=%.1f, suppressing expire "
+                         "(%d device(s) re-anchored to now)",
+                         now - previous, len(self._last_seen))
+                for key in self._last_seen:
+                    self._last_seen[key] = now
+                if self._tick_requested or now - self._last_tick >= self._tick_interval:
+                    self._emit_tick()
+                return
             self._expire(now)
             if self._tick_requested or now - self._last_tick >= self._tick_interval:
                 self._emit_tick()

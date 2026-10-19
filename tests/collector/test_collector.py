@@ -212,8 +212,11 @@ def test_stuck_provider_is_reaped_and_its_device_can_expire(tmp_path):
         assert h.state._in_flight == set()          # device no longer protected
         assert collector.stat_payload()["logitech"]["timeouts"] == 1
 
-        h.clock.advance(200.0)                      # > max(2*TTL,10)
-        h.state.on_tick()
+        # > max(2*TTL, 10) with TTL=60; tick at 1 Hz like production so the
+        # resume detector does not mistake the jump for a sleep/wake (P1-10)
+        for _ in range(121):
+            h.clock.advance(1.0)
+            h.state.on_tick()
         assert "logitech:046d:c547:u1" in {m["key"] for m in h.sink.by_type("gone")}
     finally:
         _close(h, collector, old_pool)

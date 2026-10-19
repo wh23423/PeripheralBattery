@@ -1,0 +1,13 @@
+{
+  "exe": "D:\\desktop\\电量显示插件\\src-tauri\\target\\release\\peripheral-battery.exe",
+  "exe_sha256": "4FA9142DC3DF2B45FBF0ADE78F4FA8C78550F99BFDD2264DCFF4216F98B37657",
+  "exe_mtime": "2026-10-19T21:33:41.6318638+08:00",
+  "started_at": "2026-10-19T21:33:48.2229293+08:00",
+  "elapsed_s": 133.2,
+  "visible_total": 20,
+  "visible_ok": 20,
+  "hidden_total": 5,
+  "hidden_ok": 5,
+  "hangs": 0,
+  "failures": []
+}

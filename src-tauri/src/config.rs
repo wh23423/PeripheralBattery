@@ -72,7 +72,7 @@ impl AppConfig {
             fs::create_dir_all(parent)?;
         }
         let text = serde_json::to_string_pretty(self)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+            .map_err(std::io::Error::other)?;
         let tmp = path.with_extension("json.tmp");
         {
             let mut f = fs::File::create(&tmp)?;

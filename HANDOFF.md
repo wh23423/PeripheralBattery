@@ -80,7 +80,7 @@ M0 的验收标准：**24 小时内不出现非物理原因的 key 变化，不�
 
 ## 4. 五条不可违反的约束（来自对抗性审查，违反必返工）
 
-1. **窗口 780×440**，面板 720×380。窗口等于面板会裁掉阴影、露出方角 acrylic。
+1. **窗口 720×380 = 面板尺寸**（v0.1.1 起，备选 B；原 780×440+30px 安全边方案因 acrylic 整窗填充在降级环境出现灰框而废弃，SetWindowRgn 又与 acrylic 冲突）。面板圆角 12px，acrylic 只覆盖面板；Win10/透明效果关闭走 CSS 实底。
 2. **生产环境删掉所有 CSS `backdrop-filter`**。透明窗口下它模糊的是"透明"，成本照付；毛玻璃交给窗口 acrylic。
 3. **设备 key 不能沿用上游**。PS 手柄插第二只同型号 key 会变，XInput 用槽位，Keychron/HyperX 等用 PID——同型号两台会合并。
 4. **`externalBin` 不能带 PyInstaller 的 `_internal`**。用 `bundle.resources`，从 `resource_dir()` 启动。

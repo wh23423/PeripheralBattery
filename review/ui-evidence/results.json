@@ -1,0 +1,868 @@
+{
+ "dpi": {
+  "dsf1": {
+   "panel": {
+    "x": 30,
+    "y": 30,
+    "w": 720,
+    "h": 380
+   },
+   "hero": {
+    "x": 51,
+    "y": 51,
+    "w": 196,
+    "h": 338
+   },
+   "controls": {
+    "x": 558,
+    "y": 45,
+    "w": 177,
+    "h": 40
+   },
+   "list": {
+    "x": 267,
+    "y": 118.6875,
+    "w": 462,
+    "h": 230.3125
+   },
+   "foot": {
+    "x": 267,
+    "y": 349,
+    "w": 462,
+    "h": 40
+   },
+   "dpr": 1,
+   "inner": [
+    780,
+    440
+   ],
+   "docScroll": [
+    780,
+    440
+   ],
+   "bodyScroll": [
+    780,
+    440
+   ],
+   "clipped": [
+    {
+     "cls": "",
+     "id": "",
+     "sw": 106,
+     "cw": 106,
+     "text": "外设电量"
+    },
+    {
+     "cls": "all-btn",
+     "id": "btn-all",
+     "sw": 93,
+     "cw": 84,
+     "text": "全部设备"
+    }
+   ],
+   "fontSizes": {
+    "13.3333px": 24,
+    "44px": 2,
+    "17px": 2,
+    "11px": 50,
+    "27px": 1,
+    "12.5px": 1,
+    "11.5px": 21,
+    "13.5px": 5,
+    "13px": 19,
+    "12px": 7,
+    "10.5px": 1
+   },
+   "rowCount": 4,
+   "textProbe": {
+    "h1Before": "27px",
+    "h1After": "27px",
+    "rowName": "13.5px",
+    "rootFont": "32px"
+   },
+   "panelDevicePx": {
+    "x": 30,
+    "y": 30,
+    "w": 720,
+    "h": 380
+   },
+   "panelDeviceFrac": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   }
+  },
+  "dsf1.25": {
+   "panel": {
+    "x": 30,
+    "y": 30,
+    "w": 720,
+    "h": 380
+   },
+   "hero": {
+    "x": 51,
+    "y": 51,
+    "w": 196,
+    "h": 338
+   },
+   "controls": {
+    "x": 558,
+    "y": 45,
+    "w": 177,
+    "h": 40
+   },
+   "list": {
+    "x": 267,
+    "y": 118.6875,
+    "w": 462,
+    "h": 230.3125
+   },
+   "foot": {
+    "x": 267,
+    "y": 349,
+    "w": 462,
+    "h": 40
+   },
+   "dpr": 1.25,
+   "inner": [
+    780,
+    440
+   ],
+   "docScroll": [
+    780,
+    440
+   ],
+   "bodyScroll": [
+    780,
+    440
+   ],
+   "clipped": [
+    {
+     "cls": "",
+     "id": "",
+     "sw": 106,
+     "cw": 106,
+     "text": "外设电量"
+    },
+    {
+     "cls": "all-btn",
+     "id": "btn-all",
+     "sw": 93,
+     "cw": 84,
+     "text": "全部设备"
+    }
+   ],
+   "fontSizes": {
+    "13.3333px": 24,
+    "44px": 2,
+    "17px": 2,
+    "11px": 50,
+    "27px": 1,
+    "12.5px": 1,
+    "11.5px": 21,
+    "13.5px": 5,
+    "13px": 19,
+    "12px": 7,
+    "10.5px": 1
+   },
+   "rowCount": 4,
+   "textProbe": {
+    "h1Before": "27px",
+    "h1After": "27px",
+    "rowName": "13.5px",
+    "rootFont": "32px"
+   },
+   "panelDevicePx": {
+    "x": 37.5,
+    "y": 37.5,
+    "w": 900,
+    "h": 475
+   },
+   "panelDeviceFrac": {
+    "x": -0.5,
+    "y": -0.5,
+    "w": 0,
+    "h": 0
+   }
+  },
+  "dsf1.5": {
+   "panel": {
+    "x": 30,
+    "y": 30,
+    "w": 720,
+    "h": 380
+   },
+   "hero": {
+    "x": 51,
+    "y": 51,
+    "w": 196,
+    "h": 338
+   },
+   "controls": {
+    "x": 558,
+    "y": 45,
+    "w": 177,
+    "h": 40
+   },
+   "list": {
+    "x": 267,
+    "y": 118.6875,
+    "w": 462,
+    "h": 230.3125
+   },
+   "foot": {
+    "x": 267,
+    "y": 349,
+    "w": 462,
+    "h": 40
+   },
+   "dpr": 1.5,
+   "inner": [
+    780,
+    440
+   ],
+   "docScroll": [
+    780,
+    440
+   ],
+   "bodyScroll": [
+    780,
+    440
+   ],
+   "clipped": [
+    {
+     "cls": "",
+     "id": "",
+     "sw": 106,
+     "cw": 106,
+     "text": "外设电量"
+    },
+    {
+     "cls": "all-btn",
+     "id": "btn-all",
+     "sw": 93,
+     "cw": 84,
+     "text": "全部设备"
+    }
+   ],
+   "fontSizes": {
+    "13.3333px": 24,
+    "44px": 2,
+    "17px": 2,
+    "11px": 50,
+    "27px": 1,
+    "12.5px": 1,
+    "11.5px": 21,
+    "13.5px": 5,
+    "13px": 19,
+    "12px": 7,
+    "10.5px": 1
+   },
+   "rowCount": 4,
+   "textProbe": {
+    "h1Before": "27px",
+    "h1After": "27px",
+    "rowName": "13.5px",
+    "rootFont": "32px"
+   },
+   "panelDevicePx": {
+    "x": 45,
+    "y": 45,
+    "w": 1080,
+    "h": 570
+   },
+   "panelDeviceFrac": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   }
+  },
+  "dsf2": {
+   "panel": {
+    "x": 30,
+    "y": 30,
+    "w": 720,
+    "h": 380
+   },
+   "hero": {
+    "x": 51,
+    "y": 51,
+    "w": 196,
+    "h": 338
+   },
+   "controls": {
+    "x": 558,
+    "y": 45,
+    "w": 177,
+    "h": 40
+   },
+   "list": {
+    "x": 267,
+    "y": 118.6875,
+    "w": 462,
+    "h": 230.3125
+   },
+   "foot": {
+    "x": 267,
+    "y": 349,
+    "w": 462,
+    "h": 40
+   },
+   "dpr": 2,
+   "inner": [
+    780,
+    440
+   ],
+   "docScroll": [
+    780,
+    440
+   ],
+   "bodyScroll": [
+    780,
+    440
+   ],
+   "clipped": [
+    {
+     "cls": "",
+     "id": "",
+     "sw": 106,
+     "cw": 106,
+     "text": "外设电量"
+    },
+    {
+     "cls": "all-btn",
+     "id": "btn-all",
+     "sw": 93,
+     "cw": 84,
+     "text": "全部设备"
+    }
+   ],
+   "fontSizes": {
+    "13.3333px": 24,
+    "44px": 2,
+    "17px": 2,
+    "11px": 50,
+    "27px": 1,
+    "12.5px": 1,
+    "11.5px": 21,
+    "13.5px": 5,
+    "13px": 19,
+    "12px": 7,
+    "10.5px": 1
+   },
+   "rowCount": 4,
+   "textProbe": {
+    "h1Before": "27px",
+    "h1After": "27px",
+    "rowName": "13.5px",
+    "rootFont": "32px"
+   },
+   "panelDevicePx": {
+    "x": 60,
+    "y": 60,
+    "w": 1440,
+    "h": 760
+   },
+   "panelDeviceFrac": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   }
+  }
+ },
+ "forcedColors": {
+  "forced": true,
+  "reducedTransparency": false,
+  "contrastMore": false,
+  "panelBg": "rgba(255, 255, 255, 0)",
+  "panelBgImage": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' he",
+  "panelBoxShadow": "none",
+  "rings": [
+   {
+    "cls": "ring ring-lg state-low",
+    "stroke": "rgb(255, 92, 108)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   },
+   {
+    "cls": "ring ring-sm state-low",
+    "stroke": "rgb(255, 92, 108)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   },
+   {
+    "cls": "ring ring-sm state-charging",
+    "stroke": "rgb(61, 220, 151)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   },
+   {
+    "cls": "ring ring-sm state-normal",
+    "stroke": "rgb(219, 233, 255)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   },
+   {
+    "cls": "ring ring-sm state-unknown",
+    "stroke": "rgba(0, 0, 0, 0)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   },
+   {
+    "cls": "ring ring-sm state-normal",
+    "stroke": "rgb(219, 233, 255)",
+    "track": "rgba(255, 255, 255, 0.14)"
+   }
+  ],
+  "uniqueStrokeCount": 4,
+  "uniqueStrokes": [
+   "rgb(255, 92, 108)",
+   "rgb(61, 220, 151)",
+   "rgb(219, 233, 255)",
+   "rgba(0, 0, 0, 0)"
+  ],
+  "ctrlPinBg": "rgb(255, 255, 255)",
+  "ctrlPinColor": "rgb(0, 0, 0)",
+  "alertTagColor": "rgb(0, 0, 0)",
+  "alertTagBg": "rgba(255, 255, 255, 0.18)",
+  "toastBg": "rgba(255, 255, 255, 0.9)",
+  "toastBorder": "rgb(0, 0, 0)",
+  "subtitleColor": "rgb(0, 0, 0)",
+  "checkboxAccent": "auto",
+  "selectionSupported": true
+ },
+ "reducedMotion": {
+  "before": {
+   "rafTicks": 0,
+   "anims": 0
+  },
+  "after": {
+   "reduced": true,
+   "media": true,
+   "dataAttr": "true",
+   "anims": [],
+   "pseudoDur": "1e-06s",
+   "rowDur": "1e-06s",
+   "specularTransform": "matrix(1, 0, 0, 1, -1000, -1000)",
+   "rafActive": false,
+   "rafTicks": 0,
+   "rippleChildren": 0
+  },
+  "afterClick": {
+   "rippleChildren": 0,
+   "lastPin": true
+  }
+ },
+ "reducedTransparency": {
+  "base": {
+   "matched": false,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  "emulated": {
+   "matched": true,
+   "bg": "rgb(11, 24, 52)"
+  }
+ },
+ "prefersContrast": {
+  "base": {
+   "sub": {
+    "color": "rgba(255, 255, 255, 0.78)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.78)"
+   },
+   "hint": {
+    "color": "rgba(255, 255, 255, 0.78)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.78)"
+   },
+   "btn": {
+    "color": "rgb(234, 243, 255)",
+    "bg": "rgba(90, 140, 230, 0.22)",
+    "border": "rgba(188, 216, 255, 0.5)"
+   },
+   "row": {
+    "color": "rgb(255, 255, 255)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.13)"
+   }
+  },
+  "after": {
+   "matched": true,
+   "sub": {
+    "color": "rgba(255, 255, 255, 0.78)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.78)"
+   },
+   "hint": {
+    "color": "rgba(255, 255, 255, 0.78)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.78)"
+   },
+   "btn": {
+    "color": "rgb(234, 243, 255)",
+    "bg": "rgba(90, 140, 230, 0.22)",
+    "border": "rgba(188, 216, 255, 0.5)"
+   },
+   "row": {
+    "color": "rgb(255, 255, 255)",
+    "bg": "rgba(0, 0, 0, 0)",
+    "border": "rgba(255, 255, 255, 0.13)"
+   }
+  }
+ },
+ "a11y": {
+  "tabSummary": [
+   "row",
+   "row",
+   "btn-all",
+   "demo",
+   "btn-refresh",
+   "btn-pin",
+   "btn-settings",
+   "btn-min",
+   "btn-close",
+   "row",
+   "row",
+   "row"
+  ],
+  "focusRing": {
+   "row": {
+    "left": 267,
+    "right": 729,
+    "top": 118.6875
+   },
+   "list": {
+    "left": 267,
+    "right": 729,
+    "top": 118.6875
+   },
+   "outlineWidth": "2px",
+   "outlineOffset": "2px",
+   "outlineStyle": "solid",
+   "focusVisible": true,
+   "listOverflow": "hidden auto"
+  },
+  "toolbarAfterArrow": "btn-refresh",
+  "drawerOpen": {
+   "open": true,
+   "ariaHidden": "false",
+   "inert": false,
+   "role": null,
+   "ariaModal": null,
+   "active": "set-threshold",
+   "sideInert": false,
+   "scrimHidden": false
+  },
+  "drawerTabCycle": [
+   "set-reduced",
+   "set-pinned",
+   "btn-drawer-close",
+   "set-threshold",
+   "set-reduced",
+   "set-pinned",
+   "btn-drawer-close",
+   "set-threshold",
+   "set-reduced"
+  ],
+  "drawerShiftTab": "set-threshold",
+  "drawerClosed": {
+   "open": false,
+   "ariaHidden": "true",
+   "inert": true,
+   "active": "btn-settings"
+  },
+  "axNodes": [
+   {
+    "role": "region",
+    "name": "主设备：Viper V3 Pro，68%",
+    "ignored": false
+   },
+   {
+    "role": "region",
+    "name": "设备列表",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "刷新",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "固定",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "设置",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "最小化",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "关闭",
+    "ignored": false
+   },
+   {
+    "role": "group",
+    "name": "设备列表",
+    "ignored": false
+   },
+   {
+    "role": "heading",
+    "name": "外设电量",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "Arctis Nova 7，12%",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "Xbox Elite 2，45%，充电中",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "Logi M185，电量未知",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "Arctis 7P，55%",
+    "ignored": false
+   },
+   {
+    "role": "button",
+    "name": "全部设备",
+    "ignored": false
+   }
+  ],
+  "beforeAll": {
+   "active": "btn-settings"
+  },
+  "afterAll": {
+   "active": "row",
+   "isRow": true,
+   "focusVisible": false,
+   "drawerOpen": false
+  },
+  "toastInfo": {
+   "tabIndex": -1,
+   "role": null,
+   "hasKeyHandler": false,
+   "focusable": false,
+   "text": "低电测试"
+  },
+  "liveNoise": {
+   "mutations": 4,
+   "distinctTexts": [
+    "5 台设备 · 17:01 更新"
+   ],
+   "live": "polite"
+  },
+  "escClosed": {
+   "newCalls": [],
+   "hidden": false
+  },
+  "heroLabel1": "主设备：Viper V3 Pro，68%",
+  "heroAfterEmpty": {
+   "label": "主设备：Viper V3 Pro，68%",
+   "name": "等待设备",
+   "emptyVisible": true,
+   "liveText": "等待设备"
+  }
+ },
+ "xss": {
+  "scripts": 2,
+  "imgs": 0,
+  "svgsInRows": 20,
+  "injectedScripts": [
+   "http://127.0.0.1:60188/bridge.js",
+   "http://127.0.0.1:60188/app.js"
+  ],
+  "rowNames": [
+   "Arctis Nova 7",
+   "Xbox Elite 2",
+   "Viper V3 Pro",
+   "Logi M185",
+   "Arctis 7P"
+  ],
+  "rowAria": [
+   "Xbox Elite 2，45%，充电中",
+   "Viper V3 Pro，68%",
+   "Logi M185，电量未知",
+   "Arctis 7P，55%"
+  ],
+  "badEvents": 1,
+  "toastText": "<img src=x onerror=\"window.__xss=1\"><script>window.__xss=2</script>",
+  "datasetKeys": [
+   "logi:046d:c547:unit-12",
+   "xinput:045e:0b00:unit-1",
+   "razer:1532:0099:unit-3",
+   "logi:046d:c092:unit-77",
+   "steelseries:1038:1720:unit-5"
+  ]
+ },
+ "longText": {
+  "rowName": {
+   "scrollWidth": 334,
+   "clientWidth": 334,
+   "textLen": 12
+  },
+  "rowOverflow": false,
+  "hero": {
+   "scrollWidth": 98,
+   "clientWidth": 98
+  },
+  "toast": {
+   "clientWidth": 298,
+   "scrollWidth": 4400,
+   "rect": {
+    "l": 317,
+    "r": 617,
+    "w": 300
+   },
+   "textRect": {
+    "l": 345,
+    "r": 604,
+    "w": 259
+   },
+   "textScroll": 4373,
+   "overflow": true
+  },
+  "panelOverflow": true,
+  "rowCount": 4
+ },
+ "statesEmptyError": {
+  "empty": {
+   "liveText": "等待设备",
+   "subtitle": "未发现设备 · 17:01 更新",
+   "emptyVisible": true,
+   "listHidden": true,
+   "heroLabel": "主设备",
+   "heroName": "等待设备",
+   "bannerHidden": true
+  },
+  "err": {
+   "banner": false,
+   "bannerText": "采集器启动失败：spawn ENOENT",
+   "bannerRole": null,
+   "bannerLive": null,
+   "liveText": "已断开",
+   "subtitle": "采集器已断开 · 17:01"
+  },
+  "afterRestart": {
+   "liveText": "连接中",
+   "calls": [
+    {
+     "cmd": "collector_send",
+     "args": {
+      "line": "{\"t\":\"get\",\"what\":\"snapshot\"}"
+     },
+     "ok": true,
+     "error": null,
+     "at": 1792400516438
+    },
+    {
+     "cmd": "collector_restart",
+     "args": {},
+     "ok": true,
+     "error": null,
+     "at": 1792400518342
+    }
+   ]
+  },
+  "versionErr": {
+   "subtitle": "5 台设备 · 17:01 更新",
+   "bannerText": "采集器版本过期，请重启采集器",
+   "bannerHidden": true,
+   "liveText": "在线"
+  }
+ },
+ "sessionReplay": {
+  "afterB": {
+   "session": "B",
+   "keys": [
+    "b1"
+   ],
+   "hero": "b1"
+  },
+  "afterStale": {
+   "session": "A",
+   "keys": [
+    "a2"
+   ],
+   "hero": "a2",
+   "renders": 10
+  },
+  "afterRecover": {
+   "session": "B",
+   "keys": [
+    "b1"
+   ],
+   "hero": "b1"
+  },
+  "snapCalls": 1
+ },
+ "perf": {
+  "base": {
+   "nodes": 242,
+   "rows": 5,
+   "anims": 2,
+   "rowCreates": 5,
+   "rowRemoves": 0,
+   "heap": 0
+  },
+  "after": {
+   "nodes": 373,
+   "rows": 10,
+   "anims": 9,
+   "rowCreates": 10,
+   "rowRemoves": 0,
+   "toasts": 2,
+   "ripples": 0,
+   "renders": 484,
+   "timers": 2
+  },
+  "afterChurn": {
+   "nodes": 373,
+   "hidden": false,
+   "paused": 0,
+   "timers": 2,
+   "anims": 2
+  },
+  "heapBase": 1391836,
+  "heapAfter": 1530460,
+  "heapDelta": 138624,
+  "nodesDelta": 131
+ },
+ "featureProbes": {
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "reducedTransparency": true,
+  "inert": true,
+  "focusVisible": true,
+  "accentColor": true,
+  "scrollbarWidth": true,
+  "scrollbarColor": true,
+  "maskComposite": true,
+  "backdropFilter": true,
+  "colorMix": true,
+  "has": true,
+  "containerQueries": true,
+  "atProperty": true,
+  "popover": true,
+  "structuredClone": true,
+  "arrayAt": true,
+  "Intl": true,
+  "fonts": {
+   "segoeVariable": true,
+   "yahei": true,
+   "count": 0
+  }
+ },
+ "consoleErrors": []
+}
